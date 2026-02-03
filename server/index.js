@@ -38,6 +38,17 @@ try {
 
     app.use(express.json());
 
+    // API Logging Middleware - For robust production debugging
+    app.use('/api', (req, res, next) => {
+        console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+        if (Object.keys(req.body).length > 0) {
+            const safeBody = { ...req.body };
+            if (safeBody.password) safeBody.password = '***';
+            console.log('API Request Body:', safeBody);
+        }
+        next();
+    });
+
     // DB Health Check Middleware - Stop crashes before they reach routes
     app.use('/api', (req, res, next) => {
         try {
@@ -241,6 +252,17 @@ try {
     });
 
     console.log('CaltransBizConnect: All components initialized successfully.');
+
+    // GLOBAL API ERROR HANDLER - Ensures all /api requests return JSON
+    app.use('/api', (err, req, res, next) => {
+        console.error('CaltransBizConnect: Unhandled API Error:', err);
+        res.status(err.status || 500).json({
+            success: false,
+            error: 'Server Error',
+            message: err.message || 'An unexpected error occurred',
+            debug: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
+    });
 
     // Final port binding logic for shared hosting environment
     if (process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO) {

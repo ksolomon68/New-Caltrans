@@ -75,8 +75,8 @@ async function login(email, password) {
 
         const data = await safeParseJson(response);
 
-        if (!response.ok) {
-            let errorMsg = data.error || `Server Error (${response.status})`;
+        if (!response.ok || data.success === false) {
+            let errorMsg = data.message || data.error || `Server Error (${response.status})`;
             if (data.details) errorMsg += `: ${data.details}`;
             if (data.hint) errorMsg += `\n\nHint: ${data.hint}`;
 
@@ -85,9 +85,10 @@ async function login(email, password) {
             throw error;
         }
 
-        localStorage.setItem('caltrans_user', JSON.stringify(data));
-        console.log('CaltransBizConnect: User logged in:', data.email);
-        return data;
+        const userData = data.user || data; // Handle both nested and flat for safety
+        localStorage.setItem('caltrans_user', JSON.stringify(userData));
+        console.log('CaltransBizConnect: User logged in:', userData.email);
+        return userData;
     } catch (error) {
         console.error('CaltransBizConnect Login error detail:', error);
 
@@ -119,12 +120,13 @@ async function registerVendor(formData) {
             body: JSON.stringify({ ...formData, type: 'vendor' })
         });
 
-        if (!response.ok) {
-            const error = await safeParseJson(response);
-            throw new Error(error.error || 'Registration failed');
+        const data = await safeParseJson(response);
+
+        if (!response.ok || data.success === false) {
+            throw new Error(data.message || data.error || 'Registration failed');
         }
 
-        const user = await response.json();
+        const user = data.user || data;
         localStorage.setItem('caltrans_user', JSON.stringify(user));
         console.log('CaltransBizConnect: Vendor registered:', user.businessName || user.email);
         return user;
@@ -154,12 +156,13 @@ async function registerAgency(formData) {
             body: JSON.stringify({ ...formData, type: 'agency' })
         });
 
-        if (!response.ok) {
-            const error = await safeParseJson(response);
-            throw new Error(error.error || 'Registration failed');
+        const data = await safeParseJson(response);
+
+        if (!response.ok || data.success === false) {
+            throw new Error(data.message || data.error || 'Registration failed');
         }
 
-        const user = await response.json();
+        const user = data.user || data;
         localStorage.setItem('caltrans_user', JSON.stringify(user));
         console.log('CaltransBizConnect: Agency registered:', user.organizationName || user.email);
         return user;
