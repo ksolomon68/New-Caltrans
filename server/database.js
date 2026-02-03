@@ -4,26 +4,45 @@ const fs = require('fs');
 
 const dbPath = path.resolve(__dirname, '../data.db');
 let db;
+let lastError = null;
 
 try {
-    console.log(`CaltransBizConnect DB: Opening database at ${dbPath}`);
-    db = new Database(dbPath, { verbose: console.log });
+    console.log(`CaltransBizConnect DB: Attempting to open database at ${dbPath}`);
+    db = new Database(dbPath, { timeout: 5000 });
+    console.log('CaltransBizConnect DB: Successfully connected to SQLite');
 } catch (err) {
-    console.error('CaltransBizConnect DB FATAL ERROR: Failed to open database file.', err);
-    // Continue without crashing, allowing the app to show helpful errors instead of 503
+    lastError = err;
+    console.error('CaltransBizConnect DB FATAL ERROR: Failed to init Database.', err);
+}
+
+/**
+ * Safely access the database instance.
+ * Throws a descriptive error if the database is not available.
+ */
+function getDb() {
+    if (db) return db;
+
+    let errorMsg = 'Database connection is not available.';
+    if (lastError) {
+        errorMsg += ` Detail: ${lastError.message}`;
+        if (lastError.code === 'MODULE_NOT_FOUND') {
+            errorMsg += ' (The better-sqlite3 module may not be correctly installed in the production environment).';
+        }
+    }
+
+    const error = new Error(errorMsg);
+    error.status = 500;
+    throw error;
 }
 
 // Initialize database schema
 function initDatabase() {
-    if (!db) {
-        console.error('CaltransBizConnect DB: initDatabase called but db is not initialized.');
-        return;
-    }
-
     try {
+        const database = getDb();
         console.log('CaltransBizConnect DB: Initializing schema...');
+
         // Users table
-        db.exec(`
+        database.exec(`
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT UNIQUE NOT NULL,
@@ -44,7 +63,7 @@ function initDatabase() {
         `);
 
         // Opportunities table
-        db.exec(`
+        database.exec(`
             CREATE TABLE IF NOT EXISTS opportunities (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -66,7 +85,7 @@ function initDatabase() {
         `);
 
         // Applications table
-        db.exec(`
+        database.exec(`
             CREATE TABLE IF NOT EXISTS applications (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 opportunity_id TEXT NOT NULL,
@@ -81,10 +100,10 @@ function initDatabase() {
         `);
 
         // Seed data for initial deployment
-        const count = db.prepare('SELECT COUNT(*) as count FROM opportunities').get().count;
+        const count = database.prepare('SELECT COUNT(*) as count FROM opportunities').get().count;
         if (count === 0) {
             console.log('CaltransBizConnect DB: Seeding initial opportunities...');
-            const seedStmt = db.prepare(`
+            const seedStmt = database.prepare(`
                 INSERT INTO opportunities (
                     id, title, scope_summary, district, district_name, 
                     category, category_name, subcategory, estimated_value, 
@@ -129,12 +148,11 @@ function initDatabase() {
         }
 
         // Migration logic for new columns
-        const columns = db.prepare("PRAGMA table_info(users)").all();
         const addColumn = (table, col, def) => {
-            const currentCols = db.prepare(`PRAGMA table_info(${table})`).all();
+            const currentCols = database.prepare(`PRAGMA table_info(${table})`).all();
             if (!currentCols.some(c => c.name === col)) {
                 console.log(`CaltransBizConnect DB Migration: Adding ${col} to ${table}...`);
-                db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+                database.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
             }
         };
 
@@ -159,7 +177,7 @@ function initDatabase() {
         addColumn('opportunities', 'experience', "TEXT");
 
         // Additional Tables
-        db.exec(`
+        database.exec(`
             CREATE TABLE IF NOT EXISTS saved_opportunities (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 vendor_id INTEGER NOT NULL,
@@ -171,7 +189,7 @@ function initDatabase() {
             )
         `);
 
-        db.exec(`
+        database.exec(`
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 sender_id INTEGER NOT NULL,
@@ -194,6 +212,8 @@ function initDatabase() {
 }
 
 module.exports = {
-    db,
-    initDatabase
+    getDb,
+    initDatabase,
+    get lastError() { return lastError; },
+    get db() { return db; } // Keep for backward compatibility where it might still be used
 };

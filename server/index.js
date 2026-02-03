@@ -38,6 +38,22 @@ try {
 
     app.use(express.json());
 
+    // DB Health Check Middleware - Stop crashes before they reach routes
+    app.use('/api', (req, res, next) => {
+        try {
+            const { getDb } = require('./database');
+            getDb(); // This will throw if DB is not available
+            next();
+        } catch (err) {
+            console.error('CaltransBizConnect: API Request failed - DB Unavailable:', err.message);
+            res.status(503).json({
+                error: 'Database Connection Error',
+                details: err.message,
+                hint: 'The server is running but cannot connect to its data storage. This is often due to missing native dependencies in the production environment.'
+            });
+        }
+    });
+
     // Clean Routing for Opportunities (Details Page)
     app.get('/opportunities/:id', (req, res) => {
         if (req.params.id.includes('.')) {
