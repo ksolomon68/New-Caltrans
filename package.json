@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node server/index.js",
+    "build": "echo 'No build step required - server handles its own dependencies'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
