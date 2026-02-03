@@ -150,6 +150,49 @@ try {
     app.use('/api/vendors', require('./routes/users'));
     app.use('/api/messages', require('./routes/messages'));
 
+    // EMERGENCY SEED ENDPOINT - Allows user to fix production DB without terminal access
+    // This can be triggered by visiting https://caltransbizconnect.org/api/emergency-seed-sync
+    app.get('/api/emergency-seed-sync', async (req, res) => {
+        try {
+            console.log('CaltransBizConnect: Triggering emergency database seeding...');
+            const Database = require('better-sqlite3');
+            const bcrypt = require('bcryptjs');
+            const { db } = require('./database');
+
+            const users = [
+                { email: 'ks@evobrand.net', password: 'Shadow01!', type: 'admin', name: 'Caltrans Admin' },
+                { email: 'ksolomon68@gmail.com', password: 'Shadow01!', type: 'agency', name: 'K Solomon' }
+            ];
+
+            const results = [];
+            for (const u of users) {
+                const hash = await bcrypt.hash(u.password, 10);
+                const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(u.email);
+
+                if (exists) {
+                    db.prepare('UPDATE users SET password_hash = ?, type = ?, status = ? WHERE email = ?')
+                        .run(hash, u.type, 'active', u.email);
+                    results.push(`Updated ${u.email}`);
+                } else {
+                    db.prepare('INSERT INTO users (email, password_hash, type, business_name, organization_name, status) VALUES (?, ?, ?, ?, ?, ?)')
+                        .run(u.email, hash, u.type, u.type === 'vendor' ? u.name : null, u.type === 'agency' ? u.name : null, 'active');
+                    results.push(`Created ${u.email}`);
+                }
+            }
+
+            res.send(`
+                <h1>Emergency Sync Successful</h1>
+                <p>The following users have been created or updated in the production database:</p>
+                <ul>${results.map(r => `<li>${r}</li>`).join('')}</ul>
+                <p><strong>Security Note:</strong> Please remove this code from server/index.js after verification.</p>
+                <p><a href="/login.html">Return to Login</a></p>
+            `);
+        } catch (e) {
+            console.error('Emergency seed failed:', e);
+            res.status(500).send(`Emergency sync failed: ${e.message}`);
+        }
+    });
+
     // File Upload Route
     app.post('/api/upload-cs', upload.single('file'), (req, res) => {
         if (!req.file) return res.status(400).json({ error: 'No file uploaded' });

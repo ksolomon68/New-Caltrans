@@ -57,10 +57,14 @@ router.post('/login', async (req, res) => {
 
     try {
         const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+        const match = user ? await bcrypt.compare(password, user.password_hash) : false;
 
-        if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-            console.warn(`CaltransBizConnect Auth: Login failed for ${email} - invalid credentials`);
-            return res.status(401).json({ error: 'Invalid email or password' });
+        if (!user || !match) {
+            console.warn(`CaltransBizConnect Auth Check: userFound=${!!user}, passwordMatch=${match} for ${email}`);
+            return res.status(401).json({
+                error: 'Invalid email or password',
+                debug: { found: !!user, match: match } // Temporary debug info
+            });
         }
 
         console.log(`CaltransBizConnect Auth: Login successful for ${email}`);

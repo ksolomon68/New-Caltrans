@@ -79,7 +79,10 @@ async function login(email, password) {
             let errorMsg = data.error || `Server Error (${response.status})`;
             if (data.details) errorMsg += `: ${data.details}`;
             if (data.hint) errorMsg += `\n\nHint: ${data.hint}`;
-            throw new Error(errorMsg);
+
+            const error = new Error(errorMsg);
+            if (data.debug) error.debug = data.debug;
+            throw error;
         }
 
         localStorage.setItem('caltrans_user', JSON.stringify(data));
@@ -214,7 +217,13 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 login(email, password)
                     .then(user => redirectToDashboard(user))
-                    .catch(error => showErrorMessage(error.message, loginForm.parentElement));
+                    .catch(error => {
+                        let msg = error.message;
+                        if (error.debug) {
+                            msg += ` (Debug: found=${error.debug.found}, match=${error.debug.match})`;
+                        }
+                        showErrorMessage(msg, loginForm.parentElement);
+                    });
             } catch (error) {
                 showErrorMessage('Invalid email or password. Please try again.', loginForm.parentElement);
             }
