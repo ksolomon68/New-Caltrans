@@ -51,8 +51,8 @@ async function safeParseJson(response) {
                 return { error: `Endpoint not found (404). Check API_URL: ${API_URL}` };
             }
 
-            if (text.includes("It works!") || text.includes("<!DOCTYPE html>")) {
-                return { error: `Server misconfiguration: API returned a static page instead of JSON. (Status: ${response.status})` };
+            if (text.includes("503 Service Unavailable") || text.includes("It works!") || text.includes("<!DOCTYPE html>")) {
+                return { error: `Server API is currently unavailable or returning a static page. (Status: ${response.status})` };
             }
 
             return { error: text.substring(0, 100) || 'Server returned an invalid response.' };
@@ -67,7 +67,10 @@ async function safeParseJson(response) {
 async function login(email, password) {
     console.log('CaltransBizConnect: Attempting login for:', email);
     try {
-        const response = await fetch(`${API_URL}/auth/login`, {
+        const finalUrl = `${API_URL}/auth/login`;
+        console.log('CaltransBizConnect: Fetching URL:', finalUrl);
+
+        const response = await fetch(finalUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
