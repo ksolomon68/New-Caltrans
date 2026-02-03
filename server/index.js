@@ -196,7 +196,7 @@ try {
             const allEmails = db ? db.prepare('SELECT email FROM users LIMIT 10').all().map(u => u.email).join(', ') : 'None';
 
             res.send(`
-                <h1 style="color: #005A8C;">Emergency Sync Tool v2</h1>
+                <h1 style="color: #005A8C;">Emergency Sync Tool v3 (Fresh Start)</h1>
                 <p><strong>Database Path:</strong> ${dbFilePath}</p>
                 <p><strong>Operations performed:</strong></p>
                 <ul>${results.map(r => `<li>${r}</li>`).join('')}</ul>
