@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Contact CaltransBizConnect for support, questions, or assistance with the platform.">
+    <title>Contact Us - CaltransBizConnect</title>
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="site-header" role="banner">
+        <div class="container">
+            <a href="index.html" class="site-logo">
+                <img src="images/caltrans-logo.png" alt="Caltrans">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span></button>
+            <nav class="main-nav" role="navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="for-vendors.html">For Vendors</a></li>
+                    <li><a href="for-agencies.html">For Agencies</a></li>
+                    <li><a href="opportunities.html">Opportunities</a></li>
+                    <li><a href="how-it-works.html">How It Works</a></li>
+                    <li><a href="resources.html">Resources</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html" class="active">Contact</a></li>
+                    <li><a href="login.html" class="btn btn-secondary btn-small">Log In</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <section class="container" style="padding: var(--space-2xl) var(--container-padding) var(--space-4xl);">
+            <h1 class="mb-md">Contact Us</h1>
+            <p class="mb-xl text-muted">Have questions or need assistance? We are here to help. Choose the best way to
+                reach us below.</p>
+
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-2xl); margin-bottom: var(--space-4xl);">
+                <!-- Contact Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Program Contact</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-md"><strong>Small Business Enterprise Supportive Services</strong></p>
+                        <p class="mb-sm"><strong>Phone:</strong> (916) 324-1700</p>
+                        <p class="mb-sm"><strong>Email:</strong> SBEss@dot.ca.gov</p>
+                        <p class="mb-md"><strong>Hours:</strong> Monday - Friday, 8:00 AM - 5:00 PM PST</p>
+                        <p class="mb-0 text-muted">For general inquiries about the program, certification, or technical
+                            assistance.</p>
+                    </div>
+                </div>
+
+                <!-- Technical Support -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Technical Support</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-md"><strong>Platform Technical Support</strong></p>
+                        <p class="mb-sm"><strong>Email:</strong> SBEss@dot.ca.gov</p>
+                        <p class="mb-md"><strong>Response Time:</strong> Within 1 business day</p>
+                        <p class="mb-md text-muted">For issues with logging in, uploading documents, or other technical
+                            problems.</p>
+                        <a href="report-issue.html" class="btn btn-outline">Report a Site Issue</a>
+                    </div>
+                </div>
+
+                <!-- Mailing Address -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Mailing Address</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-sm"><strong>California Department of Transportation</strong></p>
+                        <p class="mb-sm">Office of Business and Economic Opportunity</p>
+                        <p class="mb-sm">1120 N Street, MS-79</p>
+                        <p class="mb-md">Sacramento, CA 95814</p>
+                        <p class="mb-0 text-muted">For physical mail and document submissions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Send Us a Message</h2>
+                </div>
+                <div class="card-body">
+                    <form id="contactForm" novalidate>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                            <div class="form-group">
+                                <label for="firstName" class="required">First Name</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                                <span class="form-error" role="alert"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lastName" class="required">Last Name</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                                <span class="form-error" role="alert"></span>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                            <div class="form-group">
+                                <label for="email" class="required">Email Address</label>
+                                <input type="email" id="email" name="email" required>
+                                <span class="form-error" role="alert"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userType" class="required">I am a:</label>
+                            <select id="userType" name="userType" required>
+                                <option value="">Select one</option>
+                                <option value="vendor">Small Business Enterprise / Vendor</option>
+                                <option value="agency">Agency / Prime Contractor</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <span class="form-error" role="alert"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject" class="required">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                            <span class="form-error" role="alert"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="required">Message</label>
+                            <textarea id="message" name="message" required rows="6"></textarea>
+                            <span class="form-error" role="alert"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>For Vendors</h3>
+                    <ul>
+                        <li><a href="for-vendors.html">Getting Started</a></li>
+                        <li><a href="register-vendor.html">Create Account</a></li>
+                        <li><a href="eligibility.html">Eligibility</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>For Agencies</h3>
+                    <ul>
+                        <li><a href="for-agencies.html">Getting Started</a></li>
+                        <li><a href="register-agency.html">Create Account</a></li>
+                        <li><a href="opportunities.html">Post Opportunity</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Information</h3>
+                    <ul>
+                        <li><a href="how-it-works.html">How It Works</a></li>
+                        <li><a href="support-services.html">Support Services</a></li>
+
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="report-issue.html">Report Site Issue</a></li>
+                        <li><a href="mailto:SBEss@dot.ca.gov">SBEss@dot.ca.gov</a></li>
+
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Forms & Services</h3>
+                    <ul>
+                        <li><a href="https://app.smartsheet.com/b/form/b0a6941664cd453da6912c4c96d83530" target="_blank"
+                                rel="noopener noreferrer">Service Request Form &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/5a91fd621bf6473cbe2e8dd2a5b1ecdd" target="_blank"
+                                rel="noopener noreferrer">Text Notifications &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/d10fcca77e37449abbf81c035b7945f6" target="_blank"
+                                rel="noopener noreferrer">BDP Interest Form &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/2070c1554666487584e007173d2208ed" target="_blank"
+                                rel="noopener noreferrer">Workforce Development &nearrow;</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Caltrans Resources</h3>
+                    <ul>
+                        <li><a href="https://dot.ca.gov" target="_blank" rel="noopener noreferrer">Caltrans Home &nearrow;</a>
+                        </li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights" target="_blank"
+                                rel="noopener noreferrer">Civil Rights &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development"
+                                target="_blank" rel="noopener noreferrer">SB & Workforce Dev &nearrow;</a></li>
+                        <li><a href="https://ccop.dot.ca.gov/" target="_blank" rel="noopener noreferrer">Contracting
+                                Portal &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/construction/construction-mentor-protege-program"
+                                target="_blank" rel="noopener noreferrer">Mentor Protege &nearrow;</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>External Programs</h3>
+                    <ul>
+                        <li><a href="https://calosba.ca.gov/" target="_blank" rel="noopener noreferrer">CA Small
+                                Business &nearrow;</a></li>
+                        <li><a href="https://www.californiaucp.com" target="_blank" rel="noopener noreferrer">California
+                                UCP &nearrow;</a></li>
+                        <li><a href="https://www.ecfr.gov/current/title-49/subtitle-A/part-26" target="_blank"
+                                rel="noopener noreferrer">Federal SBE Regs &nearrow;</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 California Department of Transportation. All rights reserved.</p>
+                <p>CaltransBizConnect - Small Business Enterprise Supportive Services Business Development Program</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>
+
+
+

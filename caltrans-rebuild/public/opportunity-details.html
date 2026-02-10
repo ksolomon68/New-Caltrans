@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Detailed view of contracting opportunity.">
+    <title>Opportunity Details - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/dashboard-new.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+    <style>
+        .opportunity-detail-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--color-border-light);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .detail-header {
+            border-bottom: 2px solid var(--color-bg-secondary);
+            padding-bottom: var(--space-lg);
+            margin-bottom: var(--space-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .detail-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-xl);
+            background: var(--color-bg-secondary);
+            padding: var(--space-xl);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .meta-item label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-xs);
+        }
+
+        .meta-item .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .description-content {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-2xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--color-border-light);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: var(--space-lg);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--color-primary);
+        }
+    </style>
+</head>
+
+<body class="dashboard-v2">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="dashboard-container">
+        <header class="header-top" id="header-top"></header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <a href="javascript:history.back()" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Results
+            </a>
+
+            <div id="loadingOverlay" style="text-align: center; padding: 4rem;">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Loading opportunity details...</p>
+            </div>
+
+            <div id="errorView" style="display: none; text-align: center; padding: 4rem;">
+                <h2 style="color: var(--color-error);">Opportunity Not Found</h2>
+                <p>The opportunity you are looking for might have been closed or removed.</p>
+                <a href="search-opportunities.html" class="btn btn-primary" style="margin-top: 2rem;">Browse All
+                    Opportunities</a>
+            </div>
+
+            <div id="detailView" style="display: none;">
+                <div class="opportunity-detail-card">
+                    <div class="detail-header">
+                        <div>
+                            <span id="oppCategory" class="badge badge-primary"
+                                style="margin-bottom: 0.5rem;">CATEGORY</span>
+                            <h1 id="oppTitle"
+                                style="font-size: 2.5rem; color: var(--color-primary); margin-bottom: 0.5rem;">
+                                Opportunity Title</h1>
+                            <div id="oppIdDate" style="color: var(--text-muted);">ID: -- • Posted: --</div>
+                        </div>
+                        <div id="statusBadgeContainer">
+                            <span id="oppStatus" class="badge">STATUS</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-meta-grid">
+                        <div class="meta-item">
+                            <label>Estimated Value</label>
+                            <div id="oppValue" class="value">--</div>
+                        </div>
+                        <div class="meta-item">
+                            <label>Due Date</label>
+                            <div id="oppDueDate" class="value">--</div>
+                        </div>
+                        <div class="meta-item">
+                            <label>Region/District</label>
+                            <div id="oppRegion" class="value">--</div>
+                        </div>
+                        <div class="meta-item">
+                            <label>Submission Method</label>
+                            <div id="oppSubmission" class="value">--</div>
+                        </div>
+                    </div>
+
+                    <div class="description-section">
+                        <h3>📋 Scope of Work & Summary</h3>
+                        <div id="oppDescription" class="description-content">
+                            <!-- Description goes here -->
+                        </div>
+                    </div>
+
+                    <div class="action-bar" style="flex-wrap: wrap;">
+                        <button id="saveBtn" class="btn btn-outline" onclick="toggleSave()">Save Opportunity</button>
+                        <button id="viewAgencyBtn" class="btn btn-outline" onclick="viewAgencyProfile()">View Agency
+                            Profile</button>
+                        <button id="contactAgencyBtn" class="btn btn-secondary" onclick="contactAgency()">Contact
+                            Agency</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="site-footer" class="site-footer"></footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils/data-resilience.js"></script>
+    <script src="js/components/navigation.js"></script>
+    <script>
+        let currentOpportunity = null;
+        let savedOpportunityIds = new Set();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize Navigation
+            const user = getCurrentUser();
+            if (user) {
+                setTimeout(() => {
+                    Navigation.init(user.type);
+                }, 50);
+            }
+
+            // Get Opportunity ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const oppId = urlParams.get('id');
+
+            if (!oppId) {
+                showError();
+                return;
+            }
+
+            await loadOpportunityDetails(oppId);
+        });
+
+        async function loadOpportunityDetails(id) {
+            try {
+                // Use DataService for resilient fetching
+                const data = await DataService.fetch(`/opportunities/${id}`);
+
+                // Handle case where API returns a simplified error object or null
+                if (!data || data.error) {
+                    console.warn('Single fetch returned incomplete data, falling back to comprehensive search...');
+                    const allOpps = await DataService.fetch('/opportunities');
+                    if (Array.isArray(allOpps)) {
+                        currentOpportunity = allOpps.find(o => String(o.id) === String(id));
+                    }
+                } else {
+                    currentOpportunity = data;
+                }
+
+                if (!currentOpportunity) {
+                    console.error('Opportunity not found after fallback');
+                    showError();
+                    return;
+                }
+
+                // Load saved status
+                const user = getCurrentUser();
+                if (user && user.type === 'vendor') {
+                    try {
+                        const saved = await DataService.fetch(`/opportunities/saved/${user.id}`);
+                        if (Array.isArray(saved)) {
+                            savedOpportunityIds = new Set(saved.map(o => o.id));
+                        }
+                    } catch (e) { console.error('Error loading saved stats:', e); }
+                }
+
+                renderDetails(currentOpportunity);
+            } catch (error) {
+                console.error('Error loading opportunity:', error);
+                showError();
+            }
+        }
+
+        function renderDetails(opp) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('detailView').style.display = 'block';
+
+            document.getElementById('oppTitle').textContent = opp.title;
+            document.getElementById('oppCategory').textContent = opp.category_name || opp.categoryName || opp.category || 'General';
+            document.getElementById('oppIdDate').textContent = `ID: ${opp.id} • Posted: ${new Date(opp.posted_date || Date.now()).toLocaleDateString()}`;
+
+            // Status
+            const status = opp.status || 'published';
+            const statusEl = document.getElementById('oppStatus');
+            statusEl.textContent = (status || 'published').toUpperCase();
+            statusEl.className = 'badge ' + (status === 'published' || status === 'open' ? 'badge-success' : 'badge-warning');
+
+            // Meta
+            document.getElementById('oppValue').textContent = opp.estimated_value || opp.estimatedValue || 'TBD';
+            document.getElementById('oppDueDate').textContent = opp.due_date || opp.dueDate || 'Open until filled';
+            document.getElementById('oppRegion').textContent = opp.district_name || opp.districtName || `District ${opp.district}`;
+            document.getElementById('oppSubmission').textContent = opp.submission_method || opp.submissionMethod || 'Online Portal';
+
+            // Description
+            const description = opp.scope_summary || opp.scopeSummary || 'No description provided.';
+            document.getElementById('oppDescription').innerHTML = description.replace(/\n/g, '<br>');
+
+            // Save Toggle State
+            updateSaveButton();
+        }
+
+        function showError() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('errorView').style.display = 'block';
+        }
+
+
+
+        async function toggleSave() {
+            const user = Auth.getUser();
+            if (!user) return alert('Please log in to save opportunities');
+
+            const isSaved = savedOpportunityIds.has(currentOpportunity.id);
+            const endpoint = isSaved ? '/opportunities/unsave' : '/opportunities/save';
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${APP_CONFIG.API_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vendorId: user.id, opportunityId: currentOpportunity.id })
+                });
+
+                if (response.ok) {
+                    if (isSaved) {
+                        savedOpportunityIds.delete(currentOpportunity.id);
+                    } else {
+                        savedOpportunityIds.add(currentOpportunity.id);
+                    }
+                    updateSaveButton();
+                }
+            } catch (error) {
+                console.error('Error toggling save:', error);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function updateSaveButton() {
+            const btn = document.getElementById('saveBtn');
+            if (!btn || !currentOpportunity) return;
+
+            const isSaved = savedOpportunityIds.has(currentOpportunity.id);
+            btn.textContent = isSaved ? 'Remove from Saved' : 'Save Opportunity';
+            btn.className = isSaved ? 'btn btn-outline btn-saved' : 'btn btn-outline';
+            if (isSaved) {
+                btn.style.borderColor = 'var(--color-success)';
+                btn.style.color = 'var(--color-success)';
+            } else {
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }
+        }
+
+        function contactAgency() {
+            if (!currentOpportunity) return;
+            const user = Auth.getUser();
+            if (!user) {
+                alert('Please log in to contact the agency.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const agencyId = currentOpportunity.posted_by || currentOpportunity.postedBy;
+            if (agencyId) {
+                // Redirect to messages with recipient and context
+                window.location.href = `messages.html?recipient=${agencyId}&ref_type=opportunity&ref_id=${currentOpportunity.id}&ref_title=${encodeURIComponent(currentOpportunity.title)}`;
+            } else {
+                alert('Agency contact information is not available for this opportunity.');
+            }
+        }
+
+        function viewAgencyProfile() {
+            if (!currentOpportunity) return;
+            const agencyId = currentOpportunity.posted_by || currentOpportunity.postedBy;
+            if (agencyId) {
+                window.location.href = `agency-profile.html?id=${agencyId}`;
+            } else {
+                alert('Agency information not available.');
+            }
+        }
+    </script>
+</body>
+
+</html>

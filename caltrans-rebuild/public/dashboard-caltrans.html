@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caltrans Staff Dashboard - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/dashboard-new.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+</head>
+
+<body class="dashboard-v2">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="dashboard-container">
+        <header class="header-top" id="header-top"></header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-welcome">
+                        <h1>Caltrans Staff Dashboard</h1>
+                        <p>Manage programs, monitor district performance, and oversee vendor relationships across all
+                            Caltrans districts.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Staff Actions -->
+            <section class="content-card">
+                <h3>Staff Operations</h3>
+                <div class="action-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg); margin-top: var(--space-lg);">
+                    <a href="agency-analytics.html" class="enhanced-action-card">
+                        <div class="action-icon">📈</div>
+                        <div class="action-title">Agency Analytics</div>
+                        <div class="action-description">Monitor agency performance metrics</div>
+                    </a>
+
+                    <a href="manage-opportunities.html" class="enhanced-action-card">
+                        <div class="action-icon">📋</div>
+                        <div class="action-title">Manage Opportunities</div>
+                        <div class="action-description">Review and manage all opportunities</div>
+                    </a>
+
+                    <a href="search-vendors.html" class="enhanced-action-card">
+                        <div class="action-icon">🔍</div>
+                        <div class="action-title">Search Vendors</div>
+                        <div class="action-description">Find qualified vendors for projects</div>
+                    </a>
+
+                    <a href="dashboard-admin.html" class="enhanced-action-card">
+                        <div class="action-icon">⚙️</div>
+                        <div class="action-title">System Admin</div>
+                        <div class="action-description">Platform administration tools</div>
+                    </a>
+
+                    <a href="resources.html" class="enhanced-action-card">
+                        <div class="action-icon">📚</div>
+                        <div class="action-title">Resources</div>
+                        <div class="action-description">Program resources and documentation</div>
+                    </a>
+
+                    <a href="faq.html" class="enhanced-action-card">
+                        <div class="action-icon">❓</div>
+                        <div class="action-title">Help & FAQ</div>
+                        <div class="action-description">Get answers to common questions</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- District Overview -->
+            <section style="margin-top: var(--space-xl);">
+                <div class="enhanced-card">
+                    <h3>District Performance Overview</h3>
+                    <div class="stats-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-lg); margin-top: var(--space-lg);">
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Active Districts</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">856</div>
+                            <div class="stat-label">Total Opportunities</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3,421</div>
+                            <div class="stat-label">Vendor Applications</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">142</div>
+                            <div class="stat-label">This Month's Awards</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        <footer id="site-footer" class="site-footer"></footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils/data-resilience.js"></script>
+    <script src="js/components/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(() => {
+                Navigation.init('staff');
+            }, 50);
+        });
+    </script>
+
+</body>
+
+</html>

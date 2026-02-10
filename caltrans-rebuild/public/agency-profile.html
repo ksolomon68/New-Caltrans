@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Agency Profile - View details about the contracting agency.">
+    <title>Agency Profile - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/dashboard-new.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            color: white;
+            padding: var(--space-2xl) var(--space-xl);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--space-xl);
+            position: relative;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--color-border-light);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .agency-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            background: var(--color-bg-secondary);
+            padding: var(--space-xl);
+            border-radius: var(--border-radius-md);
+        }
+
+        .meta-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .opportunity-card {
+            border: 1px solid var(--color-border-light);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .opportunity-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+        }
+    </style>
+</head>
+
+<body class="dashboard-v2">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="dashboard-container">
+        <header class="header-top" id="header-top"></header>
+
+        <main id="main-content" class="main-content">
+            <a href="javascript:history.back()"
+                style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; margin-bottom: var(--space-lg); font-weight: 500;">
+                &larr; Back
+            </a>
+
+            <section class="hero-section">
+                <h1 id="agencyName">Agency Name</h1>
+                <p id="agencyTagline">District Office</p>
+            </section>
+
+            <div class="profile-card">
+                <h3>About the Agency</h3>
+                <p id="agencyDescription" style="line-height: 1.6; color: var(--text-secondary);">
+                    Loading agency information...
+                </p>
+
+                <div class="agency-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">District</span>
+                        <div id="agencyDistrict" class="meta-value">--</div>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Contact Person</span>
+                        <div id="agencyContact" class="meta-value">--</div>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Total Postings</span>
+                        <div id="agencyPostCount" class="meta-value">--</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: var(--space-xl); margin-bottom: var(--space-lg);">Active Opportunities</h3>
+                <div id="activeOppsList">
+                    <p style="color: var(--text-muted);">Scanning for active postings...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils/data-resilience.js"></script>
+    <script src="js/components/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = Auth.getUser();
+            if (user) Navigation.init(user.type);
+
+            const params = new URLSearchParams(window.location.search);
+            const agencyId = params.get('id');
+
+            if (!agencyId) {
+                alert('Agency ID required');
+                history.back();
+                return;
+            }
+
+            await loadAgencyProfile(agencyId);
+        });
+
+        async function loadAgencyProfile(id) {
+            try {
+                const agency = await DataService.fetch(`/users/${id}`);
+                const allOpps = await DataService.fetch('/opportunities');
+
+                // Filter opportunities posted by this agency
+                const agencyOpps = allOpps.filter(o => o.posted_by == id || o.postedBy == id);
+
+                document.getElementById('agencyName').textContent = agency.organization_name || agency.contact_name || 'Agency Office';
+                document.getElementById('agencyTagline').textContent = agency.district_name || `District ${agency.district}`;
+                document.getElementById('agencyDescription').textContent = agency.description || 'This agency manages various transportation projects and contracting opportunities for the California Department of Transportation.';
+
+                document.getElementById('agencyDistrict').textContent = agency.district_name || `District ${agency.district}`;
+                document.getElementById('agencyContact').textContent = agency.contact_name || 'Procurement Officer';
+                document.getElementById('agencyPostCount').textContent = agencyOpps.length;
+
+                const oppsList = document.getElementById('activeOppsList');
+                if (agencyOpps.length === 0) {
+                    oppsList.innerHTML = '<p style="color: var(--text-muted);">No active opportunities at this time.</p>';
+                } else {
+                    oppsList.innerHTML = '';
+                    agencyOpps.forEach(opp => {
+                        const div = document.createElement('div');
+                        div.className = 'opportunity-card';
+                        div.onclick = () => window.location.href = `opportunity-details.html?id=${opp.id}`;
+                        div.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h4 style="margin: 0; color: var(--color-primary);">${opp.title}</h4>
+                                <span class="badge badge-primary">${opp.category || 'General'}</span>
+                            </div>
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                                Due: ${opp.due_date || 'TBD'} | Value: ${opp.estimated_value || 'TBD'}
+                            </div>
+                        `;
+                        oppsList.appendChild(div);
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error loading agency:', error);
+                alert('Failed to load agency profile.');
+            }
+        }
+    </script>
+</body>
+
+</html>

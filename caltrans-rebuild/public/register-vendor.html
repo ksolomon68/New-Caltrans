@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Create your vendor account on CaltransBizConnect to access contracting opportunities.">
+    <title>Vendor Registration - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css?v=2.0.4">
+    <link rel="stylesheet" href="css/main.css?v=2.0.4">
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="site-header" role="banner">
+        <div class="container">
+            <a href="index.html" class="site-logo">
+                <img src="images/caltrans-logo.png" alt="Caltrans">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span></button>
+            <nav class="main-nav" role="navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="for-vendors.html">For Vendors</a></li>
+                    <li><a href="for-agencies.html">For Agencies</a></li>
+                    <li><a href="opportunities.html">Opportunities</a></li>
+                    <li><a href="how-it-works.html">How It Works</a></li>
+                    <li><a href="resources.html">Resources</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html" class="btn btn-secondary btn-small">Log In</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" class="auth-page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>Create Your Vendor Account</h1>
+                <p>Join CaltransBizConnect to access contracting opportunities</p>
+            </div>
+
+            <div class="auth-card">
+                <form id="vendorRegistrationForm" class="form">
+                    <!-- Business Information -->
+                    <fieldset class="mb-2xl">
+                        <legend class="form-section-title">Business Information</legend>
+
+                        <div class="form-group">
+                            <label for="businessName" class="form-label">Business Name <span
+                                    class="text-error">*</span></label>
+                            <input type="text" id="businessName" name="businessName" class="form-input" required>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="legalStructure" class="form-label">Legal Structure <span
+                                        class="text-error">*</span></label>
+                                <select id="legalStructure" name="legalStructure" class="form-input" required>
+                                    <option value="">Select legal structure</option>
+                                    <option value="sole-proprietorship">Sole Proprietorship</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="llc">Limited Liability Company (LLC)</option>
+                                    <option value="corporation">Corporation</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ein" class="form-label">Federal Tax ID (EIN) <span
+                                        class="text-error">*</span></label>
+                                <input type="text" id="ein" name="ein" class="form-input" placeholder="XX-XXXXXXX"
+                                    required>
+                                <small class="form-help">Format: XX-XXXXXXX</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="businessAddress" class="form-label">Business Address <span
+                                    class="text-error">*</span></label>
+                            <input type="text" id="businessAddress" name="businessAddress" class="form-input" required>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="city" class="form-label">City <span class="text-error">*</span></label>
+                                <input type="text" id="city" name="city" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="zipCode" class="form-label">ZIP Code <span
+                                        class="text-error">*</span></label>
+                                <input type="text" id="zipCode" name="zipCode" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="businessPhone" class="form-label">Business Phone <span
+                                        class="text-error">*</span></label>
+                                <input type="tel" id="businessPhone" name="businessPhone" class="form-input"
+                                    placeholder="(XXX) XXX-XXXX" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="businessWebsite" class="form-label">Business Website</label>
+                                <input type="url" id="businessWebsite" name="businessWebsite" class="form-input"
+                                    placeholder="https://">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Contact Person -->
+                    <fieldset class="mb-2xl">
+                        <legend class="form-section-title">Primary Contact</legend>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">First Name <span
+                                        class="text-error">*</span></label>
+                                <input type="text" id="firstName" name="firstName" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Last Name <span
+                                        class="text-error">*</span></label>
+                                <input type="text" id="lastName" name="lastName" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="title" class="form-label">Title/Position <span
+                                        class="text-error">*</span></label>
+                                <input type="text" id="title" name="title" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address <span
+                                        class="text-error">*</span></label>
+                                <input type="email" id="email" name="email" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number <span class="text-error">*</span></label>
+                            <input type="tel" id="phone" name="phone" class="form-input" placeholder="(XXX) XXX-XXXX"
+                                required>
+                        </div>
+                    </fieldset>
+
+                    <!-- Account Security -->
+                    <fieldset class="mb-2xl">
+                        <legend class="form-section-title">Account Security</legend>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="password" class="form-label">Password <span
+                                        class="text-error">*</span></label>
+                                <input type="password" id="password" name="password" class="form-input" required>
+                                <small class="form-help">8+ chars, with upper, lower & number</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword" class="form-label">Confirm Password <span
+                                        class="text-error">*</span></label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input"
+                                    required>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Certification -->
+                    <fieldset class="mb-2xl">
+                        <legend class="form-section-title">Certification (Optional)</legend>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="isSBE" name="isSBE">
+                                <span>My business is SBE certified</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group" id="sbeNumberGroup" style="display: none;">
+                            <label for="sbeNumber" class="form-label">SBE Certification Number</label>
+                            <input type="text" id="sbeNumber" name="sbeNumber" class="form-input">
+                        </div>
+                    </fieldset>
+
+                    <!-- Terms -->
+                    <div class="form-group mb-lg">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                                <span class="text-error">*</span></span>
+                        </label>
+                    </div>
+
+                    <!-- Submit -->
+                    <div style="display: flex; gap: var(--space-md); justify-content: flex-end;">
+                        <a href="index.html" class="btn btn-outline">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="auth-footer-links">
+                Already have an account? <a href="login.html">Log in here</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>For Vendors</h3>
+                    <ul>
+                        <li><a href="for-vendors.html">Getting Started</a></li>
+                        <li><a href="register-vendor.html">Create Account</a></li>
+                        <li><a href="eligibility.html">Eligibility</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>For Agencies</h3>
+                    <ul>
+                        <li><a href="for-agencies.html">Getting Started</a></li>
+                        <li><a href="register-agency.html">Create Account</a></li>
+                        <li><a href="opportunities.html">Post Opportunity</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Information</h3>
+                    <ul>
+                        <li><a href="how-it-works.html">How It Works</a></li>
+                        <li><a href="support-services.html">Support Services</a></li>
+
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="report-issue.html">Report Site Issue</a></li>
+                        <li><a href="mailto:SBEss@dot.ca.gov">SBEss@dot.ca.gov</a></li>
+
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Forms & Services</h3>
+                    <ul>
+                        <li><a href="https://app.smartsheet.com/b/form/b0a6941664cd453da6912c4c96d83530" target="_blank"
+                                rel="noopener noreferrer">Service Request Form &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/5a91fd621bf6473cbe2e8dd2a5b1ecdd" target="_blank"
+                                rel="noopener noreferrer">Text Notifications &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/d10fcca77e37449abbf81c035b7945f6" target="_blank"
+                                rel="noopener noreferrer">BDP Interest Form &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/2070c1554666487584e007173d2208ed" target="_blank"
+                                rel="noopener noreferrer">Workforce Development &nearrow;</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Caltrans Resources</h3>
+                    <ul>
+                        <li><a href="https://dot.ca.gov" target="_blank" rel="noopener noreferrer">Caltrans Home
+                                &nearrow;</a>
+                        </li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights" target="_blank"
+                                rel="noopener noreferrer">Civil Rights &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development"
+                                target="_blank" rel="noopener noreferrer">SB & Workforce Dev &nearrow;</a></li>
+                        <li><a href="https://ccop.dot.ca.gov/" target="_blank" rel="noopener noreferrer">Contracting
+                                Portal &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/construction/construction-mentor-protege-program"
+                                target="_blank" rel="noopener noreferrer">Mentor Protege &nearrow;</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>External Programs</h3>
+                    <ul>
+                        <li><a href="https://calosba.ca.gov/" target="_blank" rel="noopener noreferrer">CA Small
+                                Business &nearrow;</a></li>
+                        <li><a href="https://www.californiaucp.com" target="_blank" rel="noopener noreferrer">California
+                                UCP &nearrow;</a></li>
+                        <li><a href="https://www.ecfr.gov/current/title-49/subtitle-A/part-26" target="_blank"
+                                rel="noopener noreferrer">Federal SBE Regs &nearrow;</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 California Department of Transportation. All rights reserved.</p>
+                <p>CaltransBizConnect - Small Business Enterprise Supportive Services Business Development Program</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Show/hide SBE number field
+        document.getElementById('isSBE').addEventListener('change', function () {
+            document.getElementById('sbeNumberGroup').style.display = this.checked ? 'block' : 'none';
+        });
+    </script>
+</body>
+
+</html>

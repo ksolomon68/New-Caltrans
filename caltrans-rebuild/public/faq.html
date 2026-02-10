@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Frequently asked questions about CaltransBizConnect, SBE certification, and contracting opportunities.">
+    <title>FAQ - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        /* FAQ Accordion Styles */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--container-padding);
+        }
+
+        .faq-hero {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .faq-hero h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .faq-hero p {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .faq-accordion {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .faq-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .faq-section-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+
+        .accordion-item {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-light);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--space-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .accordion-item:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary-light);
+            transform: translateY(-1px);
+        }
+
+        .accordion-header {
+            padding: var(--space-lg);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            background: transparent;
+            width: 100%;
+            border: none;
+            text-align: left;
+            transition: background-color 0.2s ease;
+        }
+
+        .accordion-header:hover {
+            background-color: var(--color-bg-secondary);
+        }
+
+        .accordion-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin: 0;
+            flex: 1;
+            padding-right: var(--space-md);
+            line-height: 1.4;
+        }
+
+        .accordion-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-secondary);
+            color: var(--color-primary);
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.3s ease;
+            opacity: 0;
+            padding: 0 var(--space-lg);
+        }
+
+        .accordion-item.active .accordion-content {
+            /* max-height is set via JS */
+            opacity: 1;
+            padding-bottom: var(--space-lg);
+            padding-top: var(--space-xs);
+        }
+
+        .accordion-answer {
+            color: var(--color-text-secondary);
+            /* Ensures accessible dark gray/black */
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .accordion-answer p {
+            margin-bottom: var(--space-md);
+        }
+
+        .accordion-answer p:last-child {
+            margin-bottom: 0;
+        }
+
+        .accordion-answer strong {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        .accordion-answer a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .accordion-answer a:hover {
+            border-bottom-color: var(--color-primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .faq-container {
+                padding: var(--space-lg) var(--space-md);
+            }
+
+            .faq-hero h1 {
+                font-size: var(--font-size-2xl);
+            }
+
+            .faq-hero p {
+                font-size: var(--font-size-base);
+            }
+
+            .accordion-header {
+                padding: var(--space-md);
+            }
+
+            .accordion-question {
+                font-size: var(--font-size-md);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="site-header" role="banner" style="position: sticky; top: 0; z-index: 1060;">
+        <div class="container">
+            <a href="index.html" class="site-logo" aria-label="CaltransBizConnect Home">
+                <img src="images/caltrans-logo.png" alt="Caltrans">
+            </a>
+
+            <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span></button>
+
+            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="for-vendors.html">For Vendors</a></li>
+                    <li><a href="for-agencies.html">For Agencies</a></li>
+                    <li><a href="opportunities.html">Opportunities</a></li>
+                    <li><a href="how-it-works.html">How It Works</a></li>
+                    <li><a href="resources.html">Resources</a></li>
+                    <li><a href="faq.html" class="active">FAQ</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html" class="btn btn-secondary btn-small">Log In</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="hero hero-inner">
+            <div class="container">
+                <h1 class="hero-title">Frequently Asked Questions</h1>
+                <p class="hero-subtitle">Find answers to common questions about CaltransBizConnect</p>
+            </div>
+        </section>
+
+        <!-- FAQ Accordion -->
+        <section class="faq-container">
+            <!-- General Questions -->
+            <div class="faq-section">
+                <h2 class="faq-section-title">General Questions</h2>
+                <div class="faq-accordion" role="region" aria-label="General Questions">
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq1">
+                            <h3 class="accordion-question">Do I need to be SBE certified to use the platform?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq1">
+                            <div class="accordion-answer">
+                                <p>No, you don't need SBE certification to create an account and browse opportunities.
+                                    However, some opportunities may require SBE certification. Check the requirements
+                                    for each opportunity listing.</p>
+                                <p><strong>How do I get SBE certified?</strong> Visit our <a
+                                        href="eligibility.html">Eligibility page</a> to learn about the SBE
+                                    certification process, requirements, and how to apply.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq2">
+                            <h3 class="accordion-question">What is a capability statement?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq2">
+                            <div class="accordion-answer">
+                                <p>A capability statement is a one-page document that showcases your business
+                                    qualifications, past performance, and capabilities. It's like a resume for your
+                                    business.</p>
+                                <p>You can download our template from the <a href="resources.html">Resources page</a>.
+                                    Capability statements must be uploaded as PDF files with a maximum size of 10MB.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq3">
+                            <h3 class="accordion-question">How do I apply for an opportunity?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq3">
+                            <div class="accordion-answer">
+                                <p>Each opportunity listing includes contact information for the posting agency or prime
+                                    contractor. You'll need to contact them directly using the information provided and
+                                    follow their specific application process.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq4">
+                            <h3 class="accordion-question">Can I select multiple work categories?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq4">
+                            <div class="accordion-answer">
+                                <p>Yes, you can select all work categories that apply to your business capabilities.
+                                    This helps agencies find you when searching for vendors in those categories.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- For Vendors -->
+            <div class="faq-section">
+                <h2 class="faq-section-title">For Vendors & Small Business Enterprises</h2>
+                <div class="faq-accordion" role="region" aria-label="Vendor Questions">
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq5">
+                            <h3 class="accordion-question">How often are new opportunities posted?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq5">
+                            <div class="accordion-answer">
+                                <p>Opportunities are posted regularly as agencies have new projects. We recommend
+                                    checking the platform frequently or enabling email notifications for new
+                                    opportunities in your selected categories.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq6">
+                            <h3 class="accordion-question">How long does it take for an opportunity to be posted?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq6">
+                            <div class="accordion-answer">
+                                <p>Opportunities that meet our quality standards are typically posted within 1-2
+                                    business days after submission for review.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq7">
+                            <h3 class="accordion-question">Can I edit an opportunity after it's posted?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq7">
+                            <div class="accordion-answer">
+                                <p>Yes, you can edit your posted opportunities through your agency dashboard. Updates
+                                    will be reflected immediately on the platform.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq8">
+                            <h3 class="accordion-question">How do I search for qualified vendors?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq8">
+                            <div class="accordion-answer">
+                                <p>Use the vendor search feature in your dashboard to filter by work category, district,
+                                    and certification status. You can review vendor profiles and capability statements
+                                    to find qualified partners.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- For Agencies -->
+            <div class="faq-section">
+                <h2 class="faq-section-title">For Agencies & Prime Contractors</h2>
+                <div class="faq-accordion" role="region" aria-label="Agency Questions">
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq9">
+                            <h3 class="accordion-question">Who can post opportunities?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq9">
+                            <div class="accordion-answer">
+                                <p>Caltrans districts, other government agencies, and prime contractors working on
+                                    Caltrans projects can post opportunities on the platform.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq10">
+                            <h3 class="accordion-question">What information is required to post an opportunity?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq10">
+                            <div class="accordion-answer">
+                                <p>You'll need to provide project title, description, location (district), work
+                                    category, timeline, budget range, requirements, and contact information. All fields
+                                    are required to ensure vendors receive complete information.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq11">
+                            <h3 class="accordion-question">How long does it take for an opportunity to be posted?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq11">
+                            <div class="accordion-answer">
+                                <p>Opportunities that meet our quality standards are typically posted within 1-2
+                                    business days after submission for review.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq12">
+                            <h3 class="accordion-question">Can I edit an opportunity after it's posted?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq12">
+                            <div class="accordion-answer">
+                                <p>Yes, you can edit your posted opportunities through your agency dashboard. Updates
+                                    will be reflected immediately on the platform.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq13">
+                            <h3 class="accordion-question">How do I search for qualified vendors?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq13">
+                            <div class="accordion-answer">
+                                <p>Use the vendor search feature in your dashboard to filter by work category, district,
+                                    and certification status. You can review vendor profiles and capability statements
+                                    to find qualified partners.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq14">
+                            <h3 class="accordion-question">What are the quality standards for opportunity postings?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq14">
+                            <div class="accordion-answer">
+                                <p>All postings must include complete project information, clear requirements, realistic
+                                    timelines, and accurate contact details. This ensures vendors can make informed
+                                    decisions about applying.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Questions -->
+            <div class="faq-section">
+                <h2 class="faq-section-title">Technical Questions</h2>
+                <div class="faq-accordion" role="region" aria-label="Technical Questions">
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq15">
+                            <h3 class="accordion-question">What browsers are supported?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq15">
+                            <div class="accordion-answer">
+                                <p>CaltransBizConnect works best on the latest versions of Chrome, Firefox, Safari, and
+                                    Edge. We recommend keeping your browser updated for the best experience.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq16">
+                            <h3 class="accordion-question">Is the platform mobile-friendly?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq16">
+                            <div class="accordion-answer">
+                                <p>Yes, CaltransBizConnect is fully responsive and works on smartphones, tablets, and
+                                    desktop computers.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq17">
+                            <h3 class="accordion-question">Is my information secure?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq17">
+                            <div class="accordion-answer">
+                                <p>Yes, we use industry-standard security measures to protect your data. Your personal
+                                    information is never shared without your consent.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false" aria-controls="faq18">
+                            <h3 class="accordion-question">I forgot my password. How do I reset it?</h3>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content" id="faq18">
+                            <div class="accordion-answer">
+                                <p>Click the "Forgot Password" link on the login page and follow the instructions to
+                                    reset your password via email.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>For Vendors</h3>
+                    <ul>
+                        <li><a href="for-vendors.html">Getting Started</a></li>
+                        <li><a href="register-vendor.html">Create Account</a></li>
+                        <li><a href="eligibility.html">Eligibility</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>For Agencies</h3>
+                    <ul>
+                        <li><a href="for-agencies.html">Getting Started</a></li>
+                        <li><a href="register-agency.html">Create Account</a></li>
+                        <li><a href="post-opportunity.html">Post Opportunity</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Information</h3>
+                    <ul>
+                        <li><a href="how-it-works.html">How It Works</a></li>
+                        <li><a href="support-services.html">Support Services</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="report-issue.html">Report Site Issue</a></li>
+                        <li><a href="mailto:SBEss@dot.ca.gov">SBEss@dot.ca.gov</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Forms & Services</h3>
+                    <ul>
+                        <li><a href="https://app.smartsheet.com/b/form/b0a6941664cd453da6912c4c96d83530" target="_blank"
+                                rel="noopener noreferrer">Service Request Form &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/5a91fd621bf6473cbe2e8dd2a5b1ecdd" target="_blank"
+                                rel="noopener noreferrer">Text Notifications &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/d10fcca77e37449abbf81c035b7945f6" target="_blank"
+                                rel="noopener noreferrer">BDP Interest Form &nearrow;</a></li>
+                        <li><a href="https://app.smartsheet.com/b/form/2070c1554666487584e007173d2208ed" target="_blank"
+                                rel="noopener noreferrer">Workforce Development &nearrow;</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Caltrans Resources</h3>
+                    <ul>
+                        <li><a href="https://dot.ca.gov" target="_blank" rel="noopener noreferrer">Caltrans Home
+                                &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights" target="_blank"
+                                rel="noopener noreferrer">Civil
+                                Rights &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development"
+                                target="_blank" rel="noopener noreferrer">SB & Workforce Dev &nearrow;</a></li>
+                        <li><a href="https://ccop.dot.ca.gov/" target="_blank" rel="noopener noreferrer">Contracting
+                                Portal
+                                &nearrow;</a>
+                        </li>
+                        <li><a href="https://dot.ca.gov/programs/construction/construction-mentor-protege-program"
+                                target="_blank" rel="noopener noreferrer">Mentor Protege &nearrow;</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>External Programs</h3>
+                    <ul>
+                        <li><a href="https://calosba.ca.gov/" target="_blank" rel="noopener noreferrer">CA Small
+                                Business
+                                &nearrow;</a>
+                        </li>
+                        <li><a href="https://www.californiaucp.com" target="_blank" rel="noopener noreferrer">California
+                                UCP
+                                &nearrow;</a>
+                        </li>
+                        <li><a href="https://www.ecfr.gov/current/title-49/subtitle-A/part-26" target="_blank"
+                                rel="noopener noreferrer">Federal SBE Regs &nearrow;</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 California Department of Transportation. All rights reserved.</p>
+                <p>CaltransBizConnect - Small Business Enterprise Supportive Services Business Development Program</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // FAQ Accordion functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const item = header.parentElement;
+                    const content = item.querySelector('.accordion-content');
+                    const isActive = item.classList.contains('active');
+
+                    // Close all other accordions in the same section
+                    const section = item.closest('.faq-accordion');
+                    section.querySelectorAll('.accordion-item').forEach(otherItem => {
+                        if (otherItem !== item && otherItem.classList.contains('active')) {
+                            otherItem.classList.remove('active');
+                            otherItem.querySelector('.accordion-content').style.maxHeight = null;
+                            otherItem.querySelector('.accordion-header').setAttribute('aria-expanded', 'false');
+                        }
+                    });
+
+                    // Toggle current accordion
+                    if (!isActive) {
+                        item.classList.add('active');
+                        // Add buffer to scrollHeight to ensure it handles dynamic content adjustments or font loading
+                        content.style.maxHeight = (content.scrollHeight + 40) + 'px';
+                        header.setAttribute('aria-expanded', 'true');
+                    } else {
+                        item.classList.remove('active');
+                        content.style.maxHeight = null;
+                        header.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Keyboard support
+                header.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        header.click();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

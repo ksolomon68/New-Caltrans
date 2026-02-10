@@ -1,0 +1,31 @@
+{
+    "name": "caltrans-bizconnect",
+    "version": "2.1.0",
+    "description": "CaltransBizConnect - Connecting California businesses with contracting opportunities",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "build": "echo 'No build step required - this is a Node.js server application'",
+        "seed": "node server/seed_users.js",
+        "dev": "node index.js"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "better-sqlite3": "^11.8.1",
+        "cors": "^2.8.5",
+        "express": "^4.21.2",
+        "jsonwebtoken": "^9.0.2",
+        "multer": "^1.4.5-lts.2"
+    },
+    "keywords": [
+        "caltrans",
+        "business",
+        "contracting",
+        "opportunities"
+    ],
+    "author": "CaltransBizConnect",
+    "license": "MIT"
+}

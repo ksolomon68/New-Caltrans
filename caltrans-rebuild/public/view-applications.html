@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Applications - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/dashboard-new.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+    <style>
+        .vendor-list-container {
+            margin-top: var(--space-xl);
+        }
+
+        .vendor-item-card {
+            background: var(--card-bg);
+            border: 1px solid var(--color-border-light);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .vendor-item-card:hover {
+            transform: translateX(8px);
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .vendor-info-main h3 {
+            margin: 0 0 var(--space-xs) 0;
+            color: var(--color-primary);
+        }
+
+        .vendor-meta {
+            display: flex;
+            gap: var(--space-md);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .vendor-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        @media (max-width: 768px) {
+            .vendor-item-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+
+            .vendor-actions {
+                width: 100%;
+            }
+
+            .vendor-actions button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-v2">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="dashboard-container">
+        <header class="header-top" id="header-top"></header>
+
+        <main id="main-content" class="main-content">
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-welcome">
+                        <h1 id="opportunityTitle">Applications</h1>
+                        <p>Review submittals for this contracting opportunity</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="vendor-list-container">
+                <div id="appliedVendorsList">
+                    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        Loading applications...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Modal -->
+            <div id="messageModal" class="modal"
+                style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+                <div
+                    style="background: white; margin: 10% auto; padding: var(--space-xl); border-radius: var(--border-radius-lg); width: 90%; max-width: 600px;">
+                    <h2 id="modalTitle" style="color: var(--color-primary); margin-bottom: var(--space-md);">Send
+                        Message</h2>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="msgSubject" class="form-control"
+                            style="width: 100%; margin-bottom: var(--space-md);">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="msgBody" class="form-control"
+                            style="width: 100%; height: 150px; margin-bottom: var(--space-md);"></textarea>
+                    </div>
+                    <div style="display: flex; gap: var(--space-md); justify-content: flex-end;">
+                        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" id="sendBtn">Send Message</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils/data-resilience.js"></script>
+    <script src="js/components/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const opportunityId = params.get('id');
+            const user = Auth.getUser();
+
+            if (!opportunityId || !user || user.type !== 'agency') {
+                location.href = 'manage-opportunities.html';
+                return;
+            }
+
+            Navigation.init('agency');
+            loadAppliedVendors(opportunityId);
+        });
+
+        async function loadAppliedVendors(id) {
+            const listEl = document.getElementById('appliedVendorsList');
+            try {
+                // Fetch opportunity details for the title
+                const opp = await DataService.fetch(`/opportunities/${id}`);
+                if (opp) {
+                    document.getElementById('opportunityTitle').textContent = `Applications: ${opp.title}`;
+                }
+
+                // Fetch applications
+                const apps = await DataService.fetch(`/applications/opportunity/${id}`);
+                renderVendors(apps);
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                listEl.innerHTML = '<div style="color: var(--color-error); text-align: center; padding: 2rem;">Error loading applications.</div>';
+            }
+        }
+
+        function renderVendors(apps) {
+            const listEl = document.getElementById('appliedVendorsList');
+            if (!apps || apps.length === 0) {
+                listEl.innerHTML = '<div class="content-card" style="text-align: center; padding: 3rem;">No applications received yet.</div>';
+                return;
+            }
+
+            listEl.innerHTML = apps.map(app => `
+                <div class="vendor-item-card">
+                    <div class="vendor-info-main">
+                        <h3>${app.business_name || app.vendor_name || 'Anonymous Vendor'}</h3>
+                        <div class="vendor-meta">
+                            <span>👤 ${app.contact_name || 'N/A'}</span>
+                            <span>📅 Applied: ${new Date(app.applied_date).toLocaleDateString()}</span>
+                            <span>📋 Status: ${app.status}</span>
+                        </div>
+                        <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                            ${app.notes ? `Note: "${app.notes}"` : 'No submittal notes provided.'}
+                        </div>
+                    </div>
+                    <div class="vendor-actions">
+                        <button class="btn btn-outline btn-small" onclick="location.href='vendor-profile.html?id=${app.vendor_id}'">View Profile</button>
+                        <button class="btn btn-primary btn-small" onclick="openMessageModal('${app.vendor_id}', '${app.business_name || app.vendor_name}')">Message</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let currentRecipientId = null;
+        let currentOpportunityId = null;
+
+        function openMessageModal(vendorId, vendorName) {
+            currentRecipientId = vendorId;
+            currentOpportunityId = new URLSearchParams(window.location.search).get('id');
+            document.getElementById('modalTitle').textContent = `Message to ${vendorName}`;
+            document.getElementById('msgSubject').value = `Re: Application for Opportunity ${currentOpportunityId}`;
+            document.getElementById('messageModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+
+        document.getElementById('sendBtn').onclick = async () => {
+            const sender = Auth.getUser();
+            const subject = document.getElementById('msgSubject').value;
+            const body = document.getElementById('msgBody').value;
+
+            if (!body) return alert('Please enter a message');
+
+            try {
+                const response = await fetch(`${APP_CONFIG.API_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderId: sender.id,
+                        receiverId: currentRecipientId,
+                        opportunityId: currentOpportunityId,
+                        subject: subject,
+                        body: body
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Message sent successfully!');
+                    closeModal();
+                } else {
+                    const err = await response.json();
+                    alert(`Error: ${err.error}`);
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Connection error. Please try again.');
+            }
+        };
+    </script>
+</body>
+
+</html>

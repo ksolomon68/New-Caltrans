@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manage your business profile on CaltransBizConnect.">
+    <title>Vendor Profile - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <!-- Design System & Standard Styles -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/dashboard-new.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+    <style>
+        :root {
+            --profile-sidebar-width: 280px;
+        }
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: var(--profile-sidebar-width) 1fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        .profile-nav-card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border-light);
+            position: sticky;
+            top: var(--space-xl);
+        }
+
+        .profile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all var(--transition-base);
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+
+        .profile-nav-item:hover {
+            background: var(--color-bg-secondary);
+            color: var(--color-primary);
+        }
+
+        .profile-nav-item.active {
+            background: var(--color-bg-tertiary);
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .profile-section {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border-light);
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--color-border-light);
+            padding-bottom: var(--space-md);
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--brand-blue) 0%, var(--color-primary-light) 100%);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-2xl) var(--space-xl);
+            color: white;
+            margin-bottom: var(--space-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(255,255,255,0.1)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect width="100" height="100" fill="url(%23grad)"/></svg>');
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-welcome h1 {
+            font-size: 2.5rem;
+            margin: 0 0 var(--space-xs) 0;
+            font-weight: 800;
+        }
+
+        .hero-welcome p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .view-mode-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: 200px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 2;
+        }
+
+        .readonly-value {
+            padding: var(--space-sm) 0;
+            font-weight: 500;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .contact-card-actions {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--color-bg-tertiary);
+            border-top: 5px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-nav-card {
+                position: static;
+                margin-bottom: var(--space-lg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-v2">
+    <!-- Loading State -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; font-weight: 600; color: var(--color-primary);">Loading Profile...</p>
+    </div>
+
+    <!-- Navigation Components -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="dashboard-container">
+        <header class="header-top" id="header-top"></header>
+
+        <main id="main-content" class="main-content">
+
+            <!-- Standard Dashboard Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-welcome">
+                        <h1 class="page-title" id="heroTitle">My Profile</h1>
+                        <p id="heroSubtitle">Manage your business identities and certifications</p>
+                    </div>
+                </div>
+                <div id="viewModeBadge" class="view-mode-badge"
+                    style="display: none; position: absolute; top: var(--space-md); right: var(--space-md);">Agency View
+                    Mode</div>
+            </section>
+
+            <div class="profile-layout">
+                <!-- Side Navigation -->
+                <div class="profile-nav-card">
+                    <nav>
+                        <a href="#basic-info" class="profile-nav-item active">
+                            <span>🏢</span> Basic Information
+                        </a>
+                        <a href="#contact-details" class="profile-nav-item">
+                            <span>📞</span> Contact Details
+                        </a>
+                        <a href="#certifications-section" class="profile-nav-item">
+                            <span>📜</span> Certifications
+                        </a>
+                        <a href="#capability-section" class="profile-nav-item">
+                            <span>📑</span> Capability Statement
+                        </a>
+                    </nav>
+
+                    <!-- Profile Progress (Only for Vendors in Edit Mode) -->
+                    <div id="progressContainer"
+                        style="margin-top: var(--space-xl); padding-top: var(--space-md); border-top: 1px solid var(--color-border-light);">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); font-size: 0.85rem;">
+                            <span style="font-weight: 600;">Profile Strength</span>
+                            <span id="progressText" style="color: var(--color-primary); font-weight: 700;">--%</span>
+                        </div>
+                        <div
+                            style="height: 6px; background: var(--color-bg-tertiary); border-radius: 10px; overflow: hidden;">
+                            <div id="progressBar"
+                                style="height: 100%; background: var(--color-primary); width: 0%; transition: width 0.5s ease;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Panels -->
+                <div class="profile-panels">
+                    <form id="profileForm">
+
+                        <!-- Section: Basic Information -->
+                        <section id="basic-info" class="profile-section">
+                            <div class="section-header">
+                                <h2><span>🏢</span> Basic Information</h2>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label for="businessName" class="required">Legal Business Name</label>
+                                    <input type="text" id="businessName" name="business_name" class="form-control"
+                                        required placeholder="Enter your business name">
+                                    <div class="readonly-value" id="view_businessName" style="display: none;">--</div>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="businessDescription">Business Description</label>
+                                    <textarea id="businessDescription" name="business_description" class="form-control"
+                                        rows="4"
+                                        placeholder="Briefly describe your company's core services and expertise..."></textarea>
+                                    <div class="readonly-value" id="view_businessDescription"
+                                        style="display: none; white-space: pre-wrap;">--</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="website">Website (URL)</label>
+                                    <input type="url" id="website" name="website" class="form-control"
+                                        placeholder="https://www.example.com">
+                                    <div class="readonly-value" id="view_website" style="display: none;">--</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="yearsInBusiness">Years in Business</label>
+                                    <input type="number" id="yearsInBusiness" name="years_in_business"
+                                        class="form-control" min="0" max="150" placeholder="e.g. 10">
+                                    <div class="readonly-value" id="view_yearsInBusiness" style="display: none;">--
+                                    </div>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="address">Primary Business Address</label>
+                                    <textarea id="address" name="address" class="form-control" rows="2"
+                                        placeholder="Street, Suite, No."></textarea>
+                                    <div class="readonly-value" id="view_address" style="display: none;">--</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section: Contact Details -->
+                        <section id="contact-details" class="profile-section">
+                            <div class="section-header">
+                                <h2><span>📞</span> Contact Details</h2>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="firstName" class="required">First Name</label>
+                                    <input type="text" id="firstName" name="first_name" class="form-control" required>
+                                    <div class="readonly-value" id="view_firstName" style="display: none;">--</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName" class="required">Last Name</label>
+                                    <input type="text" id="lastName" name="last_name" class="form-control" required>
+                                    <div class="readonly-value" id="view_lastName" style="display: none;">--</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="required">Contact Email</label>
+                                    <input type="email" id="email" name="email" class="form-control" required disabled>
+                                    <div class="readonly-value" id="view_email" style="display: none;">--</div>
+                                    <small class="text-muted edit-only">Email can only be changed in account
+                                        settings.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control"
+                                        placeholder="(555) 000-0000">
+                                    <div class="readonly-value" id="view_phone" style="display: none;">--</div>
+                                </div>
+                            </div>
+
+                            <!-- Agency Contact Actions -->
+                            <div id="agencyActions" class="contact-card-actions" style="display: none;">
+                                <button type="button" class="btn btn-primary" id="btnMessage">Send Message</button>
+                                <button type="button" class="btn btn-outline" id="btnEmail">Direct Email</button>
+                            </div>
+                        </section>
+
+                        <!-- Section: Certifications -->
+                        <section id="certifications-section" class="profile-section">
+                            <div class="section-header">
+                                <h2><span>📜</span> Certifications</h2>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="certificationNumber">Certification Number</label>
+                                    <input type="text" id="certificationNumber" name="certification_number"
+                                        class="form-control" placeholder="e.g. 1234567">
+                                    <div class="readonly-value" id="view_certificationNumber" style="display: none;">--
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="certifications">Certified Statuses</label>
+                                    <input type="text" id="certifications" name="certifications" class="form-control"
+                                        placeholder="e.g. SBE, DBE, WBE">
+                                    <div class="readonly-value" id="view_certifications" style="display: none;">--</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section: Capability Statement -->
+                        <section id="capability-section" class="profile-section">
+                            <div class="section-header">
+                                <h2><span>📑</span> Capability Statement</h2>
+                            </div>
+
+                            <!-- Edit Mode Upload -->
+                            <div class="edit-only">
+                                <p class="text-muted mb-md">Upload a professional PDF of your Capability Statement. This
+                                    will be visible to Prime Contractors and Agencies.</p>
+                                <div
+                                    style="border: 2px dashed var(--color-bg-tertiary); padding: var(--space-xl); border-radius: var(--border-radius-lg); text-align: center;">
+                                    <input type="file" id="csFileInput" accept=".pdf" style="display: none;">
+                                    <div id="csEmptyState">
+                                        <div style="font-size: 3rem; margin-bottom: var(--space-sm);">📄</div>
+                                        <button type="button" class="btn btn-outline"
+                                            onclick="document.getElementById('csFileInput').click()">Choose PDF
+                                            Document</button>
+                                        <p style="margin-top: 1rem; font-size: 0.9rem;" class="text-muted">Maximum file
+                                            size: 5MB</p>
+                                    </div>
+                                    <div id="csSelectedState" style="display: none;">
+                                        <p id="csSelectedName" style="font-weight: 700; color: var(--color-primary);">
+                                        </p>
+                                        <div
+                                            style="display: flex; gap: var(--space-md); justify-content: center; margin-top: var(--space-md);">
+                                            <button type="button" class="btn btn-outline btn-small"
+                                                onclick="document.getElementById('csFileInput').click()">Change
+                                                File</button>
+                                            <button type="button" class="btn btn-success btn-small"
+                                                id="btnUploadCS">Upload Now</button>
+                                        </div>
+                                    </div>
+                                    <div id="csUploadedState" style="display: none;">
+                                        <div
+                                            style="color: var(--color-success); font-weight: 700; margin-bottom: var(--space-md);">
+                                            ✅ Capability Statement Verified</div>
+                                        <div style="display: flex; gap: var(--space-md); justify-content: center;">
+                                            <button type="button" class="btn btn-outline btn-small"
+                                                onclick="window.viewCurrentCS()">View Current</button>
+                                            <button type="button" class="btn btn-outline btn-small"
+                                                onclick="document.getElementById('csFileInput').click()">Replace
+                                                PDF</button>
+                                        </div>
+                                    </div>
+                                    <div id="uploadStatus" style="margin-top: 1rem; font-size: 0.85rem;"></div>
+                                </div>
+                            </div>
+
+                            <!-- View Mode Download -->
+                            <div class="view-only" style="display: none;">
+                                <div id="csViewContainer"
+                                    style="background: var(--color-bg-tertiary); padding: var(--space-lg); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: var(--space-md);">
+                                        <span style="font-size: 2rem;">📄</span>
+                                        <div>
+                                            <div style="font-weight: 700;">Capability Statement (PDF)</div>
+                                            <div class="text-muted" style="font-size: 0.85rem;">Professional business
+                                                summary</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" id="btnDownloadCS">Download
+                                        Document</button>
+                                </div>
+                                <div id="csNoView"
+                                    style="display: none; text-align: center; padding: var(--space-xl); color: var(--text-muted); font-style: italic;">
+                                    This vendor hasn't uploaded a capability statement yet.
+                                </div>
+                            </div>
+                        </section>
+
+                        <div id="formActions" class="edit-only"
+                            style="position: sticky; bottom: var(--space-xl); background: white; padding: var(--space-md); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); display: flex; justify-content: flex-end; gap: var(--space-md); border: 1px solid var(--color-border-light); z-index: 100;">
+                            <button type="button" class="btn btn-outline" id="btnCancel">Cancel Changes</button>
+                            <button type="submit" class="btn btn-primary" id="btnSave">Save Profile Information</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils/data-resilience.js"></script>
+    <script src="js/components/navigation.js"></script>
+    <script>
+        // Global State
+        let isViewMode = false;
+        let originalData = {};
+        const user = Auth.getUser();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Determine Mode
+            const params = new URLSearchParams(window.location.search);
+            const targetId = params.get('id');
+
+            // Mode Logic
+            // 1. Agency viewing a vendor (targetId is present and currentUser is agency)
+            // 2. Vendor viewing another vendor (targetId present and != currentUser.id)
+            if (targetId && targetId != user.id) {
+                isViewMode = true;
+            } else if (user.type === 'agency' && !targetId) {
+                // Agency should not be on this page without an ID
+                alert('Redirecting to dashboard...');
+                window.location.href = 'dashboard-agency.html';
+                return;
+            }
+
+            // UI Init
+            Navigation.init(user.type);
+            initUI();
+
+            try {
+                // Load Data
+                await loadData(targetId || user.id);
+                // Setup Listeners
+                setupForms();
+            } catch (error) {
+                console.error('Initialization error:', error);
+            } finally {
+                // Hide Loading - ALWAYS
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) overlay.style.display = 'none';
+            }
+        });
+
+        function initUI() {
+            if (isViewMode) {
+                document.getElementById('heroTitle').textContent = 'Vendor Profile';
+                document.getElementById('heroSubtitle').textContent = 'Viewing expert vendor capabilities';
+                document.getElementById('viewModeBadge').style.display = 'block';
+
+                // Hide Edit Elements
+                document.querySelectorAll('.edit-only').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.view-only').forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.form-control').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.readonly-value').forEach(el => el.style.display = 'block');
+
+                // Sidebar changes
+                document.getElementById('progressContainer').style.display = 'none';
+            }
+        }
+
+        async function loadData(userId) {
+            try {
+                const fetchedData = await DataService.fetch(`/users/${userId}`);
+                if (!fetchedData) throw new Error('Could not fetch user profile');
+
+                originalData = fetchedData;
+
+                // Populate UI
+                populateForm(fetchedData);
+
+                if (isViewMode) {
+                    populateView(fetchedData);
+                } else {
+                    calculateProgress(fetchedData);
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                alert('Critical: Failed to load profile data. Please try again.');
+            }
+        }
+
+        function populateForm(data) {
+            // Mapping schema fields to form IDs
+            const mapping = {
+                'businessName': data.business_name || '',
+                'businessDescription': data.business_description || '',
+                'website': data.website || '',
+                'yearsInBusiness': data.years_in_business || '',
+                'address': data.address || '',
+                'email': data.email || '',
+                'phone': data.phone || '',
+                'certificationNumber': data.certification_number || '',
+                'certifications': data.certifications || ''
+            };
+
+            for (const id in mapping) {
+                const el = document.getElementById(id);
+                if (el) el.value = mapping[id];
+            }
+
+            // Split name for form
+            if (data.contact_name) {
+                const parts = data.contact_name.split(' ');
+                document.getElementById('firstName').value = parts[0] || '';
+                document.getElementById('lastName').value = parts.slice(1).join(' ') || '';
+            }
+
+            // Check CS
+            if (data.capability_statement) {
+                document.getElementById('csEmptyState').style.display = 'none';
+                document.getElementById('csSelectedState').style.display = 'none';
+                document.getElementById('csUploadedState').style.display = 'block';
+                window.currentCSPath = data.capability_statement;
+            }
+        }
+
+        function populateView(data) {
+            const mapping = {
+                'businessName': data.business_name || 'Not provided',
+                'businessDescription': data.business_description || 'No description available.',
+                'website': data.website ? `<a href="${data.website}" target="_blank" style="color:var(--color-primary)">${data.website}</a>` : 'Not provided',
+                'yearsInBusiness': data.years_in_business || 'New Business',
+                'address': data.address || 'Not provided',
+                'firstName': data.contact_name ? data.contact_name.split(' ')[0] : 'N/A',
+                'lastName': data.contact_name ? data.contact_name.split(' ').slice(1).join(' ') : 'N/A',
+                'email': data.email || 'N/A',
+                'phone': data.phone || 'N/A',
+                'certificationNumber': data.certification_number || 'N/A',
+                'certifications': data.certifications || 'None listed'
+            };
+
+            for (const id in mapping) {
+                const el = document.getElementById(`view_${id}`);
+                if (el) el.innerHTML = mapping[id];
+            }
+
+            // Capability Statement View
+            if (!data.capability_statement) {
+                document.getElementById('csViewContainer').style.display = 'none';
+                document.getElementById('csNoView').style.display = 'block';
+            }
+
+            // Setup Contact Handlers
+            document.getElementById('btnMessage').onclick = () => {
+                location.href = `messages.html?recipient=${data.id}`;
+            };
+            document.getElementById('btnEmail').onclick = () => {
+                location.href = `mailto:${data.email}`;
+            };
+            document.getElementById('btnDownloadCS').onclick = () => {
+                const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+                window.open(`${API_BASE}/vendors/${data.id}/capability-statement`, '_blank');
+            };
+        }
+
+        function calculateProgress(data) {
+            const fields = [
+                data.business_name,
+                data.business_description,
+                data.website,
+                data.contact_name,
+                data.phone,
+                data.address,
+                data.capability_statement,
+                data.certification_number
+            ];
+
+            const completed = fields.filter(f => f && f.length > 0).length;
+            const percentage = Math.round((completed / fields.length) * 100);
+
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = percentage + '%';
+        }
+
+        function setupForms() {
+            if (isViewMode) return;
+
+            const form = document.getElementById('profileForm');
+            const submitBtn = document.getElementById('btnSave');
+
+            // Form Submit
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving Changes...';
+
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                // Construct full name
+                const contact_name = `${data.first_name} ${data.last_name}`.trim();
+
+                const payload = {
+                    business_name: data.business_name,
+                    business_description: data.business_description,
+                    website: data.website,
+                    years_in_business: data.years_in_business,
+                    address: data.address,
+                    contact_name: contact_name,
+                    phone: data.phone,
+                    certification_number: data.certification_number,
+                    certifications: data.certifications
+                };
+
+                try {
+                    const result = await DataService.fetch(`/users/${user.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (result.error) throw new Error(result.error);
+
+                    // Update Local Storage for Session consistency
+                    const updatedUser = { ...user, ...result };
+                    localStorage.setItem('caltrans_user', JSON.stringify(updatedUser));
+
+                    alert('✅ Profile updated successfully!');
+                    calculateProgress(result);
+
+                } catch (error) {
+                    console.error('Save Error:', error);
+                    alert('❌ Error: Could not save profile changes. Please check your connection.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Save Profile Information';
+                }
+            });
+
+            // Cancel Handler
+            document.getElementById('btnCancel').onclick = () => {
+                if (confirm('Discard unsaved changes?')) {
+                    populateForm(originalData);
+                }
+            };
+
+            // CS Upload Logic
+            const csInput = document.getElementById('csFileInput');
+            csInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File too large. Max 5MB allowed.');
+                        return;
+                    }
+                    document.getElementById('csEmptyState').style.display = 'none';
+                    document.getElementById('csUploadedState').style.display = 'none';
+                    document.getElementById('csSelectedName').textContent = file.name;
+                    document.getElementById('csSelectedState').style.display = 'block';
+                }
+            };
+
+            document.getElementById('btnUploadCS').onclick = handleCSUpload;
+        }
+
+        async function handleCSUpload() {
+            const fileInput = document.getElementById('csFileInput');
+            const file = fileInput.files[0];
+            const status = document.getElementById('uploadStatus');
+            const btn = document.getElementById('btnUploadCS');
+
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('userId', user.id);
+
+            btn.disabled = true;
+            status.textContent = '🔄 Uploading to secure server...';
+            status.style.color = 'var(--text-muted)';
+
+            try {
+                // Try real upload first, but fall back to mock if it fails (for demo/dev without backend)
+                const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+                const response = await fetch(`${API_BASE}/upload-cs`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                let result;
+                if (response.ok) {
+                    result = await response.json();
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`Upload failed: ${response.status} ${errorText}`);
+                }
+
+                status.textContent = '✅ Upload successful';
+                status.style.color = 'var(--color-success)';
+
+                // Show completed state
+                document.getElementById('csSelectedState').style.display = 'none';
+                document.getElementById('csUploadedState').style.display = 'block';
+
+                // Save locally to persist "upload" in this session
+                window.currentCSPath = result.path;
+                const updatedUser = { ...user, capability_statement: result.path };
+
+                // Persist to local storage
+                localStorage.setItem('caltrans_user', JSON.stringify(updatedUser));
+
+                // CRITICAL: Persist to Backend Database
+                try {
+                    await DataService.fetch(`/users/${user.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ capability_statement: result.path })
+                    });
+                    console.log('Capability statement path saved to DB');
+                } catch (dbError) {
+                    console.error('Failed to save CS path to DB:', dbError);
+                    // Don't fail the whole flow, as local storage might be enough for demo
+                }
+
+                calculateProgress(updatedUser);
+
+            } catch (error) {
+                console.error('Upload Error:', error);
+                status.textContent = '❌ Upload failed. Please try again.';
+                status.style.color = 'var(--color-error)';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        window.viewCurrentCS = () => {
+            const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+            window.open(`${API_BASE}/vendors/${user.id}/capability-statement`, '_blank');
+        };
+
+        // Section Scroll Spying
+        window.addEventListener('scroll', () => {
+            const sections = ['basic-info', 'contact-details', 'certifications-section', 'capability-section'];
+            let current = '';
+
+            sections.forEach(id => {
+                const section = document.getElementById(id);
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 150) {
+                    current = id;
+                }
+            });
+
+            document.querySelectorAll('.profile-nav-item').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
