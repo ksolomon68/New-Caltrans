@@ -74,8 +74,8 @@ async function safeParseJson(response) {
 // Login function
 async function login(email, password) {
     console.log('CaltransBizConnect: Attempting login for:', email);
+    const finalUrl = `${API_URL}/auth/login`;
     try {
-        const finalUrl = `${API_URL}/auth/login`;
         console.log('CaltransBizConnect: Fetching URL:', finalUrl);
 
         const response = await fetch(finalUrl, {
