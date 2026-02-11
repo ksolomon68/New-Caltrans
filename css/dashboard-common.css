@@ -117,7 +117,181 @@ textarea {
 @media (max-width: 1024px) {
     .sidebar {
         display: none;
-        /* Mobile navigation will be via standard header */
+        position: fixed;
+        top: 0;
+        left: -280px;
+        /* Hide off-screen */
+        bottom: 0;
+        z-index: 1100;
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Smoother premium slide */
+        box-shadow: none;
+        height: 100vh;
+        overflow-y: auto;
+    }
+
+    .sidebar.active {
+        display: flex;
+        flex-direction: column;
+        left: 0;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Sidebar Overlay (Backdrop) */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.4);
+        /* Deeper, more modern overlay color */
+        z-index: 1050;
+        backdrop-filter: blur(4px);
+        /* Increased blur for premium look */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+
+    /* Sidebar Internal Components */
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--color-border);
+        background: var(--color-bg-primary);
+    }
+
+    .sidebar-close-btn {
+        background: var(--color-bg-secondary);
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar-close-btn:hover {
+        background: var(--color-border-light);
+        color: var(--color-primary);
+        transform: rotate(90deg);
+    }
+
+    .sidebar-footer {
+        padding: 0.5rem 0;
+        border-top: 1px solid var(--color-border);
+        background: var(--color-bg-primary);
+    }
+
+    .sidebar-footer-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        width: 100%;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .sidebar-footer-link:hover {
+        color: var(--color-primary);
+        background: var(--color-bg-secondary);
+        padding-left: 1.75rem;
+        /* Subtle slide interaction */
+    }
+
+    /* Header Mobile Components */
+    .mobile-toggle-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        color: var(--color-primary);
+        background: var(--color-bg-secondary);
+        transition: all 0.2s ease;
+    }
+
+    .mobile-toggle-btn:hover {
+        background: var(--color-border-light);
+        transform: scale(1.05);
+    }
+
+    .mobile-toggle-btn:active {
+        transform: scale(0.95);
+    }
+
+    .header-logo span {
+        display: none;
+        /* Hide 'BizConnect' text on mobile to save space */
+    }
+
+    .header-portal-title {
+        font-size: 1rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px;
+    }
+
+    .header-user-info {
+        display: none;
+    }
+
+    .header-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--color-bg-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: var(--color-primary);
+        border: 2px solid var(--color-secondary);
+        font-size: 0.8rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .mobile-signout-btn {
+        background: var(--color-bg-secondary);
+        border: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        color: var(--text-muted);
+    }
+
+    .mobile-signout-btn:hover {
+        background: #fee2e2;
+        color: #ef4444;
     }
 
     .dashboard-v2 {
@@ -126,5 +300,73 @@ textarea {
 
     .main-content {
         padding: var(--space-lg);
+    }
+}
+
+/* Desktop Defaults For New Classes */
+.mobile-toggle-btn {
+    display: none;
+}
+
+.sidebar-close-btn {
+    display: none;
+}
+
+.sidebar-brand {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.sidebar-footer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.sidebar-signout-btn {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--color-primary);
+    border: 2px solid var(--color-secondary);
+}
+
+.mobile-signout-btn {
+    display: none;
+}
+
+@media (min-width: 1025px) {
+    .sidebar {
+        display: flex;
+        flex-direction: column;
     }
 }

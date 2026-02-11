@@ -11,7 +11,6 @@ const Navigation = {
             items: [
                 { label: 'Search Opportunities', href: 'search-opportunities.html', icon: '🏢' },
                 { label: 'Saved Items', href: 'saved-opportunities.html', icon: '⭐' },
-                { label: 'My Applications', href: 'vendor-applications.html', icon: '📝' },
                 { label: 'Messages', href: 'messages.html', icon: '✉️' },
                 { label: 'My Profile', href: 'vendor-profile.html', icon: '👤' }
             ]
@@ -49,6 +48,10 @@ const Navigation = {
         }
     },
 
+    _isMobile() {
+        return window.innerWidth <= 1024;
+    },
+
     init(role) {
         // Fallback to localStorage if no role provided
         if (!role) {
@@ -69,12 +72,10 @@ const Navigation = {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
 
         let html = `
-            <div class="sidebar-logo" style="padding: 1.5rem; text-align: center; border-bottom: 1px solid var(--color-border);">
-                <a href="index.html" style="text-decoration: none; display: block;">
-                    <img src="assets/caltrans-logo.png" alt="Caltrans" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
-                </a>
+            <div class="sidebar-brand">
+                <button class="sidebar-close-btn" aria-label="Close menu">&times;</button>
             </div>
-            <nav class="sidebar-nav" style="padding: 1rem 0;">
+            <nav class="sidebar-nav" style="padding: 1rem 0; flex: 1; overflow-y: auto;">
                 <div style="padding: 0 1.5rem 0.5rem; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">
                     ${config.title}
                 </div>
@@ -101,16 +102,28 @@ const Navigation = {
 
         html += `
             </nav>
-            <div class="sidebar-footer" style="position: absolute; bottom: 0; width: 100%; padding: 1.5rem; border-top: 1px solid var(--color-border);">
+            <div class="sidebar-footer">
+                <a href="index.html" class="sidebar-footer-link">
+                    <span style="font-size: 1.25rem;">🌐</span> Back to Public Site
+                </a>
                 <button onclick="if(typeof logout === 'function') { logout() } else { localStorage.removeItem('caltrans_user'); window.location.href='index.html'; }" 
-                    class="btn-style-none" style="width: 100%; color: var(--text-primary); border: none !important; box-shadow: none !important; text-align: left; padding: 1rem 1.5rem; background: transparent !important; cursor: pointer; display: flex; align-items: center; gap: 0.75rem; font-weight: 500;">
-                    <span style="font-size: 1.25rem;">📬</span> Sign Out
+                    class="sidebar-footer-link sidebar-signout-btn">
+                    <span style="font-size: 1.25rem;">🚪</span> Sign Out
                 </button>
             </div>
         `;
 
         sidebar.innerHTML = html;
-        sidebar.className = 'sidebar active'; // Ensure visible on desktop
+
+        // On desktop, sidebar is always visible via CSS (no 'active' needed).
+        // On mobile, sidebar starts hidden (no 'active' class).
+        sidebar.className = 'sidebar';
+
+        // Close button inside sidebar (mobile only)
+        const closeBtn = sidebar.querySelector('.sidebar-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.closeSidebar());
+        }
     },
 
     renderHeader(role) {
@@ -122,28 +135,64 @@ const Navigation = {
 
         header.innerHTML = `
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <button id="mobile-toggle" style="display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer;">☰</button>
-                <div style="font-weight: 700; color: var(--color-primary);">CALTRANS <span style="font-weight: 400; color: var(--color-text-muted);">| BizConnect</span></div>
+                <button id="mobile-toggle" class="mobile-toggle-btn" aria-label="Open navigation menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="12" x2="20" y2="12"></line>
+                        <line x1="4" y1="6" x2="20" y2="6"></line>
+                        <line x1="4" y1="18" x2="20" y2="18"></line>
+                    </svg>
+                </button>
+                <div class="header-logo" style="display: flex; align-items: center;">
+                    <a href="index.html" style="text-decoration: none; display: flex; align-items: center;">
+                        <img src="assets/caltrans-logo.png" alt="Caltrans" style="height: 32px; width: auto; display: block;">
+                        <span style="font-weight: 700; color: var(--color-primary); font-size: 1.1rem; letter-spacing: -0.01em; margin-left: 0.5rem; border-left: 1px solid var(--color-border); padding-left: 0.5rem;">BizConnect</span>
+                    </a>
+                </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 1.5rem;">
-                <div style="text-align: right; display: none; @media (min-width: 768px) { display: block; }">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="header-user-info">
                     <div style="font-weight: 600; font-size: 0.9rem;">${userName}</div>
                     <div style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: capitalize;">${role} Role</div>
                 </div>
-                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-bg-secondary); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-primary); border: 2px solid var(--color-secondary);">
+                <div class="header-avatar">
                     ${userName.charAt(0).toUpperCase()}
                 </div>
+                <button class="mobile-signout-btn" onclick="if(typeof logout === 'function') { logout() } else { localStorage.removeItem('caltrans_user'); window.location.href='index.html'; }" aria-label="Sign Out" title="Sign Out">
+                    🚪
+                </button>
             </div>
         `;
     },
 
+    openSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar) sidebar.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scroll behind
+    },
+
+    closeSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    },
+
     setupMobileToggle() {
         const toggle = document.getElementById('mobile-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        if (toggle && sidebar) {
-            toggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
+        if (toggle) {
+            toggle.addEventListener('click', () => this.openSidebar());
+        }
+
+        // Create overlay for closing sidebar when clicked outside
+        if (!document.getElementById('sidebar-overlay')) {
+            const overlay = document.createElement('div');
+            overlay.id = 'sidebar-overlay';
+            overlay.className = 'sidebar-overlay';
+            overlay.addEventListener('click', () => this.closeSidebar());
+            document.body.appendChild(overlay);
         }
     }
 };

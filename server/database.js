@@ -25,13 +25,13 @@ function getDb() {
     let errorMsg = 'Database connection is not available.';
     if (lastError) {
         errorMsg += ` Detail: ${lastError.message}`;
-        if (lastError.code === 'MODULE_NOT_FOUND') {
-            errorMsg += ' (The better-sqlite3 module may not be correctly installed in the production environment).';
+        if (lastError.code === 'MODULE_NOT_FOUND' || lastError.message.includes('better-sqlite3')) {
+            errorMsg += '\n\nHostinger Tip: The "better-sqlite3" module requires native C++ compilation. On Hostinger, ensure you have selected a Node.js version in your dashboard and run "npm install" from the Hostinger Terminal or using their "Setup Node.js App" tool to correctly build native dependencies.';
         }
     }
 
     const error = new Error(errorMsg);
-    error.status = 500;
+    error.status = 503; // Service Unavailable
     throw error;
 }
 

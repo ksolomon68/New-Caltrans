@@ -2,7 +2,7 @@ const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 
-const dbPath = path.resolve(__dirname, './data.db');
+const dbPath = path.resolve(__dirname, './server/data.db');
 const db = new Database(dbPath);
 
 async function seed() {

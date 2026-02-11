@@ -45,17 +45,25 @@ async function safeParseJson(response) {
             return await response.json();
         } else {
             const text = await response.text();
-            console.warn('Non-JSON response received:', text.substring(0, 500));
+            console.warn('Non-JSON response received:', text.substring(0, 1000));
 
             if (response.status === 404) {
                 return { error: `Endpoint not found (404). Check API_URL: ${API_URL}` };
             }
 
-            if (text.includes("503 Service Unavailable") || text.includes("It works!") || text.includes("<!DOCTYPE html>")) {
-                return { error: `Server API is currently unavailable or returning a static page. (Status: ${response.status})` };
+            // Capture specific server errors or blank pages
+            if (response.status === 503) {
+                if (text.includes("Database Connection Error")) {
+                    return { error: "Database Connection Error: The server could not connect to its data storage. This is likely a configuration issue on Hostinger." };
+                }
+                return { error: `Server API is currently unavailable (Status: 503). Server Response: ${text.substring(0, 200)}...` };
             }
 
-            return { error: text.substring(0, 100) || 'Server returned an invalid response.' };
+            if (text.includes("It works!") || text.includes("<!DOCTYPE html>")) {
+                return { error: `Server API is returning a static HTML page instead of JSON. (Status: ${response.status}). This often means the custom domain is not correctly routing to the Node.js application.` };
+            }
+
+            return { error: text.substring(0, 300) || 'Server returned an invalid response.' };
         }
     } catch (e) {
         console.error('Parsing error:', e);
@@ -224,13 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 login(email, password)
                     .then(user => redirectToDashboard(user))
                     .catch(error => {
-                        let msg = error.message;
-                        if (error.debug) {
-                            msg += `\n\nDebug Info:\n- Found: ${error.debug.found}\n- Match: ${error.debug.match}`;
-                            if (error.debug.dbPath) msg += `\n- DB Path: ${error.debug.dbPath}`;
-                            if (error.debug.dbExists !== undefined) msg += `\n- DB Exists: ${error.debug.dbExists ? 'Yes' : 'No'}`;
-                        }
-                        showErrorMessage(msg, loginForm.parentElement);
+                        showErrorMessage(error.message, loginForm.parentElement);
                     });
             } catch (error) {
                 showErrorMessage('Invalid email or password. Please try again.', loginForm.parentElement);

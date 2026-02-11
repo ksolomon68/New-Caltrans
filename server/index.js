@@ -7,14 +7,16 @@ console.log('CaltransBizConnect: Starting server initialization...');
 
 const app = express();
 // Priority: Phusion Passenger (PASSENGER_NODE_CONTROL_REPO), process.env.PORT, default 3000
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 try {
     // Middleware
     const allowedOrigins = [
         'http://localhost:3000',
+        'http://localhost:3001',
         'http://localhost:5500',
         'http://127.0.0.1:5500',
+        'http://127.0.0.1:3001',
         'https://caltransbizconnect.org',
         'https://www.caltransbizconnect.org',
         'http://caltransbizconnect.org',
@@ -41,7 +43,7 @@ try {
     // API Logging Middleware - For robust production debugging
     app.use('/api', (req, res, next) => {
         console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-        if (Object.keys(req.body).length > 0) {
+        if (req.body && Object.keys(req.body).length > 0) {
             const safeBody = { ...req.body };
             if (safeBody.password) safeBody.password = '***';
             console.log('API Request Body:', safeBody);
@@ -299,6 +301,16 @@ try {
 
 } catch (globalError) {
     console.error('CaltransBizConnect CRITICAL STARTUP ERROR:', globalError);
-    // On Passenger, the app should still try to listen or it will result in 503
-    try { app.listen(PORT); } catch (e) { }
+    // On Passenger, the app MUST listen on 'passenger' or it will result in a generic web server 503.
+    // By listening, we might be able to serve the /api/health endpoint or error JSON.
+    if (process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO) {
+        try {
+            console.log('CaltransBizConnect: Attempting emergency listen on "passenger"...');
+            app.listen('passenger');
+        } catch (e) {
+            console.error('CaltransBizConnect: Emergency listen failed:', e.message);
+        }
+    } else {
+        try { app.listen(PORT); } catch (e) { }
+    }
 }

@@ -157,8 +157,6 @@
                     </div>
 
                     <div class="action-bar" style="flex-wrap: wrap;">
-                        <button id="applyBtn" class="btn btn-primary" onclick="handleApply()">Apply for
-                            Opportunity</button>
                         <button id="saveBtn" class="btn btn-outline" onclick="toggleSave()">Save Opportunity</button>
                         <button id="viewAgencyBtn" class="btn btn-outline" onclick="viewAgencyProfile()">View Agency
                             Profile</button>
@@ -275,17 +273,7 @@
             document.getElementById('errorView').style.display = 'block';
         }
 
-        function handleApply() {
-            if (!currentOpportunity) return;
-            const user = getCurrentUser();
-            if (!user) {
-                alert('Please log in to apply for opportunities.');
-                window.location.href = 'login.html';
-                return;
-            }
-            // Redirect to application form with opportunity ID
-            window.location.href = `vendor-applications.html?apply=${currentOpportunity.id}`;
-        }
+
 
         async function toggleSave() {
             const user = Auth.getUser();
