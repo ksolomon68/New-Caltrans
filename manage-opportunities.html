@@ -31,8 +31,8 @@
                 <div class="hero-content">
                     <div class="hero-welcome">
                         <h1 class="page-title">Manage Opportunities</h1>
-                        <p style="color: rgba(255,255,255,0.9); font-size: var(--font-size-md);">Review applications,
-                            update opportunity status, and manage your active contracting opportunities.</p>
+                        <p style="color: rgba(255,255,255,0.9); font-size: var(--font-size-md);">Update opportunity
+                            status and manage your active contracting opportunities.</p>
                     </div>
                 </div>
             </section>
@@ -157,7 +157,6 @@
                                 <option value="closed" ${opp.status === 'closed' ? 'selected' : ''}>Closed</option>
                                 <option value="awarded" ${opp.status === 'awarded' ? 'selected' : ''}>Awarded</option>
                             </select>
-                            <button class="btn btn-outline btn-small" onclick="location.href='view-applications.html?id=${opp.id}'">View Applications</button>
                             <button class="btn btn-small btn-outline" onclick="editOpportunity('${opp.id}')">Edit</button>
                         </div>
                     `;
@@ -177,7 +176,6 @@
                                     <span class="badge badge-secondary">${opp.status || 'Active'}</span>
                                     <span class="badge badge-secondary">${opp.category || 'Construction'}</span>
                                     <span class="badge badge-secondary">${opp.district || `District ${opp.district_id || '4'}`}</span>
-                                    ${!isAdmin ? `<span class="badge badge-info">${opp.application_count || 0} Applications</span>` : ''}
                                 </div>
                             </div>
                             <div style="text-align: right;">
@@ -222,9 +220,6 @@
             window.updateOpportunityStatus(id, 'published');
         };
 
-        window.viewApplications = function (opportunityId) {
-            window.location.href = `applied-vendors.html?id=${opportunityId}`;
-        };
 
         window.deleteOpportunity = async function (id) {
             if (!confirm('Are you sure you want to delete this opportunity? This action cannot be undone.')) return;
