@@ -4,8 +4,8 @@ dist/
 build/
 
 # Local databases
-*.db
-*.sqlite
+# *.db (Removed to include demo content)
+# *.sqlite
 
 # User-specific or sensitive files
 .env
