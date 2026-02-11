@@ -104,8 +104,8 @@ async function login(email, password) {
         console.error('CaltransBizConnect Login error detail:', error);
 
         // Handle specific network errors
-        if (error instanceof TypeError && error.message.includes('fetch')) {
-            throw new Error('Connection Error: Unable to reach the authentication server. Please check your internet connection and ensure the API is running.');
+        if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('NetworkError'))) {
+            throw new Error(`Connection Error: Unable to reach the authentication server at ${finalUrl}. Please ensure the API server is running on port 3001.`);
         }
 
         if (window.location.protocol === 'https:' && API_URL.startsWith('http:')) {
