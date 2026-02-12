@@ -3,10 +3,10 @@ node_modules/
 dist/
 build/
 
-# Local databases
-*.db
-*.sqlite
-server/data.db
+# Local databases (Removed to allow tracking per user request)
+# *.db
+# *.sqlite
+# server/data.db
 server/data1.db
 
 # User-specific or sensitive files
