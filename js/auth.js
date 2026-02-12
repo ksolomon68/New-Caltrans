@@ -372,7 +372,12 @@ function syncNavHeader() {
         if (user.type === 'agency') dashboardUrl = 'dashboard-agency.html';
         if (user.type === 'admin') dashboardUrl = 'dashboard-admin.html';
 
-        li.innerHTML = `<a href="${dashboardUrl}" class="btn btn-primary btn-small">Dashboard</a>`;
+        li.innerHTML = `
+            <div style="display: flex; gap: var(--space-sm); align-items: center;">
+                <a href="${dashboardUrl}" class="btn btn-primary btn-small">Dashboard</a>
+                <a href="#" onclick="logout(); return false;" class="btn btn-outline btn-small">Log Out</a>
+            </div>
+        `;
     }
 }
 

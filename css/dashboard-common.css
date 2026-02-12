@@ -360,6 +360,18 @@ textarea {
     border: 2px solid var(--color-secondary);
 }
 
+@media (max-width: 1024px) {
+    .mobile-signout-btn {
+        display: flex !important;
+    }
+
+    .sidebar-footer {
+        position: relative;
+        /* Change from absolute if it was low */
+        margin-top: auto;
+    }
+}
+
 .mobile-signout-btn {
     display: none;
 }

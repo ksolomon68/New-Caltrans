@@ -166,7 +166,7 @@ router.put('/:id', async (req, res) => {
             (profileData.preferredDistricts || profileData.districts) ? JSON.stringify(profileData.preferredDistricts || profileData.districts) : null,
             (profileData.workCategories || profileData.categories) ? JSON.stringify(profileData.workCategories || profileData.categories) : null,
             profileData.savedOpportunities ? JSON.stringify(profileData.savedOpportunities) : null,
-            profileData.capabilityStatement || profileData.capability_statement ? (profileData.capabilityStatement || profileData.capability_statement) : null,
+            profileData.capabilityStatement || profileData.capability_statement ? JSON.stringify(profileData.capabilityStatement || profileData.capability_statement) : null,
             profileData.address || null,
             profileData.city || null,
             profileData.zip || profileData.zipCode || null,
