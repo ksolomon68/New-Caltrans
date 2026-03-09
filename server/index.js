@@ -140,25 +140,27 @@ try {
 
         // If JSON is requested (like from health API)
         if (req.path.includes('/api/health')) {
-            status: 'ok',
+            return res.json({
+                status: 'ok',
                 version: VERSION,
-                    database: {
-                status: dbStatus,
+                database: {
+                    status: dbStatus,
                     detail: detail,
-                        path: getDbPath(),
-                            exists: checkDbFile()
-            },
-            uptime: process.uptime(),
+                    path: getDbPath(),
+                    exists: checkDbFile()
+                },
+                uptime: process.uptime(),
                 timestamp: new Date().toISOString(),
-                    env: {
-                node: process.version,
+                env: {
+                    node: process.version,
                     passenger: !!(process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO),
-                        cwd: process.cwd(),
-                            dirname: __dirname,
-                                publicPath: publicPath,
-                                    indexExists: fs.existsSync(path.join(publicPath, 'index.html')),
-                                        serverFiles: fs.readdirSync(__dirname)
-            }
+                    cwd: process.cwd(),
+                    dirname: __dirname,
+                    publicPath: publicPath,
+                    indexExists: fs.existsSync(path.join(publicPath, 'index.html')),
+                    serverFiles: fs.readdirSync(__dirname)
+                }
+            });
         }
 
         // Default HTML response
