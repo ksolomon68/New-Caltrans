@@ -8,6 +8,8 @@ build/
 # *.sqlite
 # server/data.db
 server/data1.db
+server/*.db-shm
+server/*.db-wal
 
 # User-specific or sensitive files
 .env
