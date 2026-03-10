@@ -2,9 +2,9 @@ const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Load environment variables
-dotenv.config();
-dotenv.config({ path: path.resolve(process.cwd(), '.env.production') });
+// Load environment variables with override for production
+dotenv.config({ path: path.resolve(__dirname, '../.env.production'), override: true });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 console.log('CaltransBizConnect DB: Initializing MySQL Connection Pool...');
 console.log('DB Host:', process.env.DB_HOST || 'localhost');
@@ -16,8 +16,9 @@ let pool;
 function getDb() {
     if (!pool) {
         try {
+            const dbHost = process.env.DB_HOST || '127.0.0.1';
             pool = mysql.createPool({
-                host: process.env.DB_HOST || 'localhost',
+                host: dbHost === 'localhost' ? '127.0.0.1' : dbHost,
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
