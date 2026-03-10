@@ -1,3 +1,5 @@
+// Load .env.production first (live credentials), then .env for any local overrides
+require('dotenv').config({ path: require('path').join(__dirname, '../.env.production') });
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
 const express = require('express');
