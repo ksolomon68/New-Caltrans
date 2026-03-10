@@ -99,7 +99,8 @@ router.put('/:id', async (req, res) => {
     const {
         business_name, organization_name, contact_name, phone,
         website, address, city, state, zip, description,
-        certifications, years_in_business, districts, categories
+        certifications, years_in_business, districts, categories,
+        capability_statement
     } = req.body;
 
     const bizDesc = description || req.body.business_description;
@@ -126,6 +127,7 @@ router.put('/:id', async (req, res) => {
         const newDesc = safeVal(bizDesc, existingUser.business_description);
         const newCerts = safeVal(certifications, existingUser.certifications);
         const newYears = safeVal(years_in_business, existingUser.years_in_business);
+        const newCS = safeVal(capability_statement, existingUser.capability_statement);
 
         // Handle JSON arrays specially
         let newDistricts = existingUser.districts;
@@ -139,11 +141,11 @@ router.put('/:id', async (req, res) => {
         }
 
         const sql = `
-            UPDATE users SET 
+            UPDATE users SET
                 business_name = ?, organization_name = ?, contact_name = ?, phone = ?,
                 website = ?, address = ?, city = ?, state = ?, zip = ?,
                 business_description = ?, certifications = ?, years_in_business = ?,
-                districts = ?, categories = ?
+                districts = ?, categories = ?, capability_statement = ?
             WHERE id = ?
         `;
 
@@ -151,7 +153,7 @@ router.put('/:id', async (req, res) => {
             newBusinessName, newOrgName, newContactName, newPhone,
             newWebsite, newAddress, newCity, newState, newZip,
             newDesc, newCerts, newYears,
-            newDistricts, newCategories,
+            newDistricts, newCategories, newCS,
             id
         ]);
 

@@ -420,13 +420,16 @@
                                     <div id="csUploadedState" style="display: none;">
                                         <div
                                             style="color: var(--color-success); font-weight: 700; margin-bottom: var(--space-md);">
-                                            ✅ Capability Statement Verified</div>
-                                        <div style="display: flex; gap: var(--space-md); justify-content: center;">
+                                            ✅ Capability Statement Uploaded</div>
+                                        <div id="csUploadedFileName" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: var(--space-md);"></div>
+                                        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
                                             <button type="button" class="btn btn-outline btn-small"
-                                                onclick="window.viewCurrentCS()">View Current</button>
+                                                onclick="window.viewCurrentCS()">View PDF</button>
                                             <button type="button" class="btn btn-outline btn-small"
-                                                onclick="document.getElementById('csFileInput').click()">Replace
-                                                PDF</button>
+                                                onclick="document.getElementById('csFileInput').click()">Replace PDF</button>
+                                            <button type="button" class="btn btn-outline btn-small"
+                                                style="color: var(--color-error); border-color: var(--color-error);"
+                                                onclick="window.removeCS()">Remove</button>
                                         </div>
                                     </div>
                                     <div id="uploadStatus" style="margin-top: 1rem; font-size: 0.85rem;"></div>
@@ -588,6 +591,13 @@
                 document.getElementById('csSelectedState').style.display = 'none';
                 document.getElementById('csUploadedState').style.display = 'block';
                 window.currentCSPath = data.capability_statement;
+                // Show filename extracted from path
+                const fname = data.capability_statement.split('/').pop();
+                document.getElementById('csUploadedFileName').textContent = fname;
+            } else {
+                document.getElementById('csEmptyState').style.display = 'block';
+                document.getElementById('csUploadedState').style.display = 'none';
+                document.getElementById('csSelectedState').style.display = 'none';
             }
         }
 
@@ -769,6 +779,7 @@
                 // Show completed state
                 document.getElementById('csSelectedState').style.display = 'none';
                 document.getElementById('csUploadedState').style.display = 'block';
+                document.getElementById('csUploadedFileName').textContent = result.originalName || file.name;
 
                 // Save locally to persist "upload" in this session
                 window.currentCSPath = result.path;
@@ -804,6 +815,41 @@
         window.viewCurrentCS = () => {
             const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
             window.open(`${API_BASE}/vendors/${user.id}/capability-statement`, '_blank');
+        };
+
+        window.removeCS = async () => {
+            if (!confirm('Remove your capability statement? This cannot be undone.')) return;
+
+            const status = document.getElementById('uploadStatus');
+            status.textContent = '🔄 Removing...';
+            status.style.color = 'var(--text-muted)';
+
+            try {
+                const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+                const response = await fetch(`${API_BASE}/vendors/${user.id}/capability-statement`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Server error');
+
+                window.currentCSPath = null;
+                document.getElementById('csFileInput').value = '';
+                document.getElementById('csUploadedState').style.display = 'none';
+                document.getElementById('csEmptyState').style.display = 'block';
+                document.getElementById('csUploadedFileName').textContent = '';
+                status.textContent = '✅ Capability statement removed.';
+                status.style.color = 'var(--color-success)';
+
+                const updatedUser = { ...user, capability_statement: null };
+                localStorage.setItem('caltrans_user', JSON.stringify(updatedUser));
+                calculateProgress(updatedUser);
+
+                setTimeout(() => { status.textContent = ''; }, 3000);
+            } catch (error) {
+                console.error('Remove CS error:', error);
+                status.textContent = '❌ Failed to remove. Please try again.';
+                status.style.color = 'var(--color-error)';
+            }
         };
 
         // Section Scroll Spying
