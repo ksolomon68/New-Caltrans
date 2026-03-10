@@ -52,19 +52,19 @@
 
   /* Map prefs to CSS classes applied on <html> */
   var CLASS_MAP = {
-    stopAnimations:       'a11y-no-animations',
-    keyboardMode:         'a11y-keyboard-mode',
-    highlightLinks:       'a11y-highlight-links',
-    highlightHeadings:    'a11y-highlight-headings',
-    hideImages:           'a11y-hide-images',
-    grayscale:            'a11y-grayscale',
-    'contrast-high':      'a11y-contrast-high',
-    'contrast-dark':      'a11y-contrast-dark',
+    stopAnimations: 'a11y-no-animations',
+    keyboardMode: 'a11y-keyboard-mode',
+    highlightLinks: 'a11y-highlight-links',
+    highlightHeadings: 'a11y-highlight-headings',
+    hideImages: 'a11y-hide-images',
+    grayscale: 'a11y-grayscale',
+    'contrast-high': 'a11y-contrast-high',
+    'contrast-dark': 'a11y-contrast-dark',
     'lineHeight-relaxed': 'a11y-line-height-relaxed',
-    'lineHeight-loose':   'a11y-line-height-loose',
-    'letterSpacing-wide':   'a11y-letter-spacing-wide',
-    'letterSpacing-wider':  'a11y-letter-spacing-wider',
-    'fontFamily-dyslexic':  'a11y-dyslexic-font'
+    'lineHeight-loose': 'a11y-line-height-loose',
+    'letterSpacing-wide': 'a11y-letter-spacing-wide',
+    'letterSpacing-wider': 'a11y-letter-spacing-wider',
+    'fontFamily-dyslexic': 'a11y-dyslexic-font'
   };
 
   var ALL_CLASSES = Object.values(CLASS_MAP);
@@ -126,7 +126,7 @@
 
     /* Boolean toggles */
     var booleans = ['stopAnimations', 'keyboardMode', 'highlightLinks',
-                    'highlightHeadings', 'hideImages', 'grayscale'];
+      'highlightHeadings', 'hideImages', 'grayscale'];
     booleans.forEach(function (key) {
       if (prefs[key] && CLASS_MAP[key]) {
         html.classList.add(CLASS_MAP[key]);
@@ -204,7 +204,7 @@
     triggerBtn.setAttribute('aria-label', 'Open Accessibility Settings (Alt+A)');
     triggerBtn.setAttribute('aria-expanded', 'false');
     triggerBtn.setAttribute('aria-controls', 'a11y-panel');
-    triggerBtn.innerHTML = '<span class="a11y-trigger-icon" aria-hidden="true">' +
+    triggerBtn.innerHTML = '<span class="sr-only">Accessibility Options</span><span class="a11y-trigger-icon" aria-hidden="true">' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
       'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
       '<circle cx="12" cy="5" r="2"></circle>' +
@@ -227,140 +227,140 @@
   function buildPanelHTML() {
     return '' +
       '<div class="a11y-panel-header">' +
-        '<div>' +
-          '<div class="a11y-panel-title">Accessibility Settings</div>' +
-          '<div class="a11y-panel-shortcut">Alt + A to open / close</div>' +
-        '</div>' +
-        '<button class="a11y-close-btn" id="a11y-close-btn" aria-label="Close Accessibility Settings">' +
-          '&times;' +
-        '</button>' +
+      '<div>' +
+      '<div class="a11y-panel-title">Accessibility Settings</div>' +
+      '<div class="a11y-panel-shortcut">Alt + A to open / close</div>' +
+      '</div>' +
+      '<button class="a11y-close-btn" id="a11y-close-btn" aria-label="Close Accessibility Settings">' +
+      '&times;' +
+      '</button>' +
       '</div>' +
 
       /* -- VISUAL ADJUSTMENTS -- */
       '<div class="a11y-section">' +
-        '<div class="a11y-section-title">Visual Adjustments</div>' +
+      '<div class="a11y-section-title">Visual Adjustments</div>' +
 
-        /* Text Size */
-        '<div class="a11y-control-row">' +
-          '<span class="a11y-control-label" id="a11y-text-size-label">Text Size</span>' +
-          '<div class="a11y-stepper" role="group" aria-labelledby="a11y-text-size-label">' +
-            '<button class="a11y-stepper-btn" id="a11y-text-decrease" aria-label="Decrease text size">&minus;</button>' +
-            '<span class="a11y-stepper-value" id="a11y-text-size-val" aria-live="polite" aria-atomic="true">100%</span>' +
-            '<button class="a11y-stepper-btn" id="a11y-text-increase" aria-label="Increase text size">+</button>' +
-          '</div>' +
-        '</div>' +
+      /* Text Size */
+      '<div class="a11y-control-row">' +
+      '<span class="a11y-control-label" id="a11y-text-size-label">Text Size</span>' +
+      '<div class="a11y-stepper" role="group" aria-labelledby="a11y-text-size-label">' +
+      '<button class="a11y-stepper-btn" id="a11y-text-decrease" aria-label="Decrease text size">&minus;</button>' +
+      '<span class="a11y-stepper-value" id="a11y-text-size-val" aria-live="polite" aria-atomic="true">100%</span>' +
+      '<button class="a11y-stepper-btn" id="a11y-text-increase" aria-label="Increase text size">+</button>' +
+      '</div>' +
+      '</div>' +
 
-        /* Line Height */
-        '<div class="a11y-control-row">' +
-          '<span class="a11y-control-label" id="a11y-lh-label">Line Height</span>' +
-          '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-lh-label">' +
-            '<button class="a11y-btn" id="a11y-lh-normal" data-pref="lineHeight" data-val="normal" aria-pressed="true">Normal</button>' +
-            '<button class="a11y-btn" id="a11y-lh-relaxed" data-pref="lineHeight" data-val="relaxed" aria-pressed="false">Relaxed</button>' +
-            '<button class="a11y-btn" id="a11y-lh-loose" data-pref="lineHeight" data-val="loose" aria-pressed="false">Loose</button>' +
-          '</div>' +
-        '</div>' +
+      /* Line Height */
+      '<div class="a11y-control-row">' +
+      '<span class="a11y-control-label" id="a11y-lh-label">Line Height</span>' +
+      '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-lh-label">' +
+      '<button class="a11y-btn" id="a11y-lh-normal" data-pref="lineHeight" data-val="normal" aria-pressed="true">Normal</button>' +
+      '<button class="a11y-btn" id="a11y-lh-relaxed" data-pref="lineHeight" data-val="relaxed" aria-pressed="false">Relaxed</button>' +
+      '<button class="a11y-btn" id="a11y-lh-loose" data-pref="lineHeight" data-val="loose" aria-pressed="false">Loose</button>' +
+      '</div>' +
+      '</div>' +
 
-        /* Letter Spacing */
-        '<div class="a11y-control-row">' +
-          '<span class="a11y-control-label" id="a11y-ls-label">Letter Spacing</span>' +
-          '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-ls-label">' +
-            '<button class="a11y-btn" id="a11y-ls-normal" data-pref="letterSpacing" data-val="normal" aria-pressed="true">Normal</button>' +
-            '<button class="a11y-btn" id="a11y-ls-wide" data-pref="letterSpacing" data-val="wide" aria-pressed="false">Wide</button>' +
-            '<button class="a11y-btn" id="a11y-ls-wider" data-pref="letterSpacing" data-val="wider" aria-pressed="false">Wider</button>' +
-          '</div>' +
-        '</div>' +
+      /* Letter Spacing */
+      '<div class="a11y-control-row">' +
+      '<span class="a11y-control-label" id="a11y-ls-label">Letter Spacing</span>' +
+      '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-ls-label">' +
+      '<button class="a11y-btn" id="a11y-ls-normal" data-pref="letterSpacing" data-val="normal" aria-pressed="true">Normal</button>' +
+      '<button class="a11y-btn" id="a11y-ls-wide" data-pref="letterSpacing" data-val="wide" aria-pressed="false">Wide</button>' +
+      '<button class="a11y-btn" id="a11y-ls-wider" data-pref="letterSpacing" data-val="wider" aria-pressed="false">Wider</button>' +
+      '</div>' +
+      '</div>' +
 
-        /* Font Family */
-        '<div class="a11y-control-row">' +
-          '<span class="a11y-control-label" id="a11y-ff-label">Font</span>' +
-          '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-ff-label">' +
-            '<button class="a11y-btn" id="a11y-ff-default" data-pref="fontFamily" data-val="default" aria-pressed="true">Default</button>' +
-            '<button class="a11y-btn" id="a11y-ff-dyslexic" data-pref="fontFamily" data-val="dyslexic" aria-pressed="false">Dyslexic</button>' +
-          '</div>' +
-        '</div>' +
+      /* Font Family */
+      '<div class="a11y-control-row">' +
+      '<span class="a11y-control-label" id="a11y-ff-label">Font</span>' +
+      '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-ff-label">' +
+      '<button class="a11y-btn" id="a11y-ff-default" data-pref="fontFamily" data-val="default" aria-pressed="true">Default</button>' +
+      '<button class="a11y-btn" id="a11y-ff-dyslexic" data-pref="fontFamily" data-val="dyslexic" aria-pressed="false">Dyslexic</button>' +
+      '</div>' +
+      '</div>' +
       '</div>' +
 
       /* -- CONTRAST & COLORS -- */
       '<div class="a11y-section">' +
-        '<div class="a11y-section-title">Contrast &amp; Colors</div>' +
+      '<div class="a11y-section-title">Contrast &amp; Colors</div>' +
 
-        /* Contrast Mode */
-        '<div class="a11y-control-row">' +
-          '<span class="a11y-control-label" id="a11y-ct-label">Contrast</span>' +
-          '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-ct-label">' +
-            '<button class="a11y-btn" id="a11y-ct-default" data-pref="contrast" data-val="default" aria-pressed="true">Default</button>' +
-            '<button class="a11y-btn" id="a11y-ct-high" data-pref="contrast" data-val="high" aria-pressed="false">High</button>' +
-            '<button class="a11y-btn" id="a11y-ct-dark" data-pref="contrast" data-val="dark" aria-pressed="false">Dark</button>' +
-          '</div>' +
-        '</div>' +
+      /* Contrast Mode */
+      '<div class="a11y-control-row">' +
+      '<span class="a11y-control-label" id="a11y-ct-label">Contrast</span>' +
+      '<div class="a11y-btn-group" role="group" aria-labelledby="a11y-ct-label">' +
+      '<button class="a11y-btn" id="a11y-ct-default" data-pref="contrast" data-val="default" aria-pressed="true">Default</button>' +
+      '<button class="a11y-btn" id="a11y-ct-high" data-pref="contrast" data-val="high" aria-pressed="false">High</button>' +
+      '<button class="a11y-btn" id="a11y-ct-dark" data-pref="contrast" data-val="dark" aria-pressed="false">Dark</button>' +
+      '</div>' +
+      '</div>' +
 
-        /* Grayscale */
-        '<div class="a11y-control-row">' +
-          '<label class="a11y-control-label" for="a11y-grayscale-toggle">Grayscale</label>' +
-          '<label class="a11y-toggle">' +
-            '<input type="checkbox" id="a11y-grayscale-toggle" data-pref="grayscale">' +
-            '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
-          '</label>' +
-        '</div>' +
+      /* Grayscale */
+      '<div class="a11y-control-row">' +
+      '<label class="a11y-control-label" for="a11y-grayscale-toggle">Grayscale</label>' +
+      '<label class="a11y-toggle">' +
+      '<input type="checkbox" id="a11y-grayscale-toggle" data-pref="grayscale">' +
+      '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
+      '</label>' +
+      '</div>' +
 
-        /* Highlight Links */
-        '<div class="a11y-control-row">' +
-          '<label class="a11y-control-label" for="a11y-links-toggle">Highlight Links</label>' +
-          '<label class="a11y-toggle">' +
-            '<input type="checkbox" id="a11y-links-toggle" data-pref="highlightLinks">' +
-            '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
-          '</label>' +
-        '</div>' +
+      /* Highlight Links */
+      '<div class="a11y-control-row">' +
+      '<label class="a11y-control-label" for="a11y-links-toggle">Highlight Links</label>' +
+      '<label class="a11y-toggle">' +
+      '<input type="checkbox" id="a11y-links-toggle" data-pref="highlightLinks">' +
+      '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
+      '</label>' +
+      '</div>' +
 
-        /* Highlight Headings */
-        '<div class="a11y-control-row">' +
-          '<label class="a11y-control-label" for="a11y-headings-toggle">Highlight Headings</label>' +
-          '<label class="a11y-toggle">' +
-            '<input type="checkbox" id="a11y-headings-toggle" data-pref="highlightHeadings">' +
-            '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
-          '</label>' +
-        '</div>' +
+      /* Highlight Headings */
+      '<div class="a11y-control-row">' +
+      '<label class="a11y-control-label" for="a11y-headings-toggle">Highlight Headings</label>' +
+      '<label class="a11y-toggle">' +
+      '<input type="checkbox" id="a11y-headings-toggle" data-pref="highlightHeadings">' +
+      '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
+      '</label>' +
+      '</div>' +
       '</div>' +
 
       /* -- CONTENT & MOTION -- */
       '<div class="a11y-section">' +
-        '<div class="a11y-section-title">Content &amp; Motion</div>' +
+      '<div class="a11y-section-title">Content &amp; Motion</div>' +
 
-        /* Stop Animations */
-        '<div class="a11y-control-row">' +
-          '<label class="a11y-control-label" for="a11y-anim-toggle">Stop Animations</label>' +
-          '<label class="a11y-toggle">' +
-            '<input type="checkbox" id="a11y-anim-toggle" data-pref="stopAnimations">' +
-            '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
-          '</label>' +
-        '</div>' +
+      /* Stop Animations */
+      '<div class="a11y-control-row">' +
+      '<label class="a11y-control-label" for="a11y-anim-toggle">Stop Animations</label>' +
+      '<label class="a11y-toggle">' +
+      '<input type="checkbox" id="a11y-anim-toggle" data-pref="stopAnimations">' +
+      '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
+      '</label>' +
+      '</div>' +
 
-        /* Keyboard Mode */
-        '<div class="a11y-control-row">' +
-          '<label class="a11y-control-label" for="a11y-kbd-toggle">Enhanced Focus</label>' +
-          '<label class="a11y-toggle">' +
-            '<input type="checkbox" id="a11y-kbd-toggle" data-pref="keyboardMode">' +
-            '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
-          '</label>' +
-        '</div>' +
+      /* Keyboard Mode */
+      '<div class="a11y-control-row">' +
+      '<label class="a11y-control-label" for="a11y-kbd-toggle">Enhanced Focus</label>' +
+      '<label class="a11y-toggle">' +
+      '<input type="checkbox" id="a11y-kbd-toggle" data-pref="keyboardMode">' +
+      '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
+      '</label>' +
+      '</div>' +
 
-        /* Hide Images */
-        '<div class="a11y-control-row">' +
-          '<label class="a11y-control-label" for="a11y-img-toggle">Hide Images</label>' +
-          '<label class="a11y-toggle">' +
-            '<input type="checkbox" id="a11y-img-toggle" data-pref="hideImages">' +
-            '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
-          '</label>' +
-        '</div>' +
+      /* Hide Images */
+      '<div class="a11y-control-row">' +
+      '<label class="a11y-control-label" for="a11y-img-toggle">Hide Images</label>' +
+      '<label class="a11y-toggle">' +
+      '<input type="checkbox" id="a11y-img-toggle" data-pref="hideImages">' +
+      '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
+      '</label>' +
+      '</div>' +
 
-        /* Reading Guide */
-        '<div class="a11y-control-row">' +
-          '<label class="a11y-control-label" for="a11y-guide-toggle">Reading Guide</label>' +
-          '<label class="a11y-toggle">' +
-            '<input type="checkbox" id="a11y-guide-toggle" data-pref="readingGuide">' +
-            '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
-          '</label>' +
-        '</div>' +
+      /* Reading Guide */
+      '<div class="a11y-control-row">' +
+      '<label class="a11y-control-label" for="a11y-guide-toggle">Reading Guide</label>' +
+      '<label class="a11y-toggle">' +
+      '<input type="checkbox" id="a11y-guide-toggle" data-pref="readingGuide">' +
+      '<span class="a11y-toggle-track" aria-hidden="true"></span>' +
+      '</label>' +
+      '</div>' +
       '</div>' +
 
       /* -- RESET -- */
@@ -383,10 +383,10 @@
 
     /* Segmented button groups */
     var groups = {
-      lineHeight:    ['normal', 'relaxed', 'loose'],
+      lineHeight: ['normal', 'relaxed', 'loose'],
       letterSpacing: ['normal', 'wide', 'wider'],
-      fontFamily:    ['default', 'dyslexic'],
-      contrast:      ['default', 'high', 'dark']
+      fontFamily: ['default', 'dyslexic'],
+      contrast: ['default', 'high', 'dark']
     };
 
     Object.keys(groups).forEach(function (pref) {
@@ -406,13 +406,13 @@
 
     /* Checkbox toggles */
     var checkboxMap = {
-      grayscale:        '#a11y-grayscale-toggle',
-      highlightLinks:   '#a11y-links-toggle',
-      highlightHeadings:'#a11y-headings-toggle',
-      stopAnimations:   '#a11y-anim-toggle',
-      keyboardMode:     '#a11y-kbd-toggle',
-      hideImages:       '#a11y-img-toggle',
-      readingGuide:     '#a11y-guide-toggle'
+      grayscale: '#a11y-grayscale-toggle',
+      highlightLinks: '#a11y-links-toggle',
+      highlightHeadings: '#a11y-headings-toggle',
+      stopAnimations: '#a11y-anim-toggle',
+      keyboardMode: '#a11y-kbd-toggle',
+      hideImages: '#a11y-img-toggle',
+      readingGuide: '#a11y-guide-toggle'
     };
 
     Object.keys(checkboxMap).forEach(function (pref) {
@@ -462,7 +462,7 @@
     /* Close button */
     panel.addEventListener('click', function (e) {
       if (e.target.id === 'a11y-close-btn' ||
-          e.target.closest('#a11y-close-btn')) {
+        e.target.closest('#a11y-close-btn')) {
         closePanel();
       }
     });
@@ -501,7 +501,7 @@
       var btn = e.target.closest('[data-pref][data-val]');
       if (!btn) return;
       var pref = btn.getAttribute('data-pref');
-      var val  = btn.getAttribute('data-val');
+      var val = btn.getAttribute('data-val');
       prefs[pref] = val;
       savePrefs();
       applyClasses();
@@ -565,18 +565,18 @@
 
   function labelFor(pref) {
     var labels = {
-      textSize:         'Text size',
-      lineHeight:       'Line height',
-      letterSpacing:    'Letter spacing',
-      fontFamily:       'Font',
-      contrast:         'Contrast',
-      grayscale:        'Grayscale',
-      highlightLinks:   'Highlight links',
-      highlightHeadings:'Highlight headings',
-      stopAnimations:   'Stop animations',
-      keyboardMode:     'Enhanced focus',
-      hideImages:       'Hide images',
-      readingGuide:     'Reading guide'
+      textSize: 'Text size',
+      lineHeight: 'Line height',
+      letterSpacing: 'Letter spacing',
+      fontFamily: 'Font',
+      contrast: 'Contrast',
+      grayscale: 'Grayscale',
+      highlightLinks: 'Highlight links',
+      highlightHeadings: 'Highlight headings',
+      stopAnimations: 'Stop animations',
+      keyboardMode: 'Enhanced focus',
+      hideImages: 'Hide images',
+      readingGuide: 'Reading guide'
     };
     return labels[pref] || pref;
   }
@@ -590,7 +590,7 @@
     var extLinks = document.querySelectorAll('a[target="_blank"]');
     extLinks.forEach(function (link) {
       if (!link.getAttribute('aria-label') &&
-          !link.querySelector('.sr-only')) {
+        !link.querySelector('.sr-only')) {
         var sr = document.createElement('span');
         sr.className = 'sr-only';
         sr.textContent = ' (opens in new window)';
