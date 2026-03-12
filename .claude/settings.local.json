@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node \"c:/Users/Keisha/Documents/caltrans/new caltrans/audit_widget.js\")"
+      "Bash(node \"c:/Users/Keisha/Documents/caltrans/new caltrans/audit_widget.js\")",
+      "Bash(node -e \":*)",
+      "Bash(git add server/index.js server/routes/users.js server/routes/upload.js server/routes/vendors.js vendor-profile.html)",
+      "Bash(git commit:*)",
+      "Bash(curl -s -X POST http://localhost:3001/api/upload-cs -F \"file=@uploads/cs-1769996741255-102823023.pdf\" -F \"userId=4\")"
     ]
   }
 }

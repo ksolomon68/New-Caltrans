@@ -20,6 +20,38 @@ const startServer = async () => {
         app.use(cors());
         app.use(express.json());
 
+        // Maintenance Mode Middleware
+        app.use((req, res, next) => {
+            // Check for admin bypass query param
+            if (req.query.admin === 'true') {
+                res.cookie('admin_bypass', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+                return res.redirect(req.path);
+            }
+            
+            // Check bypass mechanisms
+            const hasBypassCookie = req.headers.cookie && req.headers.cookie.includes('admin_bypass=true');
+            const isAllowedIP = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip);
+            
+            if (process.env.MAINTENANCE_MODE === 'true' && !hasBypassCookie && !isAllowedIP) {
+                // Always allow static assets needed for the maintenance page
+                if (req.path.startsWith('/css/maintenance.css') || 
+                    req.path.startsWith('/images/') || 
+                    req.path.startsWith('/assets/') ||
+                    req.path.startsWith('/js/maintenance-animations.js')) {
+                    return next();
+                }
+                
+                // Revert APIs to 503 JSON
+                if (req.path.startsWith('/api/')) {
+                    return res.status(503).json({ error: 'Service Unavailable', message: 'Platform upgrade in progress.' });
+                }
+                
+                // Return the maintenance page for all other requests
+                return res.status(503).sendFile(path.join(__dirname, '../maintenance.html'));
+            }
+            next();
+        });
+
         // API Logging
         app.use('/api', (req, res, next) => {
             console.log(`[API ${new Date().toISOString()}] ${req.method} ${req.path}`);
