@@ -4,6 +4,55 @@ const fs = require('fs');
 const { db } = require('../database');
 const router = express.Router();
 
+// GET /api/vendors — search/list vendors (type=vendor users)
+// Supports query params: district, category, search
+router.get('/', async (req, res) => {
+    const { type, district, category, search } = req.query;
+
+    try {
+        let query = `SELECT id, email, type, business_name, organization_name, contact_name,
+            phone, districts, categories, business_description, certifications,
+            years_in_business, capability_statement, created_at
+            FROM users WHERE type = 'vendor'`;
+        const params = [];
+
+        if (district) {
+            query += " AND districts LIKE ?";
+            params.push(`%${district}%`);
+        }
+        if (category) {
+            query += " AND categories LIKE ?";
+            params.push(`%${category}%`);
+        }
+        if (search) {
+            query += " AND (business_name LIKE ? OR organization_name LIKE ? OR email LIKE ?)";
+            const term = `%${search}%`;
+            params.push(term, term, term);
+        }
+
+        query += " ORDER BY created_at DESC LIMIT 100";
+
+        const [rows] = await db.execute(query, params);
+
+        const vendors = rows.map(user => {
+            let districts = [], categories = [];
+            try {
+                districts  = user.districts  ? (typeof user.districts  === 'string' && user.districts.startsWith('[')  ? JSON.parse(user.districts)  : [user.districts])  : [];
+                categories = user.categories ? (typeof user.categories === 'string' && user.categories.startsWith('[') ? JSON.parse(user.categories) : [user.categories]) : [];
+            } catch {
+                districts  = user.districts  ? [user.districts]  : [];
+                categories = user.categories ? [user.categories] : [];
+            }
+            return { ...user, districts, categories };
+        });
+
+        res.json(vendors);
+    } catch (error) {
+        console.error('Error fetching vendors:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // GET /api/vendors/:id/capability-statement — serve the PDF
 router.get('/:id/capability-statement', async (req, res) => {
     const { id } = req.params;
