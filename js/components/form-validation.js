@@ -290,7 +290,7 @@ async function submitOpportunity() {
         </ul>
       </div>
       <div style="display: flex; gap: var(--space-md);">
-        <a href="dashboard-agency.html" class="btn btn-primary">Return to Dashboard</a>
+        <a href="dashboard-prime-contractor.html" class="btn btn-primary">Return to Dashboard</a>
         <a href="manage-opportunities.html" class="btn btn-outline">Manage My Postings</a>
       </div>
     `;

@@ -220,9 +220,9 @@ function redirectToDashboard(user) {
     if (user.type === 'admin') {
         window.location.href = 'dashboard-admin.html';
     } else if (user.type === 'vendor') {
-        window.location.href = 'dashboard-vendor.html';
+        window.location.href = 'dashboard-small-business.html';
     } else if (user.type === 'agency') {
-        window.location.href = 'dashboard-agency.html';
+        window.location.href = 'dashboard-prime-contractor.html';
     }
 }
 
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function () {
             registerVendor(formData)
                 .then(user => {
                     alert('Account created successfully! Redirecting...');
-                    window.location.href = 'dashboard-vendor.html';
+                    window.location.href = 'dashboard-small-business.html';
                 })
                 .catch(error => {
                     showErrorMessage(error.message, vendorRegForm.parentElement);
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
             registerAgency(formData)
                 .then(user => {
                     alert('Account created successfully! Redirecting...');
-                    window.location.href = 'dashboard-agency.html';
+                    window.location.href = 'dashboard-prime-contractor.html';
                 })
                 .catch(error => {
                     showErrorMessage(error.message, agencyRegForm.parentElement);
@@ -389,8 +389,8 @@ function syncNavHeader() {
     const loginBtn = navUl.querySelector('a[href="login.html"]');
     if (user && loginBtn) {
         const li = loginBtn.parentElement;
-        let dashboardUrl = 'dashboard-vendor.html';
-        if (user.type === 'agency') dashboardUrl = 'dashboard-agency.html';
+        let dashboardUrl = 'dashboard-small-business.html';
+        if (user.type === 'agency') dashboardUrl = 'dashboard-prime-contractor.html';
         if (user.type === 'admin') dashboardUrl = 'dashboard-admin.html';
 
         li.innerHTML = `
