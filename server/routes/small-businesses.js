@@ -53,6 +53,40 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET /api/small-businesses/:id — fetch a single small business profile by ID
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [rows] = await db.execute(
+            `SELECT id, email, type, business_name, organization_name, contact_name,
+                phone, address, districts, categories, business_description, certifications,
+                years_in_business, capability_statement, created_at, website
+                FROM users WHERE id = ? AND type = 'vendor'`,
+            [id]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Small Business not found' });
+        }
+
+        const user = rows[0];
+        let districts = [], categories = [];
+        try {
+            districts  = user.districts  ? (typeof user.districts  === 'string' && user.districts.startsWith('[')  ? JSON.parse(user.districts)  : [user.districts])  : [];
+            categories = user.categories ? (typeof user.categories === 'string' && user.categories.startsWith('[') ? JSON.parse(user.categories) : [user.categories]) : [];
+        } catch {
+            districts  = user.districts  ? [user.districts]  : [];
+            categories = user.categories ? [user.categories] : [];
+        }
+
+        res.json({ ...user, districts, categories });
+    } catch (error) {
+        console.error('Error fetching small business profile:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // GET /api/small-businesses/:id/capability-statement — serve the PDF
 router.get('/:id/capability-statement', async (req, res) => {
     const { id } = req.params;

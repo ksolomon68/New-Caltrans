@@ -1103,7 +1103,7 @@
             // Best-effort: delete from DB and disk (non-blocking)
             try {
                 const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
-                await fetch(`${API_BASE}/vendors/${user.id}/capability-statement`, { method: 'DELETE' });
+                await fetch(`${API_BASE}/small-businesses/${user.id}/capability-statement`, { method: 'DELETE' });
             } catch (error) {
                 console.warn('Could not delete CS from server (will retry on next session):', error);
             }
