@@ -65,7 +65,7 @@
             }
 
             // prevent authorized users from seeing the wrong nav momentarily 
-            // by not hardcoding 'prime contractor' here.
+            // by not hardcoding 'agency' here.
             setTimeout(() => {
                 Navigation.init(user.type); // Init based on actual role
                 loadOpportunities();
@@ -89,7 +89,7 @@
                     // Admin sees all opportunities (or a specific admin endpoint)
                     endpoint = '/opportunities'; // Assuming this returns all
                 } else {
-                    // Prime Contractors see only their own
+                    // Agencies see only their own
                     endpoint = `/opportunities/agency/${user.id}`;
                 }
 
@@ -104,7 +104,7 @@
                             { id: '102', title: 'Bridge Maintenance', status: 'published', district: '3', category: 'Maintenance', created_at: '2025-01-20', agency_name: 'Caltrans District 3' }
                         ];
                     } else {
-                        // Prime Contractor Fallback
+                        // Agency Fallback
                         opportunities = [];
                     }
                 }
@@ -133,7 +133,7 @@
 
             let html = '';
             opportunities.forEach(opp => {
-                // Admin Actions vs Prime Contractor Actions
+                // Admin Actions vs Agency Actions
                 let actionButtons = '';
 
                 if (isAdmin) {

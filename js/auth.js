@@ -20,8 +20,8 @@ function isStorageAvailable() {
 
 // Simulated user database (in production, this would be server-side)
 const users = {
-    small businesses: [],
-    prime contractors: []
+    vendors: [],
+    agencies: []
 };
 
 const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
@@ -143,13 +143,13 @@ window.handleLogout = async function() {
 // Keep backward compatibility
 window.logout = window.handleLogout;
 
-// Register small business
+// Register vendor
 async function registerVendor(formData) {
     try {
         const response = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...formData, type: 'small business' })
+            body: JSON.stringify({ ...formData, type: 'vendor' })
         });
 
         const data = await safeParseJson(response);
@@ -160,7 +160,7 @@ async function registerVendor(formData) {
 
         const user = data.user || data;
         localStorage.setItem('caltrans_user', JSON.stringify(user));
-        console.log('CaltransBizConnect: Small Business registered:', user.businessName || user.email);
+        console.log('CaltransBizConnect: Vendor registered:', user.businessName || user.email);
         return user;
     } catch (error) {
         // Mock fallback if API is unreachable
@@ -169,7 +169,7 @@ async function registerVendor(formData) {
             const mockUser = {
                 id: 'v-' + Date.now(),
                 ...formData,
-                type: 'small business',
+                type: 'vendor',
                 password: null
             };
             localStorage.setItem('caltrans_user', JSON.stringify(mockUser));
@@ -179,13 +179,13 @@ async function registerVendor(formData) {
     }
 }
 
-// Register prime contractor
+// Register agency
 async function registerAgency(formData) {
     try {
         const response = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...formData, type: 'prime contractor' })
+            body: JSON.stringify({ ...formData, type: 'agency' })
         });
 
         const data = await safeParseJson(response);
@@ -196,7 +196,7 @@ async function registerAgency(formData) {
 
         const user = data.user || data;
         localStorage.setItem('caltrans_user', JSON.stringify(user));
-        console.log('CaltransBizConnect: Prime Contractor registered:', user.organizationName || user.email);
+        console.log('CaltransBizConnect: Agency registered:', user.organizationName || user.email);
         return user;
     } catch (error) {
         // Mock fallback if API is unreachable
@@ -205,7 +205,7 @@ async function registerAgency(formData) {
             const mockUser = {
                 id: 'a-' + Date.now(),
                 ...formData,
-                type: 'prime contractor',
+                type: 'agency',
                 password: null
             };
             localStorage.setItem('caltrans_user', JSON.stringify(mockUser));
@@ -219,9 +219,9 @@ async function registerAgency(formData) {
 function redirectToDashboard(user) {
     if (user.type === 'admin') {
         window.location.href = 'dashboard-admin.html';
-    } else if (user.type === 'small business') {
+    } else if (user.type === 'vendor') {
         window.location.href = 'dashboard-small-business.html';
-    } else if (user.type === 'prime contractor') {
+    } else if (user.type === 'agency') {
         window.location.href = 'dashboard-prime-contractor.html';
     }
 }
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Small Business registration form handler
+    // Vendor registration form handler
     const vendorRegForm = document.getElementById('vendorRegistrationForm');
 
     if (vendorRegForm) {
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Prime Contractor registration form handler
+    // Agency registration form handler
     const agencyRegForm = document.getElementById('agencyRegistrationForm');
 
     if (agencyRegForm) {
@@ -390,7 +390,7 @@ function syncNavHeader() {
     if (user && loginBtn) {
         const li = loginBtn.parentElement;
         let dashboardUrl = 'dashboard-small-business.html';
-        if (user.type === 'prime contractor') dashboardUrl = 'dashboard-prime-contractor.html';
+        if (user.type === 'agency') dashboardUrl = 'dashboard-prime-contractor.html';
         if (user.type === 'admin') dashboardUrl = 'dashboard-admin.html';
 
         li.innerHTML = `

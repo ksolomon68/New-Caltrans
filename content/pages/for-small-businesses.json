@@ -3,7 +3,7 @@
   "isSystem": true,
   "updatedAt": "2026-03-17T00:00:00.000Z",
   "meta": {
-    "title": "For Small Businesses & Small Businesses - CaltransBizConnect",
+    "title": "For Vendors & SBEs - CaltransBizConnect",
     "description": "Small Business Enterprises: Find contracting opportunities, upload your capability statement, and connect with Caltrans agencies."
   },
   "header": {
@@ -16,7 +16,7 @@
       "id": "hero",
       "type": "hero-inner",
       "fields": {
-        "title": "For Small Businesses & Small Business Enterprises",
+        "title": "For Vendors & Small Business Enterprises",
         "subtitle": "Connect with Caltrans contracting opportunities, showcase your capabilities, and grow your business through our streamlined platform.",
         "primaryButton": { "label": "Create Your Account", "href": "register-vendor.html" },
         "secondaryButton": { "label": "Browse Opportunities", "href": "opportunities.html" }
@@ -36,7 +36,7 @@
           {
             "id": "showcase-capabilities",
             "title": "Showcase Your Capabilities",
-            "body": "Upload your capability statement and profile to demonstrate your core competencies, past performance, and qualifications to prime contractors seeking partners."
+            "body": "Upload your capability statement and profile to demonstrate your core competencies, past performance, and qualifications to agencies seeking partners."
           },
           {
             "id": "streamlined-process",
@@ -53,7 +53,7 @@
         "heading": "Your Journey to Success",
         "steps": [
           { "label": "Create Your Account",            "detail": "Register as a Small Business Enterprise with your business information and contact details." },
-          { "label": "Complete Your Profile",           "detail": "Add your business details, certifications, and service areas to help prime contractors find you." },
+          { "label": "Complete Your Profile",           "detail": "Add your business details, certifications, and service areas to help agencies find you." },
           { "label": "Upload Capability Statement",     "detail": "Showcase your core competencies, past performance, key personnel, and qualifications." },
           { "label": "Select Districts and Categories", "detail": "Choose the Caltrans districts and work categories that match your expertise." },
           { "label": "Search and Apply",                "detail": "Browse opportunities, filter by your preferences, and submit proposals directly through the platform." }
@@ -71,7 +71,7 @@
           "Business name and legal structure",
           "Federal Tax ID (EIN)",
           "Business address and contact information",
-          "Small Business certification number (if applicable)",
+          "SBE certification number (if applicable)",
           "Capability statement (PDF format, maximum 10MB)"
         ]
       }
@@ -81,7 +81,7 @@
       "type": "card-grid",
       "fields": {
         "heading": "Capability Statement Requirements",
-        "intro": "Your capability statement must include the following information to help prime contractors evaluate your qualifications:",
+        "intro": "Your capability statement must include the following information to help agencies evaluate your qualifications:",
         "cards": [
           { "id": "core-competencies", "title": "Core Competencies",    "body": "Detailed description of your primary services and areas of expertise" },
           { "id": "past-performance",  "title": "Past Performance",     "body": "Examples of completed projects with scope, value, and outcomes" },

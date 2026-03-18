@@ -141,10 +141,10 @@
     {
       "type": "pathway-cards",
       "label": "Dual Pathway Cards",
-      "description": "Two large pathway cards side by side (Small Business and Prime Contractor). Home page only.",
+      "description": "Two large pathway cards side by side (Vendor and Agency). Home page only.",
       "fields": [
-        { "key": "vendorCard", "label": "Small Business Pathway Card", "inputType": "pathway-card", "required": true },
-        { "key": "agencyCard", "label": "Prime Contractor Pathway Card", "inputType": "pathway-card", "required": true }
+        { "key": "vendorCard", "label": "Vendor Pathway Card", "inputType": "pathway-card", "required": true },
+        { "key": "agencyCard", "label": "Agency Pathway Card", "inputType": "pathway-card", "required": true }
       ],
       "pathwayCardFields": [
         { "key": "href",        "label": "Link URL",       "inputType": "url",   "required": true  },

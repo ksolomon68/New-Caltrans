@@ -4,7 +4,7 @@
   "updatedAt": "2026-03-17T00:00:00.000Z",
   "meta": {
     "title": "Resources - CaltransBizConnect",
-    "description": "Access templates, guides, and resources for Small Business Enterprises and prime contractors using CaltransBizConnect."
+    "description": "Access templates, guides, and resources for Small Business Enterprises and agencies using CaltransBizConnect."
   },
   "header": {
     "backgroundImage": "",
@@ -24,7 +24,7 @@
       "id": "vendor-resources",
       "type": "card-grid",
       "fields": {
-        "heading": "For Small Businesses & Small Business Enterprises",
+        "heading": "For Vendors & Small Business Enterprises",
         "cards": [
           {
             "id": "capability-guide",
@@ -35,7 +35,7 @@
           },
           {
             "id": "eligibility-checklist",
-            "title": "Small Business Eligibility Checklist",
+            "title": "SBE Eligibility Checklist",
             "body": "Review all eligibility requirements for Small Business Enterprise certification with Caltrans.",
             "buttonLabel": "View Checklist",
             "buttonHref": "eligibility.html"
@@ -54,7 +54,7 @@
       "id": "agency-resources",
       "type": "card-grid",
       "fields": {
-        "heading": "For Prime Contractors & Prime Contractors",
+        "heading": "For Agencies & Prime Contractors",
         "cards": [
           {
             "id": "posting-guidelines",
@@ -65,14 +65,14 @@
           },
           {
             "id": "vendor-checklist",
-            "title": "Small Business Evaluation Checklist",
-            "body": "Use this checklist to evaluate small business qualifications and capability statements.",
+            "title": "Vendor Evaluation Checklist",
+            "body": "Use this checklist to evaluate vendor qualifications and capability statements.",
             "buttonLabel": "View Checklist",
             "buttonHref": "for-vendors.html#get-started"
           },
           {
             "id": "sbe-overview",
-            "title": "Small Business Program Overview",
+            "title": "SBE Program Overview",
             "body": "Learn about the Small Business Enterprise program goals, requirements, and benefits.",
             "buttonLabel": "View Overview",
             "buttonHref": "index.html#why-choose"

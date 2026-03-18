@@ -4,7 +4,7 @@ const fs = require('fs');
 const { db } = require('../database');
 const router = express.Router();
 
-// GET /api/small-businesses — search/list small businesses (type=small business users)
+// GET /api/small-businesses — search/list small businesses (type=vendor users)
 // Supports query params: district, category, search
 router.get('/', async (req, res) => {
     const { type, district, category, search } = req.query;
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
         let query = `SELECT id, email, type, business_name, organization_name, contact_name,
             phone, districts, categories, business_description, certifications,
             years_in_business, capability_statement, created_at
-            FROM users WHERE type = 'small business'`;
+            FROM users WHERE type = 'vendor'`;
         const params = [];
 
         if (district) {
@@ -62,7 +62,7 @@ router.get('/:id', async (req, res) => {
             `SELECT id, email, type, business_name, organization_name, contact_name,
                 phone, address, districts, categories, business_description, certifications,
                 years_in_business, capability_statement, created_at, website
-                FROM users WHERE id = ? AND type = 'small business'`,
+                FROM users WHERE id = ? AND type = 'vendor'`,
             [id]
         );
 

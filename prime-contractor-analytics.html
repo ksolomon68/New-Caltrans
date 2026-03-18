@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prime Contractor Analytics - CaltransBizConnect</title>
+    <title>Agency Analytics - CaltransBizConnect</title>
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/design-system.css">
     <link rel="stylesheet" href="css/dashboard-new.css">
     <link rel="stylesheet" href="css/dashboard-common.css">
     <style>
-        /* Enhanced prime contractor analytics styling */
+        /* Enhanced agency analytics styling */
         body.dashboard-v2 {
             background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
             min-height: 100vh;
@@ -281,7 +281,7 @@
             <section class="hero-section">
                 <div class="hero-content">
                     <div class="hero-welcome">
-                        <h1 class="page-title">Prime Contractor Performance Analytics</h1>
+                        <h1 class="page-title">Agency Performance Analytics</h1>
                         <p>Monitor platform effectiveness, track opportunity engagement, and optimize outreach
                             strategies across all Caltrans districts.</p>
                     </div>
@@ -304,7 +304,7 @@
                         <div class="metric-item">
                             <span class="metric-icon">👀</span>
                             <div class="metric-value">156</div>
-                            <div class="metric-label">Small Businesses Registered</div>
+                            <div class="metric-label">Vendors Registered</div>
                         </div>
                         <div class="metric-item">
                             <span class="metric-icon">🏢</span>
@@ -325,7 +325,7 @@
                 <div class="enhanced-card">
                     <div class="card-header">
                         <h3 class="card-title">📈 Engagement Metrics</h3>
-                        <div class="card-subtitle">Track small business interactions and opportunity engagement over time</div>
+                        <div class="card-subtitle">Track vendor interactions and opportunity engagement over time</div>
                     </div>
                     <div class="chart-container">
                         <canvas id="engagementChart" width="400" height="200"></canvas>
@@ -346,7 +346,7 @@
                             <h4 class="trend-title">District 4 Growth</h4>
                             <div class="trend-metric">
                                 <span class="trend-value">+15%</span>
-                                <span class="trend-label">Small Business Participation</span>
+                                <span class="trend-label">Vendor Participation</span>
                             </div>
                         </div>
                     </div>
@@ -364,7 +364,7 @@
                             <h4 class="trend-title">Statewide Outreach</h4>
                             <div class="trend-metric">
                                 <span class="trend-value">+22%</span>
-                                <span class="trend-label">Small Business Engagement</span>
+                                <span class="trend-label">SBE Engagement</span>
                             </div>
                         </div>
                     </div>
@@ -376,7 +376,7 @@
                 <div class="enhanced-card">
                     <div class="card-header">
                         <h3 class="card-title">⚙️ Quick Actions</h3>
-                        <div class="card-subtitle">Manage your prime contractor dashboard and access key administrative functions
+                        <div class="card-subtitle">Manage your agency dashboard and access key administrative functions
                         </div>
                     </div>
                     <div class="metric-grid">
@@ -391,7 +391,7 @@
                             <span class="metric-icon">🔍</span>
                             <div class="metric-action">
                                 <a href="search-small-businesses.html" class="metric-value">Search</a>
-                                <div class="metric-label">Small Business Directory</div>
+                                <div class="metric-label">Vendor Directory</div>
                             </div>
                         </div>
                         <div class="metric-item">
@@ -420,10 +420,10 @@
     <script src="js/utils/data-resilience.js"></script>
     <script src="js/components/navigation.js"></script>
     <script>
-        // Initialize Prime Contractor Analytics dashboard with enhanced design
+        // Initialize Agency Analytics dashboard with enhanced design
         document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(() => {
-                Navigation.init('prime contractor');
+                Navigation.init('agency');
                 initAnalyticsData();
             }, 50);
         });
@@ -433,7 +433,7 @@
 
             try {
                 // Set organization name in welcome section
-                const orgName = user.organization_name || user.business_name || user.contact_name || 'Prime Contractor Partner';
+                const orgName = user.organization_name || user.business_name || user.contact_name || 'Agency Partner';
                 const welcomeEl = document.querySelector('.hero-welcome h1');
                 if (welcomeEl) {
                     welcomeEl.textContent = orgName;

@@ -159,10 +159,10 @@
 
                     <div class="action-bar" style="flex-wrap: wrap;">
                         <button id="saveBtn" class="btn btn-outline" onclick="toggleSave()">Save Opportunity</button>
-                        <button id="viewAgencyBtn" class="btn btn-outline" onclick="viewAgencyProfile()">View Prime Contractor
+                        <button id="viewAgencyBtn" class="btn btn-outline" onclick="viewAgencyProfile()">View Agency
                             Profile</button>
                         <button id="contactAgencyBtn" class="btn btn-secondary" onclick="contactAgency()">Contact
-                            Prime Contractor</button>
+                            Agency</button>
                     </div>
                 </div>
             </div>
@@ -225,7 +225,7 @@
 
                 // Load saved status
                 const user = getCurrentUser();
-                if (user && user.type === 'small business') {
+                if (user && user.type === 'vendor') {
                     try {
                         const saved = await DataService.fetch(`/opportunities/saved/${user.id}`);
                         if (Array.isArray(saved)) {
@@ -337,7 +337,7 @@
                 // Redirect to messages with recipient and context
                 window.location.href = `messages.html?recipient=${agencyId}&ref_type=opportunity&ref_id=${currentOpportunity.id}&ref_title=${encodeURIComponent(currentOpportunity.title)}`;
             } else {
-                alert('Prime Contractor contact information is not available for this opportunity.');
+                alert('Agency contact information is not available for this opportunity.');
             }
         }
 
@@ -347,7 +347,7 @@
             if (agencyId) {
                 window.location.href = `prime-contractor-profile.html?id=${agencyId}`;
             } else {
-                alert('Prime Contractor information not available.');
+                alert('Agency information not available.');
             }
         }
     </script>

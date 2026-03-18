@@ -185,7 +185,7 @@
                 &nearrow;</a>
             </li>
             <li><a href="https://www.ecfr.gov/current/title-49/subtitle-A/part-26" target="_blank"
-                rel="noopener noreferrer">Federal Small Business Regs &nearrow;</a></li>
+                rel="noopener noreferrer">Federal SBE Regs &nearrow;</a></li>
           </ul>
         </div>
       </div>
@@ -215,8 +215,8 @@
       if (user) {
         // User is logged in - add dashboard link
         const dashboardLi = document.createElement('li');
-        let dashboardUrl = user.type === 'small business' ? 'dashboard-small-business.html' :
-          user.type === 'prime contractor' ? 'dashboard-prime-contractor.html' :
+        let dashboardUrl = user.type === 'vendor' ? 'dashboard-small-business.html' :
+          user.type === 'agency' ? 'dashboard-prime-contractor.html' :
             'dashboard-admin.html';
         dashboardLi.innerHTML = `<a href="${dashboardUrl}">Dashboard</a>`;
         nav.appendChild(dashboardLi);
@@ -357,7 +357,7 @@
         }
 
         const user = getCurrentUser();
-        const isVendor = user && user.type === 'small business';
+        const isVendor = user && user.type === 'vendor';
 
         let actionBtn = '';
         if (isVendor) {
@@ -372,7 +372,7 @@
           const isSaved = savedOpps.includes(id);
 
           actionBtn = `<button id="saveOppBtn" class="btn ${isSaved ? 'btn-success' : 'btn-primary'}" ${isSaved ? 'disabled' : ''} onclick="window.saveOpportunity('${id}')">${isSaved ? 'Saved' : 'Save Opportunity'}</button>`;
-        } else if (user && user.type === 'prime contractor' && (opp.posted_by == user.id || opp.postedBy == user.id)) {
+        } else if (user && user.type === 'agency' && (opp.posted_by == user.id || opp.postedBy == user.id)) {
           actionBtn = `<a href="post-opportunity.html?id=${id}" class="btn btn-outline">Edit Opportunity</a>`;
         }
 

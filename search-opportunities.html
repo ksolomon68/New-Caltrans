@@ -342,10 +342,10 @@
     <script src="js/utils/data-resilience.js"></script>
     <script src="js/components/navigation.js"></script>
     <script>
-        // Initialize small business dashboard with opportunity search
+        // Initialize vendor dashboard with opportunity search
         document.addEventListener('DOMContentLoaded', async () => {
             setTimeout(() => {
-                Navigation.init('small business');
+                Navigation.init('vendor');
             }, 50);
 
             const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
@@ -524,7 +524,7 @@
 
                 const user = Auth.getUser();
                 window.savedOpportunityIds = new Set();
-                if (user && user.type === 'small business') {
+                if (user && user.type === 'vendor') {
                     const saved = await DataService.fetch(`/opportunities/saved/${user.id}`).catch(() => []);
                     window.savedOpportunityIds = new Set(saved ? saved.map(o => o.id) : []);
                     const savedCountEl = document.getElementById('savedCount');

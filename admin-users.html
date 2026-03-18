@@ -143,7 +143,7 @@
                 <div class="hero-content">
                     <div class="hero-welcome">
                         <h1 class="page-title">User Management</h1>
-                        <p style="opacity: 0.9;">View and verify registered small businesses and agencies.</p>
+                        <p style="opacity: 0.9;">View and verify registered vendors and agencies.</p>
                     </div>
                 </div>
             </section>
@@ -215,8 +215,8 @@
                 <div class="form-group" style="margin-bottom: 1rem;">
                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Account Type</label>
                     <select id="modalUserType" class="form-input" style="width: 100%;">
-                        <option value="small business">Small Business</option>
-                        <option value="prime contractor">Prime Contractor</option>
+                        <option value="vendor">Vendor</option>
+                        <option value="agency">Agency</option>
                         <option value="admin">Administrator</option>
                     </select>
                 </div>
@@ -226,7 +226,7 @@
                         <option value="active">Active</option>
                         <option value="pending">Pending Verification</option>
                         <option value="suspended">Suspended</option>
-                        <option value="verified">Verified Small Business</option>
+                        <option value="verified">Verified Vendor</option>
                     </select>
                 </div>
                 <div style="display: flex; gap: 1rem; justify-content: space-between;">
@@ -277,8 +277,8 @@
                 // Fallback for visual verification if backend is empty/broken during dev
                 if (!currentUsers.length) {
                     currentUsers = [
-                        { id: 1, business_name: 'Acme Construction', email: 'contact@acme.com', type: 'small business', status: 'verified', created_at: '2025-01-15' },
-                        { id: 2, organization_name: 'City of Sacramento', email: 'planning@city.gov', type: 'prime contractor', status: 'active', created_at: '2025-02-01' }
+                        { id: 1, business_name: 'Acme Construction', email: 'contact@acme.com', type: 'vendor', status: 'verified', created_at: '2025-01-15' },
+                        { id: 2, organization_name: 'City of Sacramento', email: 'planning@city.gov', type: 'agency', status: 'active', created_at: '2025-02-01' }
                     ];
                 }
                 renderUsers(currentUsers);
@@ -299,9 +299,9 @@
                 const displayName = u.business_name || u.organization_name || u.email;
                 const status = u.status || 'active';
 
-                const typeBadge = u.type === 'small business'
-                    ? '<span class="badge badge-secondary">Small Business</span>'
-                    : (u.type === 'prime contractor' ? '<span class="badge badge-primary">Prime Contractor</span>'
+                const typeBadge = u.type === 'vendor'
+                    ? '<span class="badge badge-secondary">Vendor</span>'
+                    : (u.type === 'agency' ? '<span class="badge badge-primary">Agency</span>'
                         : '<span class="badge badge-outline">Admin</span>');
 
                 let statusColor = 'var(--color-success)';
@@ -343,7 +343,7 @@
             document.getElementById('modalUserEmail').value = '';
             document.getElementById('modalUserPassword').value = '';
             document.getElementById('passwordGroup').style.display = 'block';
-            document.getElementById('modalUserType').value = 'small business';
+            document.getElementById('modalUserType').value = 'vendor';
             document.getElementById('modalUserStatus').value = 'active';
             document.getElementById('btnDeleteUser').style.display = 'none';
             document.getElementById('btnSaveUser').textContent = 'Create User';
@@ -360,7 +360,7 @@
             document.getElementById('modalUserEmail').value = u.email;
             document.getElementById('modalUserPassword').value = '';
             document.getElementById('passwordGroup').style.display = 'block'; // Keep it for password reset
-            document.getElementById('modalUserType').value = u.type || 'small business';
+            document.getElementById('modalUserType').value = u.type || 'vendor';
             document.getElementById('modalUserStatus').value = u.status || 'active';
             document.getElementById('btnDeleteUser').style.display = 'block';
             document.getElementById('btnSaveUser').textContent = 'Save Changes';
@@ -384,8 +384,8 @@
                 email: document.getElementById('modalUserEmail').value,
                 type: document.getElementById('modalUserType').value,
                 status: document.getElementById('modalUserStatus').value,
-                business_name: document.getElementById('modalUserType').value === 'small business' ? document.getElementById('modalUserName').value : null,
-                organization_name: document.getElementById('modalUserType').value === 'prime contractor' ? document.getElementById('modalUserName').value : null
+                business_name: document.getElementById('modalUserType').value === 'vendor' ? document.getElementById('modalUserName').value : null,
+                organization_name: document.getElementById('modalUserType').value === 'agency' ? document.getElementById('modalUserName').value : null
             };
 
             const password = document.getElementById('modalUserPassword').value;

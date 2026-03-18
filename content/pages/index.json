@@ -4,7 +4,7 @@
   "updatedAt": "2026-03-17T00:00:00.000Z",
   "meta": {
     "title": "CaltransBizConnect - Connecting Businesses with Opportunities",
-    "description": "CaltransBizConnect connects Small Business Enterprises with contracting opportunities and Prime Contractors with qualified partners. Your central hub for Caltrans business development."
+    "description": "CaltransBizConnect connects Small Business Enterprises with contracting opportunities and Agencies with qualified partners. Your central hub for Caltrans business development."
   },
   "header": {
     "backgroundImage": "",
@@ -17,7 +17,7 @@
       "type": "hero",
       "fields": {
         "title": "Build. Compete. Win.",
-        "subtitle": "Caltrans delivers statewide supportive services to help Small Businesses strengthen readiness for transportation contracting opportunities through structured training, technical assistance, and resource navigation.",
+        "subtitle": "Caltrans delivers statewide supportive services to help SBEs strengthen readiness for transportation contracting opportunities through structured training, technical assistance, and resource navigation.",
         "backgroundImage": "",
         "backgroundImageAlt": ""
       }
@@ -30,17 +30,17 @@
           "href": "for-vendors.html",
           "image": "images/vendor-pathway.jpg",
           "imageAlt": "Construction professionals reviewing plans on site",
-          "title": "For Small Businesses & Small Businesses",
-          "description": "Find contracting opportunities, upload your capability statement, and connect with prime contractors seeking your expertise.",
-          "srText": "Learn more about small business services"
+          "title": "For Vendors & SBEs",
+          "description": "Find contracting opportunities, upload your capability statement, and connect with agencies seeking your expertise.",
+          "srText": "Learn more about vendor services"
         },
         "agencyCard": {
           "href": "for-agencies.html",
           "image": "images/agency-pathway.jpg",
           "imageAlt": "Construction professional reviewing blueprints",
-          "title": "For Prime Contractors & Primes",
+          "title": "For Agencies & Primes",
           "description": "Post structured opportunities, find qualified Small Business Enterprises, and manage your contracting needs efficiently.",
-          "srText": "Learn more about prime contractor services"
+          "srText": "Learn more about agency services"
         }
       }
     },

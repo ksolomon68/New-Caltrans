@@ -280,11 +280,11 @@ async function submitOpportunity() {
         successContainer.setAttribute('role', 'alert');
         successContainer.innerHTML = `
       <h2 class="mb-sm">Opportunity Published Successfully!</h2>
-      <p class="mb-md">Your opportunity has been successfully published and is now visible to all registered small businesses on the platform.</p>
+      <p class="mb-md">Your opportunity has been successfully published and is now visible to all registered vendors on the platform.</p>
       <div class="alert alert-info mb-md">
         <strong>Next Steps:</strong>
         <ul class="mb-0">
-          <li>Small Businesses matching your work category and district will be notified immediately.</li>
+          <li>Vendors matching your work category and district will be notified immediately.</li>
           <li>You can track applications and inquiries in your dashboard.</li>
           <li>You can manage or edit this posting at any time from "Manage Postings".</li>
         </ul>

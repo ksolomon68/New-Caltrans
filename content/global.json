@@ -13,8 +13,8 @@
   "navigation": {
     "items": [
       { "label": "Home",        "href": "index.html",           "active": true  },
-      { "label": "For Small Businesses", "href": "for-vendors.html",     "active": true  },
-      { "label": "For Prime Contractors","href": "for-agencies.html",    "active": true  },
+      { "label": "For Vendors", "href": "for-vendors.html",     "active": true  },
+      { "label": "For Agencies","href": "for-agencies.html",    "active": true  },
       { "label": "Opportunities","href": "opportunities.html",  "active": true  },
       { "label": "How It Works","href": "how-it-works.html",    "active": true  },
       { "label": "Resources",   "href": "resources.html",       "active": true  },
@@ -26,7 +26,7 @@
   "footer": {
     "columns": [
       {
-        "heading": "For Small Businesses",
+        "heading": "For Vendors",
         "links": [
           { "label": "Getting Started",  "href": "for-vendors.html"     },
           { "label": "Create Account",   "href": "register-vendor.html" },
@@ -35,7 +35,7 @@
         ]
       },
       {
-        "heading": "For Prime Contractors",
+        "heading": "For Agencies",
         "links": [
           { "label": "Getting Started",  "href": "for-agencies.html"    },
           { "label": "Create Account",   "href": "register-agency.html" },
@@ -98,7 +98,7 @@
         "links": [
           { "label": "CA Small Business","href": "https://calosba.ca.gov/",                                       "external": true },
           { "label": "California UCP",   "href": "https://www.californiaucp.com",                                 "external": true },
-          { "label": "Federal Small Business Regs", "href": "https://www.ecfr.gov/current/title-49/subtitle-A/part-26",     "external": true }
+          { "label": "Federal SBE Regs", "href": "https://www.ecfr.gov/current/title-49/subtitle-A/part-26",     "external": true }
         ]
       }
     ]

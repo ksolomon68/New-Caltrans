@@ -27,8 +27,8 @@ const requireAdmin = (req, res, next) => {
 router.get('/dashboard', requireAdmin, async (req, res) => {
     try {
         // Get stats
-        const [[vendorCount]] = await db.execute("SELECT COUNT(*) as count FROM users WHERE type = 'small business'");
-        const [[agencyCount]] = await db.execute("SELECT COUNT(*) as count FROM users WHERE type = 'prime contractor'");
+        const [[vendorCount]] = await db.execute("SELECT COUNT(*) as count FROM users WHERE type = 'vendor'");
+        const [[agencyCount]] = await db.execute("SELECT COUNT(*) as count FROM users WHERE type = 'agency'");
         const [[pendingCount]] = await db.execute("SELECT COUNT(*) as count FROM opportunities WHERE status = 'pending'");
 
         // Get pending opportunities
@@ -49,7 +49,7 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
         `);
 
         const recentActivity = recentUsers.map(user => ({
-            type: user.type === 'small business' ? 'user_reg' : 'agency_reg',
+            type: user.type === 'vendor' ? 'user_reg' : 'agency_reg',
             user: user.email,
             time: formatRelativeTime(user.created_at)
         }));

@@ -114,7 +114,7 @@ Every page file follows this schema:
   "isSystem": true,
   "updatedAt": "2026-03-17T00:00:00.000Z",
   "meta": {
-    "title": "For Small Businesses & Small Businesses - CaltransBizConnect",
+    "title": "For Vendors & SBEs - CaltransBizConnect",
     "description": "SEO description here."
   },
   "header": {
@@ -127,7 +127,7 @@ Every page file follows this schema:
       "id": "hero",
       "type": "hero-inner",
       "fields": {
-        "title": "For Small Businesses & Small Business Enterprises",
+        "title": "For Vendors & Small Business Enterprises",
         "subtitle": "Connect with opportunities…"
       }
     }

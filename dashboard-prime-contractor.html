@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/dashboard-new.css">
     <link rel="stylesheet" href="css/dashboard-common.css">
     <style>
-        /* Enhanced prime contractor dashboard styling */
+        /* Enhanced agency dashboard styling */
         body.dashboard-v2 {
             background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
             min-height: 100vh;
@@ -234,7 +234,7 @@
                 <div class="hero-content">
                     <div class="hero-welcome">
                         <h1 class="page-title">Prime Contractor Dashboard</h1>
-                        <p>Manage opportunities, track small business engagement, and monitor performance.</p>
+                        <p>Manage opportunities, track vendor engagement, and monitor performance.</p>
                     </div>
                 </div>
             </section>
@@ -253,7 +253,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">248</div>
-                            <div class="stat-label">Registered Small Businesses</div>
+                            <div class="stat-label">Registered Vendors</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">15</div>
@@ -278,7 +278,7 @@
                         <a href="post-opportunity.html" class="action-card">
                             <div class="action-icon">📝</div>
                             <div class="action-title">Post New Opportunity</div>
-                            <div class="action-description">Create and publish new contracting opportunities for small businesses
+                            <div class="action-description">Create and publish new contracting opportunities for vendors
                             </div>
                         </a>
 
@@ -298,7 +298,7 @@
                         <a href="search-small-businesses.html" class="action-card">
                             <div class="action-icon">🔍</div>
                             <div class="action-title">Search Small Businesses</div>
-                            <div class="action-description">Find and connect with qualified small businesses for your
+                            <div class="action-description">Find and connect with qualified vendors for your
                                 opportunities</div>
                         </a>
 
@@ -328,10 +328,10 @@
     <script src="js/utils/data-resilience.js"></script>
     <script src="js/components/navigation.js"></script>
     <script>
-        // Initialize Prime Contractor dashboard
+        // Initialize Agency dashboard
         document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(() => {
-                Navigation.init('prime contractor');
+                Navigation.init('agency');
                 initDashboardData();
             }, 50);
         });
@@ -342,23 +342,23 @@
 
             try {
                 // Set organization name in welcome section
-                const orgName = user.organization_name || user.business_name || user.contact_name || 'Prime Contractor Partner';
+                const orgName = user.organization_name || user.business_name || user.contact_name || 'Agency Partner';
                 const welcomeEl = document.querySelector('.hero-welcome h1');
                 if (welcomeEl) {
                     welcomeEl.textContent = `Welcome, ${orgName}`;
                 }
 
                 // Load real stats
-                const [opps, small businesses, apps] = await Promise.all([
+                const [opps, vendors, apps] = await Promise.all([
                     DataService.fetch(`/opportunities/agency/${user.id}`),
-                    DataService.fetch('/vendors?type=small business'),
+                    DataService.fetch('/vendors?type=vendor'),
                     DataService.fetch(`/applications?agencyId=${user.id}`).catch(() => [])
                 ]);
 
                 const statNumbers = document.querySelectorAll('.stat-number');
                 if (statNumbers.length >= 4) {
                     statNumbers[0].textContent = opps ? (Array.isArray(opps) ? opps.length : 0) : 0;
-                    statNumbers[1].textContent = small businesses ? (Array.isArray(small businesses) ? vendors.length : 0) : 0;
+                    statNumbers[1].textContent = vendors ? (Array.isArray(vendors) ? vendors.length : 0) : 0;
 
                     const pendingApps = apps ? (Array.isArray(apps) ? apps.filter(a => a.status === 'pending') : []) : [];
                     statNumbers[2].textContent = pendingApps.length;
