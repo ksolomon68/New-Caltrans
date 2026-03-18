@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Manage your business profile on CaltransBizConnect.">
-    <title>Vendor Profile - CaltransBizConnect</title>
+    <title>Small Business Profile - CaltransBizConnect</title>
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
     <!-- Design System & Standard Styles -->
     <link rel="stylesheet" href="css/design-system.css">
@@ -375,11 +375,37 @@
                                     <div class="readonly-value" id="view_certificationNumber" style="display: none;">--
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="certifications">Certified Statuses</label>
-                                    <input type="text" id="certifications" name="certifications" class="form-control"
-                                        placeholder="e.g. SBE, DBE, WBE">
-                                    <div class="readonly-value" id="view_certifications" style="display: none;">--</div>
+                            </div>
+
+                            <!-- Dynamic Certifications List -->
+                            <div class="edit-only">
+                                <fieldset style="border: none; padding: 0; margin-top: var(--space-lg);">
+                                    <legend style="font-weight: 700; font-size: 1rem; margin-bottom: var(--space-md); color: var(--text-primary);">
+                                        Certified Statuses
+                                    </legend>
+
+                                    <div id="certifications-list" style="border: 1px solid var(--color-border-light); border-radius: var(--border-radius-md); padding: var(--space-md); background: var(--color-bg-secondary);">
+                                        <!-- Certification rows will be dynamically added here -->
+                                    </div>
+
+                                    <button type="button" id="btnAddCertification" class="btn btn-outline"
+                                        style="margin-top: var(--space-md); display: inline-flex; align-items: center; gap: var(--space-sm);"
+                                        aria-label="Add new certification">
+                                        <span style="font-size: 1.2rem;">+</span> Add Certification
+                                    </button>
+                                </fieldset>
+                                <p class="text-muted" style="font-size: 0.85rem; margin-top: var(--space-sm);">
+                                    Examples: SBE, WBE, MBE, LGBTBE, etc.
+                                </p>
+                            </div>
+
+                            <!-- View Mode Certifications -->
+                            <div class="view-only" style="display: none;">
+                                <div id="certShowContainer" style="display: none;">
+                                    <div id="certifications-view" style="display: flex; flex-wrap: wrap; gap: var(--space-sm);"></div>
+                                </div>
+                                <div id="certHideContainer" style="text-align: center; color: var(--text-muted); font-style: italic; padding: var(--space-lg);">
+                                    No certifications listed
                                 </div>
                             </div>
                         </section>
@@ -453,7 +479,7 @@
                                 </div>
                                 <div id="csNoView"
                                     style="display: none; text-align: center; padding: var(--space-xl); color: var(--text-muted); font-style: italic;">
-                                    This vendor hasn't uploaded a capability statement yet.
+                                    This Small Business hasn't uploaded a capability statement yet.
                                 </div>
                             </div>
                         </section>
@@ -523,8 +549,8 @@
 
         function initUI() {
             if (isViewMode) {
-                document.getElementById('heroTitle').textContent = 'Vendor Profile';
-                document.getElementById('heroSubtitle').textContent = 'Viewing expert vendor capabilities';
+                document.getElementById('heroTitle').textContent = 'Small Business Profile';
+                document.getElementById('heroSubtitle').textContent = 'Viewing professional capabilities';
                 document.getElementById('viewModeBadge').style.display = 'block';
 
                 // Hide Edit Elements
@@ -569,8 +595,7 @@
                 'address': data.address || '',
                 'email': data.email || '',
                 'phone': data.phone || '',
-                'certificationNumber': data.certification_number || '',
-                'certifications': data.certifications || ''
+                'certificationNumber': data.certification_number || ''
             };
 
             for (const id in mapping) {
@@ -584,6 +609,12 @@
                 document.getElementById('firstName').value = parts[0] || '';
                 document.getElementById('lastName').value = parts.slice(1).join(' ') || '';
             }
+
+            // Render Dynamic Certifications List
+            const certs = data.certifications && typeof data.certifications === 'string'
+                ? data.certifications.split(',').map(c => c.trim()).filter(c => c)
+                : Array.isArray(data.certifications) ? data.certifications : [];
+            renderCertificationsList(certs);
 
             // Check CS
             if (data.capability_statement) {
@@ -612,13 +643,31 @@
                 'lastName': data.contact_name ? data.contact_name.split(' ').slice(1).join(' ') : 'N/A',
                 'email': data.email || 'N/A',
                 'phone': data.phone || 'N/A',
-                'certificationNumber': data.certification_number || 'N/A',
-                'certifications': data.certifications || 'None listed'
+                'certificationNumber': data.certification_number || 'N/A'
             };
 
             for (const id in mapping) {
                 const el = document.getElementById(`view_${id}`);
                 if (el) el.innerHTML = mapping[id];
+            }
+
+            // Render Certifications in View Mode as Badges
+            const certs = data.certifications && typeof data.certifications === 'string'
+                ? data.certifications.split(',').map(c => c.trim()).filter(c => c)
+                : Array.isArray(data.certifications) ? data.certifications : [];
+
+            const certsView = document.getElementById('certifications-view');
+            if (certs.length > 0) {
+                certsView.innerHTML = certs.map(cert =>
+                    `<span style="background: var(--color-bg-tertiary); padding: 0.5rem 1rem; border-radius: var(--border-radius-md); font-weight: 600; color: var(--color-primary); font-size: 0.9rem;">
+                        ${cert}
+                    </span>`
+                ).join('');
+                document.getElementById('certShowContainer').style.display = 'block';
+                document.getElementById('certHideContainer').style.display = 'none';
+            } else {
+                document.getElementById('certShowContainer').style.display = 'none';
+                document.getElementById('certHideContainer').style.display = 'block';
             }
 
             // Capability Statement View
@@ -640,6 +689,150 @@
             };
         }
 
+        /**
+         * Render the dynamic certifications list UI
+         * @param {string[]} certifications - Array of certification strings
+         */
+        function renderCertificationsList(certifications = []) {
+            const container = document.getElementById('certifications-list');
+            if (!container) return;
+
+            // If no certifications, show one empty row
+            if (!certifications || certifications.length === 0) {
+                container.innerHTML = createCertificationRow('', 0);
+                attachCertificationHandlers();
+                return;
+            }
+
+            // Render each certification
+            container.innerHTML = certifications
+                .map((cert, index) => createCertificationRow(cert, index))
+                .join('');
+
+            attachCertificationHandlers();
+        }
+
+        /**
+         * Create a single certification input row
+         * @param {string} value - Certification value
+         * @param {number} index - Row index
+         * @returns {string} HTML string
+         */
+        function createCertificationRow(value = '', index = 0) {
+            return `
+                <div class="certification-row" style="display: flex; gap: var(--space-sm); align-items: center; margin-bottom: var(--space-sm);">
+                    <input type="text"
+                        class="certification-input form-control"
+                        name="certifications[]"
+                        value="${value}"
+                        placeholder="e.g. SBE, WBE, MBE"
+                        style="flex: 1; font-family: Arial, Calibri, sans-serif; font-size: 12pt;"
+                        aria-label="Certification ${index + 1}">
+                    <button type="button"
+                        class="btn-delete-cert"
+                        aria-label="Delete this certification"
+                        style="background: white; border: 1px solid var(--color-border-light); border-radius: var(--border-radius-md); width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #000000; font-weight: bold; font-size: 1.2rem; transition: all 0.2s ease;">
+                        🗑️
+                    </button>
+                </div>
+            `;
+        }
+
+        /**
+         * Attach event listeners to certification rows
+         */
+        function attachCertificationHandlers() {
+            const container = document.getElementById('certifications-list');
+            const addBtn = document.getElementById('btnAddCertification');
+
+            // Delete buttons
+            container.querySelectorAll('.btn-delete-cert').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    this.closest('.certification-row').remove();
+                    updateCertificationIndices();
+                };
+                // Keyboard support for delete button
+                btn.onkeydown = function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                };
+                // Focus indicator
+                btn.onfocus = function() {
+                    this.style.outline = '3px solid #000000';
+                    this.style.outlineOffset = '2px';
+                };
+                btn.onblur = function() {
+                    this.style.outline = 'none';
+                };
+            });
+
+            // Certification inputs - keyboard navigation
+            container.querySelectorAll('.certification-input').forEach((input, index) => {
+                input.onkeydown = function(e) {
+                    if (e.key === 'Tab' && e.shiftKey) return; // Allow default shift+tab
+                    if (e.key === 'Tab' && index === container.querySelectorAll('.certification-input').length - 1) {
+                        // Last input, Tab should focus Add button
+                        e.preventDefault();
+                        addBtn.focus();
+                    }
+                };
+            });
+
+            // Add button
+            addBtn.onclick = function(e) {
+                e.preventDefault();
+                const rowCount = container.querySelectorAll('.certification-row').length;
+                const newRow = createCertificationRow('', rowCount);
+                container.insertAdjacentHTML('beforeend', newRow);
+                attachCertificationHandlers();
+                // Focus the new input
+                const newInput = container.querySelectorAll('.certification-input').pop();
+                newInput.focus();
+            };
+
+            // Keyboard support for Add button
+            addBtn.onkeydown = function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            };
+
+            // Focus indicator for Add button
+            addBtn.onfocus = function() {
+                this.style.outline = '3px solid #000000';
+                this.style.outlineOffset = '2px';
+            };
+            addBtn.onblur = function() {
+                this.style.outline = 'none';
+            };
+        }
+
+        /**
+         * Update ARIA labels for certification inputs after rows change
+         */
+        function updateCertificationIndices() {
+            const container = document.getElementById('certifications-list');
+            container.querySelectorAll('.certification-input').forEach((input, index) => {
+                input.setAttribute('aria-label', `Certification ${index + 1}`);
+            });
+        }
+
+        /**
+         * Collect all certifications from the list into an array
+         * @returns {string[]}
+         */
+        function collectCertifications() {
+            const container = document.getElementById('certifications-list');
+            const values = Array.from(container.querySelectorAll('.certification-input'))
+                .map(input => input.value.trim())
+                .filter(val => val.length > 0);
+            return values;
+        }
+
         function calculateProgress(data) {
             const fields = [
                 data.business_name,
@@ -657,6 +850,69 @@
 
             document.getElementById('progressBar').style.width = percentage + '%';
             document.getElementById('progressText').textContent = percentage + '%';
+        }
+
+        /**
+         * Show a temporary success message toast
+         * @param {string} message - Message to display
+         */
+        function showSuccessMessage(message) {
+            const toast = document.createElement('div');
+            toast.id = 'success-toast';
+            toast.style.cssText = `
+                position: fixed;
+                top: 2rem;
+                right: 2rem;
+                background: #22c55e;
+                color: #000000;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                font-family: Arial, Calibri, sans-serif;
+                font-size: 14pt;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'polite');
+            document.body.appendChild(toast);
+
+            // Add animation styles if not present
+            if (!document.getElementById('toast-animation-styles')) {
+                const style = document.createElement('style');
+                style.id = 'toast-animation-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(400px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideOut {
+                        from {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(400px);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         function setupForms() {
@@ -687,7 +943,7 @@
                     contact_name: contact_name,
                     phone: data.phone,
                     certification_number: data.certification_number,
-                    certifications: data.certifications
+                    certifications: collectCertifications().join(', ')
                 };
 
                 try {
@@ -703,7 +959,8 @@
                     const updatedUser = { ...user, ...result };
                     localStorage.setItem('caltrans_user', JSON.stringify(updatedUser));
 
-                    alert('✅ Profile updated successfully!');
+                    // Show success message
+                    showSuccessMessage('✅ Profile saved successfully');
                     calculateProgress(result);
 
                 } catch (error) {
