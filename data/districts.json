@@ -1,0 +1,16 @@
+{
+  "districts": [
+    { "id": "1",  "name": "District 1 – Eureka",         "region": "Northern California" },
+    { "id": "2",  "name": "District 2 – Redding",        "region": "Northern California" },
+    { "id": "3",  "name": "District 3 – Marysville",     "region": "Northern California" },
+    { "id": "4",  "name": "District 4 – Bay Area",       "region": "Bay Area" },
+    { "id": "5",  "name": "District 5 – San Luis Obispo","region": "Central California" },
+    { "id": "6",  "name": "District 6 – Fresno",         "region": "Central California" },
+    { "id": "7",  "name": "District 7 – Los Angeles",    "region": "Southern California" },
+    { "id": "8",  "name": "District 8 – San Bernardino", "region": "Southern California" },
+    { "id": "9",  "name": "District 9 – Bishop",         "region": "Eastern California" },
+    { "id": "10", "name": "District 10 – Stockton",      "region": "Central California" },
+    { "id": "11", "name": "District 11 – San Diego",     "region": "Southern California" },
+    { "id": "12", "name": "District 12 – Orange County", "region": "Southern California" }
+  ]
+}

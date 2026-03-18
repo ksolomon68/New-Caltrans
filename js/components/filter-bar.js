@@ -23,13 +23,14 @@ document.addEventListener('DOMContentLoaded', async function () {
             };
 
         // Load districts and categories in parallel
+        // Use native fetch — these are static JSON files, not API routes
         console.log('CaltransBizConnect: Loading filters...');
         const [districtsData, categoriesData] = await Promise.all([
-            fetcher('/data/districts.json').catch(err => {
+            fetch('/data/districts.json').then(r => r.ok ? r.json() : { districts: [] }).catch(err => {
                 console.error('Failed to load districts.json:', err);
                 return { districts: [] };
             }),
-            fetcher('/data/work-categories.json').catch(err => {
+            fetch('/data/work-categories.json').then(r => r.ok ? r.json() : { categories: [] }).catch(err => {
                 console.error('Failed to load work-categories.json:', err);
                 return { categories: [] };
             })

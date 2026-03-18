@@ -16,7 +16,6 @@ build/
 *.db-journal
 *.db-shm
 *.db-wal
-data/
 data-export.json
 
 # User Uploads — track directory but not contents
