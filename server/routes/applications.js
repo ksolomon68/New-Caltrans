@@ -24,7 +24,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Get applications (filtered by vendor or agency)
+// Get applications (filtered by small business or prime contractor)
 router.get('/', async (req, res) => {
     const { vendorId, agencyId } = req.query;
 
@@ -68,7 +68,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Find agency ID from opportunity
+        // Find prime contractor ID from opportunity
         const [oppRows] = await db.execute('SELECT posted_by FROM opportunities WHERE id = ?', [opportunityId]);
         if (oppRows.length === 0) return res.status(404).json({ error: 'Opportunity not found' });
 
@@ -90,7 +90,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Get applications for a specific opportunity (Agency view)
+// Get applications for a specific opportunity (Prime Contractor view)
 router.get('/opportunity/:opportunityId', async (req, res) => {
     const { opportunityId } = req.params;
     try {
@@ -104,7 +104,7 @@ router.get('/opportunity/:opportunityId', async (req, res) => {
             ORDER BY a.applied_date DESC
         `, [opportunityId]);
 
-        // Parse JSON fields for vendors
+        // Parse JSON fields for small businesses
         const processed = rows.map(app => ({
             ...app,
             districts: app.districts ? (typeof app.districts === 'string' && app.districts.startsWith('[') ? JSON.parse(app.districts) : (Array.isArray(app.districts) ? app.districts : [app.districts])) : [],
@@ -118,7 +118,7 @@ router.get('/opportunity/:opportunityId', async (req, res) => {
     }
 });
 
-// Get applications for a specific vendor
+// Get applications for a specific small business
 router.get('/vendor/:vendorId', async (req, res) => {
     const { vendorId } = req.params;
     try {
@@ -132,7 +132,7 @@ router.get('/vendor/:vendorId', async (req, res) => {
         `, [vendorId]);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching applications for vendor:', error);
+        console.error('Error fetching applications for small business:', error);
         res.status(500).json({ error: error.message });
     }
 });

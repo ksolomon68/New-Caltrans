@@ -3,8 +3,8 @@
   "isSystem": true,
   "updatedAt": "2026-03-17T19:30:31.291Z",
   "meta": {
-    "title": "For Agencies & Prime Contractors - CaltransBizConnect",
-    "description": "Agencies and prime contractors: Post opportunities, find qualified Small Business Enterprises, and manage your contracting needs."
+    "title": "For Prime Contractors & Prime Contractors - CaltransBizConnect",
+    "description": "Prime Contractors and prime contractors: Post opportunities, find qualified Small Business Enterprises, and manage your contracting needs."
   },
   "header": {
     "backgroundImage": "",
@@ -16,14 +16,14 @@
       "id": "hero",
       "type": "hero-inner",
       "fields": {
-        "title": "For Agencies & Prime Contractors",
+        "title": "For Prime Contractors & Prime Contractors",
         "subtitle": "Find qualified Small Business Enterprises, post structured opportunities, and streamline your contractor outreach with CaltransBizConnect.",
         "primaryButton": {
-          "label": "Create Agency Account",
+          "label": "Create Prime Contractor Account",
           "href": "register-agency.html"
         },
         "secondaryButton": {
-          "label": "Search Vendors",
+          "label": "Search Small Businesses",
           "href": "search-vendors.html"
         }
       }
@@ -32,22 +32,22 @@
       "id": "how-we-help",
       "type": "card-grid",
       "fields": {
-        "heading": "How CaltransBizConnect Helps Agencies",
+        "heading": "How CaltransBizConnect Helps Prime Contractors",
         "cards": [
           {
             "id": "post-opportunities",
             "title": "Post Structured Opportunities",
-            "body": "Create detailed opportunity listings that attract the most qualified SBE vendors for your project requirements."
+            "body": "Create detailed opportunity listings that attract the most qualified Small Business small businesses for your project requirements."
           },
           {
             "id": "find-vendors",
-            "title": "Find Qualified Vendors",
-            "body": "Search our directory of pre-screened SBEs by district, certification, and work category to find the right partners."
+            "title": "Find Qualified Small Businesses",
+            "body": "Search our directory of pre-screened Small Businesses by district, certification, and work category to find the right partners."
           },
           {
             "id": "manage-contracts",
             "title": "Manage Contracting",
-            "body": "Track applications, communicate with vendors, and manage your contracting workflow all in one place."
+            "body": "Track applications, communicate with small businesses, and manage your contracting workflow all in one place."
           }
         ]
       }
@@ -57,22 +57,22 @@
       "type": "text-block",
       "fields": {
         "heading": "Opportunity Posting Requirements",
-        "body": "All agency opportunity postings must include a clear project description, required certifications, district location, estimated value, and submission deadline. This ensures vendors can accurately assess fit and submit complete proposals."
+        "body": "All prime contractor opportunity postings must include a clear project description, required certifications, district location, estimated value, and submission deadline. This ensures small businesses can accurately assess fit and submit complete proposals."
       }
     },
     {
       "id": "cta",
       "type": "cta-banner",
       "fields": {
-        "heading": "Start Finding Qualified SBEs",
-        "text": "Register your agency today to post opportunities and connect with our SBE network.",
+        "heading": "Start Finding Qualified Small Businesses",
+        "text": "Register your prime contractor today to post opportunities and connect with our Small Business network.",
         "columns": [
           {
-            "buttonLabel": "Create Agency Account",
+            "buttonLabel": "Create Prime Contractor Account",
             "buttonHref": "register-agency.html"
           },
           {
-            "buttonLabel": "Search Vendors",
+            "buttonLabel": "Search Small Businesses",
             "buttonHref": "search-vendors.html"
           }
         ]

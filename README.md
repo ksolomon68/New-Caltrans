@@ -1,19 +1,19 @@
 # CaltransBizConnect Platform
 
-A mission-critical digital platform connecting Small Business Enterprises (SBEs) with contracting opportunities and Agencies/Prime Contractors with qualified partners.
+A mission-critical digital platform connecting Small Business Enterprises (Small Businesses) with contracting opportunities and Agencies/Prime Contractors with qualified partners.
 
 ## Overview
 
 CaltransBizConnect serves as the central hub for the Small Business Enterprise Supportive Services Business Development Program (SBE/BDP). The platform streamlines the contracting process by providing:
 
 - **For Vendors/SBEs**: Opportunity discovery, profile management, capability statement uploads, and application tracking
-- **For Agencies**: Structured opportunity posting, vendor search, and submission management
+- **For Prime Contractors**: Structured opportunity posting, small business search, and submission management
 
 ## Key Features
 
 ### Dual User Flows
-- **SBE (Vendor) Flow**: Home → For Vendors → Create Account → Dashboard → Profile Completion → Search Opportunities
-- **Agency Flow**: Home → For Agencies → Create Account → Dashboard → Post Opportunity → Manage Postings
+- **Small Business (Small Business) Flow**: Home → For Small Businesses → Create Account → Dashboard → Profile Completion → Search Opportunities
+- **Prime Contractor Flow**: Home → For Prime Contractors → Create Account → Dashboard → Post Opportunity → Manage Postings
 
 ### Quality Standards
 - All opportunity postings must meet strict validation requirements
@@ -33,12 +33,12 @@ CaltransBizConnect serves as the central hub for the Small Business Enterprise S
 ```
 Antig2/
 ├── index.html                  # Home page with dual pathway hero
-├── for-vendors.html            # Vendor landing page
-├── for-agencies.html           # Agency landing page
+├── for-vendors.html            # Small Business landing page
+├── for-agencies.html           # Prime Contractor landing page
 ├── opportunities.html          # Opportunity listing with filters
 ├── login.html                  # Login page
-├── dashboard-vendor.html       # Vendor dashboard
-├── dashboard-agency.html       # Agency dashboard
+├── dashboard-vendor.html       # Small Business dashboard
+├── dashboard-agency.html       # Prime Contractor dashboard
 ├── capability-statement.html   # Capability statement upload
 ├── post-opportunity.html       # Opportunity posting form
 ├── contact.html                # Contact page
@@ -99,21 +99,21 @@ Antig2/
 
 ### Public Pages
 - **Home** (`index.html`): Dual pathway selection
-- **For Vendors** (`for-vendors.html`): SBE journey and requirements
-- **For Agencies** (`for-agencies.html`): Posting process and standards
+- **For Small Businesses** (`for-vendors.html`): Small Business journey and requirements
+- **For Prime Contractors** (`for-agencies.html`): Posting process and standards
 - **Opportunities** (`opportunities.html`): Filterable opportunity listing
 
-### Vendor Dashboard
+### Small Business Dashboard
 - Profile completeness indicator
 - Action tiles for key tasks
 - Capability statement upload
 - Opportunity search and filtering
 
-### Agency Dashboard
+### Prime Contractor Dashboard
 - Summary metrics
 - Opportunity posting form with validation
 - Posting management
-- Vendor search
+- Small Business search
 
 ## Browser Support
 - Chrome (latest)

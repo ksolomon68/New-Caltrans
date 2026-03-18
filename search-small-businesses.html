@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Search for qualified vendors and Small Business Enterprises (SBEs) to partner on your contracting opportunities.">
+        content="Search for qualified small businesses and Small Business Enterprises (Small Businesses) to partner on your contracting opportunities.">
     <title>Search Small Businesses - CaltransBizConnect</title>
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/design-system.css">
@@ -282,8 +282,8 @@
             <section class="hero-section">
                 <div class="hero-content">
                     <div class="hero-welcome">
-                        <h1 class="page-title">Vendor Directory</h1>
-                        <p>Search and discover qualified Small Business Enterprises and vendors for your contracting
+                        <h1 class="page-title">Small Business Directory</h1>
+                        <p>Search and discover qualified Small Business Enterprises and small businesses for your contracting
                             opportunities.</p>
                     </div>
                 </div>
@@ -295,14 +295,14 @@
                     <div class="card-header">
                         <h3 class="card-title" style="display: flex; align-items: center; gap: var(--space-sm);">
                             <span style="font-size: 1.8rem; margin-right: var(--space-sm);">🔍</span>
-                            Vendor Search
+                            Small Business Search
                         </h3>
                         <div class="card-subtitle">Search by name, location, services, or certifications</div>
                     </div>
                     <div class="search-container">
                         <div class="search-input-group">
                             <input type="text" id="vendorSearch"
-                                placeholder="Search vendors by name, services, or location..."
+                                placeholder="Search small businesses by name, services, or location..."
                                 style="width: 100%; padding: var(--space-md) var(--space-lg); border: 2px solid var(--color-border-light); border-radius: var(--border-radius-lg); font-size: 1rem; transition: all var(--transition-base);">
                             <div class="search-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -340,7 +340,7 @@
 
                 <!-- Results Count -->
                 <div id="searchResults" style="margin: var(--space-md) 0; color: var(--text-muted);">
-                    <strong>All vendors</strong> (showing 2 results)
+                    <strong>All small businesses</strong> (showing 2 results)
                 </div>
             </section>
 
@@ -379,9 +379,9 @@
                 }
             </style>
 
-            <!-- Vendor Grid -->
+            <!-- Small Business Grid -->
             <section id="vendorGrid" class="vendor-grid">
-                <!-- Sample Vendor 1 -->
+                <!-- Sample Small Business 1 -->
                 <div class="enhanced-card">
                     <div class="vendor-info">
                         <div class="vendor-details">
@@ -420,7 +420,7 @@
                                         d="M3 9l9 9m0 0a9 9 0 0 1 9v6.5m-9 9L3 9a9 9 0 0 1 9v6.5M9 3a9 9 0 0 1 9v6.5M21 12a9 9 0 0 1 9 0l-9 9a9 9 0 0 0 1 9z">
                                     </path>
                                 </svg>
-                                Contact Vendor
+                                Contact Small Business
                             </button>
                             <button class="contact-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -434,7 +434,7 @@
                     </div>
                 </div>
 
-                <!-- Sample Vendor 2 -->
+                <!-- Sample Small Business 2 -->
                 <div class="enhanced-card">
                     <div class="vendor-info">
                         <div class="vendor-details">
@@ -473,7 +473,7 @@
                                         d="M3 9l9 9m0 0a9 9 0 0 1 9v6.5m-9 9L3 9a9 9 0 0 1 9v6.5M9 3a9 9 0 0 1 9v6.5M21 12a9 9 0 0 1 9 0l-9 9a9 9 0 0 0 1 9z">
                                     </path>
                                 </svg>
-                                Contact Vendor
+                                Contact Small Business
                             </button>
                             <button class="contact-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -497,7 +497,7 @@
     <script src="js/utils/data-resilience.js"></script>
     <script src="js/components/navigation.js"></script>
     <script>
-        // Initialize vendor search with enhanced design
+        // Initialize small business search with enhanced design
         document.addEventListener('DOMContentLoaded', async function () {
             // Get current user and initialize appropriate navigation
             const user = JSON.parse(localStorage.getItem('caltrans_user'));
@@ -509,19 +509,19 @@
             }, 50);
         });
 
-        // Load vendors from API and display them
+        // Load small businesses from API and display them
         async function loadVendors() {
             try {
                 // Use DataService for resilient fetching
-                const data = await DataService.fetch('/vendors?type=vendor');
+                const data = await DataService.fetch('/vendors?type=small business');
                 if (!data || !Array.isArray(data)) {
-                    throw new Error('Invalid vendor data received');
+                    throw new Error('Invalid small business data received');
                 }
-                const vendors = data;
-                displayVendors(vendors);
+                const small businesses = data;
+                displayVendors(small businesses);
 
             } catch (error) {
-                console.error('Error loading vendors:', error);
+                console.error('Error loading small businesses:', error);
                 document.getElementById('vendorGrid').innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--color-error);">
                         <p>Error loading vendors. Please try again later.</p>
@@ -531,21 +531,21 @@
             }
         }
 
-        // Display vendor cards
-        function displayVendors(vendors) {
+        // Display small business cards
+        function displayVendors(small businesses) {
             const gridEl = document.getElementById('vendorGrid');
             const resultsEl = document.getElementById('searchResults');
 
             if (vendors.length === 0) {
-                gridEl.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">No vendors found matching your search criteria.</div>';
-                resultsEl.innerHTML = '<strong>No vendors</strong> found';
+                gridEl.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">No small businesses found matching your search criteria.</div>';
+                resultsEl.innerHTML = '<strong>No small businesses</strong> found';
                 return;
             }
 
-            resultsEl.innerHTML = `<strong>${vendors.length} vendors</strong> found`;
+            resultsEl.innerHTML = `<strong>${vendors.length} small businesses</strong> found`;
             gridEl.innerHTML = '';
 
-            vendors.forEach(vendor => {
+            vendors.forEach(small business => {
                 const card = document.createElement('div');
                 card.className = 'enhanced-card vendor-card';
                 card.style.cssText = 'margin-bottom: var(--space-lg); cursor: pointer; display: flex; flex-direction: column;';
@@ -556,7 +556,7 @@
                 const location = vendor.location || (vendor.city && vendor.state ? `${vendor.city}, ${vendor.state}` : (vendor.districts ? `District ${vendor.districts}` : 'Various Districts'));
                 const phone = vendor.phone || 'Contact for info';
                 const email = vendor.email || 'No email provided';
-                const certs = vendor.certifications || vendor.certification_number || 'SBE Certified';
+                const certs = vendor.certifications || vendor.certification_number || 'Small Business Certified';
                 const description = vendor.description || vendor.tagline || 'Specializing in high-quality transportation and engineering solutions for public works projects across California.';
                 const years = vendor.years_in_business || '5+ years';
                 const rating = vendor.rating || 4.8;
@@ -632,9 +632,9 @@
                 const user = Auth.getUser();
                 const opps = await DataService.fetch('/opportunities');
 
-                // If vendor, also fetch saved list
+                // If small business, also fetch saved list
                 let savedIds = new Set();
-                if (user && user.type === 'vendor') {
+                if (user && user.type === 'small business') {
                     const saved = await DataService.fetch(`/opportunities/saved/${user.id}`);
                     savedIds = new Set(saved.map(o => o.id));
                 }
@@ -645,12 +645,12 @@
             }
         }
 
-        // View vendor profile
+        // View small business profile
         window.viewVendorProfile = function (vendorId, event) {
             if (event) {
                 event.stopPropagation();
             }
-            // Navigate to vendor profile page
+            // Navigate to small business profile page
             window.location.href = `small-business-profile.html?id=${vendorId}`;
         };
 
@@ -659,7 +659,7 @@
                 event.stopPropagation();
             }
             // For demo, show contact info - in real app would open contact form or modal
-            alert(`Contact feature would open communication options for vendor ID: ${vendorId}`);
+            alert(`Contact feature would open communication options for small business ID: ${vendorId}`);
         };
     </script>
 

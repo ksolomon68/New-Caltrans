@@ -19,12 +19,12 @@ function processDirectory(dirPath) {
             if (content.includes('<a href="mailto:SBEss@dot.ca.gov">SBEss@dot.ca.gov</a>')) {
                 content = content.replace(
                     /<li><a href="mailto:SBEss@dot\.ca\.gov">SBEss@dot\.ca\.gov<\/a><\/li>/g,
-                    '<li><a href="mailto:SBEss@dot.ca.gov" aria-label="Email Caltrans SBE Support at SBEss@dot.ca.gov">SBEss@dot.ca.gov</a></li>'
+                    '<li><a href="mailto:SBEss@dot.ca.gov" aria-label="Email Caltrans Small Business Support at SBEss@dot.ca.gov">SBEss@dot.ca.gov</a></li>'
                 );
                 // Also handle non-li cases just in case
                 content = content.replace(
                     /<a href="mailto:SBEss@dot\.ca\.gov">SBEss@dot\.ca\.gov<\/a>/g,
-                    '<a href="mailto:SBEss@dot.ca.gov" aria-label="Email Caltrans SBE Support at SBEss@dot.ca.gov">SBEss@dot.ca.gov</a>'
+                    '<a href="mailto:SBEss@dot.ca.gov" aria-label="Email Caltrans Small Business Support at SBEss@dot.ca.gov">SBEss@dot.ca.gov</a>'
                 );
                 modified = true;
             }

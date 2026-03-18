@@ -1,7 +1,7 @@
 {
   "name": "antig2",
   "version": "1.0.0",
-  "description": "A mission-critical digital platform connecting Small Business Enterprises (SBEs) with contracting opportunities and Agencies/Prime Contractors with qualified partners.",
+  "description": "A mission-critical digital platform connecting Small Business Enterprises (Small Businesses) with contracting opportunities and Agencies/Prime Contractors with qualified partners.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

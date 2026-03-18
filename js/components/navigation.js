@@ -6,7 +6,7 @@
 const Navigation = {
     // Role configurations
     config: {
-        vendor: {
+        small business: {
             title: 'Small Business Portal',
             items: [
                 { label: 'Search Opportunities', href: 'search-opportunities.html', icon: '🏢' },
@@ -15,7 +15,7 @@ const Navigation = {
                 { label: 'My Profile', href: 'small-business-profile.html', icon: '👤' }
             ]
         },
-        agency: {
+        prime contractor: {
             title: 'Prime Contractor Portal',
             items: [
                 { label: 'Dashboard', href: 'dashboard-prime-contractor.html', icon: '🏠' },
@@ -56,7 +56,7 @@ const Navigation = {
         // Fallback to localStorage if no role provided
         if (!role) {
             const user = JSON.parse(localStorage.getItem('caltrans_user'));
-            role = user ? user.type : 'vendor';
+            role = user ? user.type : 'small business';
         }
 
         this.renderSidebar(role);

@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get opportunities by agency ID
+// Get opportunities by prime contractor ID
 router.get('/agency/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -29,7 +29,7 @@ router.get('/agency/:id', async (req, res) => {
 // Get single opportunity by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    if (id === 'agency' || id === 'saved' || id === 'save' || id === 'unsave') return res.status(404).json({ error: 'Not found' });
+    if (id === 'prime contractor' || id === 'saved' || id === 'save' || id === 'unsave') return res.status(404).json({ error: 'Not found' });
 
     try {
         const [rows] = await db.execute('SELECT * FROM opportunities WHERE id = ?', [id]);
@@ -159,7 +159,7 @@ router.delete('/:id', async (req, res) => {
 
 // --- Saved Opportunities Endpoints ---
 
-// Get saved opportunities for a vendor
+// Get saved opportunities for a small business
 router.get('/saved/:vendorId', async (req, res) => {
     const { vendorId } = req.params;
     try {
@@ -179,7 +179,7 @@ router.get('/saved/:vendorId', async (req, res) => {
 router.post('/save', async (req, res) => {
     const { vendorId, opportunityId } = req.body;
     if (!vendorId || !opportunityId) {
-        return res.status(400).json({ error: 'Vendor ID and Opportunity ID are required' });
+        return res.status(400).json({ error: 'Small Business ID and Opportunity ID are required' });
     }
     try {
         const sql = `
@@ -197,7 +197,7 @@ router.post('/save', async (req, res) => {
 router.post('/unsave', async (req, res) => {
     const { vendorId, opportunityId } = req.body;
     if (!vendorId || !opportunityId) {
-        return res.status(400).json({ error: 'Vendor ID and Opportunity ID are required' });
+        return res.status(400).json({ error: 'Small Business ID and Opportunity ID are required' });
     }
     try {
         const [result] = await db.execute(`

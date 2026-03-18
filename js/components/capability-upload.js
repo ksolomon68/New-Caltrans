@@ -11,7 +11,7 @@ const CapabilityUpload = {
             <div class="capability-upload-container" style="border: 2px dashed var(--color-gray-200); padding: 1.5rem; border-radius: 8px; text-align: center;">
                 <h4 style="margin-top: 0;">Capability Statement</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                    Upload your Capability Statement (PDF, DOCX, MAX 10MB) to help agencies find you.
+                    Upload your Capability Statement (PDF, DOCX, MAX 10MB) to help prime contractors find you.
                 </p>
                 <input type="file" id="csFileInput" accept=".pdf,.doc,.docx" style="display: none;">
                 <button class="btn btn-outline" onclick="document.getElementById('csFileInput').click()">Choose File</button>

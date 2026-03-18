@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/dashboard-new.css">
     <link rel="stylesheet" href="css/dashboard-common.css">
     <style>
-        /* Enhanced Dashboard Styling matching Agency */
+        /* Enhanced Dashboard Styling matching Prime Contractor */
         .hero-section {
             background: linear-gradient(135deg, var(--brand-blue) 0%, var(--color-primary-light) 100%);
             color: white;
@@ -222,7 +222,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">248</div>
-                            <div class="stat-label">Registered Vendors</div>
+                            <div class="stat-label">Registered Small Businesses</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">15</div>
@@ -296,10 +296,10 @@
     <script src="js/utils/data-resilience.js"></script>
     <script src="js/components/navigation.js"></script>
     <script>
-        // Initialize Vendor dashboard
+        // Initialize Small Business dashboard
         document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(() => {
-                Navigation.init('vendor');
+                Navigation.init('small business');
                 initDashboardData();
             }, 50);
         });
@@ -312,7 +312,7 @@
                 // Set business name in welcome section - Removed as we standardized title
 
                 // Load real stats
-                const [opps, vendors, saved, apps] = await Promise.all([
+                const [opps, small businesses, saved, apps] = await Promise.all([
                     DataService.fetch('/opportunities'),
                     DataService.fetch('/vendors'),
                     DataService.fetch(`/opportunities/saved/${user.id}`),
@@ -322,7 +322,7 @@
                 const statNumbers = document.querySelectorAll('.stat-number');
                 if (statNumbers.length >= 4) {
                     statNumbers[0].textContent = opps ? (Array.isArray(opps) ? opps.length : 0) : 0;
-                    statNumbers[1].textContent = vendors ? (Array.isArray(vendors) ? vendors.length : 0) : 0;
+                    statNumbers[1].textContent = small businesses ? (Array.isArray(small businesses) ? vendors.length : 0) : 0;
                     statNumbers[2].textContent = saved ? (Array.isArray(saved) ? saved.length : 0) : 0;
                     statNumbers[3].textContent = apps ? (Array.isArray(apps) ? apps.length : 0) : 0;
 

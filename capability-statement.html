@@ -37,7 +37,7 @@
         <div class="container">
             <div class="dashboard">
                 <aside class="dashboard-sidebar" role="navigation">
-                    <h2 class="mb-md" style="font-size: var(--font-size-lg);">Vendor Menu</h2>
+                    <h2 class="mb-md" style="font-size: var(--font-size-lg);">Small Business Menu</h2>
                     <ul class="dashboard-nav">
                         <li><a href="dashboard-small-business.html">Dashboard</a></li>
                         <li><a href="small-business-profile.html">My Profile</a></li>
@@ -61,7 +61,7 @@
                             <div class="card-header"
                                 style="display: flex; justify-content: space-between; align-items: center;">
                                 <h2 class="card-title">Statement Details</h2>
-                                <span class="badge badge-primary">Visible to Agencies</span>
+                                <span class="badge badge-primary">Visible to Prime Contractors</span>
                             </div>
                             <div class="card-body">
                                 <p class="text-muted mb-lg">Fill out the sections below to create a professional,
@@ -181,7 +181,7 @@
     <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        const user = protectPage('vendor');
+        const user = protectPage('small business');
         let currentFile = null;
 
         // Load existing data

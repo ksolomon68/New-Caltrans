@@ -239,7 +239,7 @@
                     </div>
                 </div>
                 <div id="viewModeBadge" class="view-mode-badge"
-                    style="display: none; position: absolute; top: var(--space-md); right: var(--space-md);">Agency View
+                    style="display: none; position: absolute; top: var(--space-md); right: var(--space-md);">Prime Contractor View
                     Mode</div>
             </section>
 
@@ -261,7 +261,7 @@
                         </a>
                     </nav>
 
-                    <!-- Profile Progress (Only for Vendors in Edit Mode) -->
+                    <!-- Profile Progress (Only for Small Businesses in Edit Mode) -->
                     <div id="progressContainer"
                         style="margin-top: var(--space-xl); padding-top: var(--space-md); border-top: 1px solid var(--color-border-light);">
                         <div
@@ -355,7 +355,7 @@
                                 </div>
                             </div>
 
-                            <!-- Agency Contact Actions -->
+                            <!-- Prime Contractor Contact Actions -->
                             <div id="agencyActions" class="contact-card-actions" style="display: none;">
                                 <button type="button" class="btn btn-primary" id="btnMessage">Send Message</button>
                                 <button type="button" class="btn btn-outline" id="btnEmail">Direct Email</button>
@@ -395,7 +395,7 @@
                                     </button>
                                 </fieldset>
                                 <p class="text-muted" style="font-size: 0.85rem; margin-top: var(--space-sm);">
-                                    Examples: SBE, WBE, MBE, LGBTBE, etc.
+                                    Examples: Small Business, WBE, MBE, LGBTBE, etc.
                                 </p>
                             </div>
 
@@ -518,12 +518,12 @@
             const targetId = params.get('id');
 
             // Mode Logic
-            // 1. Agency viewing a vendor (targetId is present and currentUser is agency)
-            // 2. Vendor viewing another vendor (targetId present and != currentUser.id)
+            // 1. Prime Contractor viewing a small business (targetId is present and currentUser is prime contractor)
+            // 2. Small Business viewing another small business (targetId present and != currentUser.id)
             if (targetId && targetId != user.id) {
                 isViewMode = true;
-            } else if (user.type === 'agency' && !targetId) {
-                // Agency should not be on this page without an ID
+            } else if (user.type === 'prime contractor' && !targetId) {
+                // Prime Contractor should not be on this page without an ID
                 alert('Redirecting to dashboard...');
                 window.location.href = 'dashboard-prime-contractor.html';
                 return;
@@ -725,7 +725,7 @@
                         class="certification-input form-control"
                         name="certifications[]"
                         value="${value}"
-                        placeholder="e.g. SBE, WBE, MBE"
+                        placeholder="e.g. Small Business, WBE, MBE"
                         style="flex: 1; font-family: Arial, Calibri, sans-serif; font-size: 12pt;"
                         aria-label="Certification ${index + 1}">
                     <button type="button"

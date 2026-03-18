@@ -7,7 +7,7 @@ async function runFix() {
 
     try {
         // 1. Ensure Test Agent Exists
-        const testAgentEmail = 'agency@test.com';
+        const testAgentEmail = 'prime contractor@test.com';
         const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [testAgentEmail]);
         let agent = rows[0];
 
@@ -17,7 +17,7 @@ async function runFix() {
             const [info] = await db.execute(`
                 INSERT INTO users (email, password_hash, type, organization_name, status)
                 VALUES (?, ?, ?, ?, ?)
-            `, [testAgentEmail, hash, 'agency', 'Test Agency Dept', 'active']);
+            `, [testAgentEmail, hash, 'prime contractor', 'Test Prime Contractor Dept', 'active']);
 
             agent = { id: info.insertId };
             console.log(`Created test agent with ID: ${agent.id}`);

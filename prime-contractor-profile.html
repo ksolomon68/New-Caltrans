@@ -83,14 +83,14 @@
             </a>
 
             <section class="hero-section">
-                <h1 id="agencyName">Agency Name</h1>
+                <h1 id="agencyName">Prime Contractor Name</h1>
                 <p id="agencyTagline">District Office</p>
             </section>
 
             <div class="profile-card">
-                <h3>About the Agency</h3>
+                <h3>About the Prime Contractor</h3>
                 <p id="agencyDescription" style="line-height: 1.6; color: var(--text-secondary);">
-                    Loading agency information...
+                    Loading prime contractor information...
                 </p>
 
                 <div class="agency-meta">
@@ -129,7 +129,7 @@
             const agencyId = params.get('id');
 
             if (!agencyId) {
-                alert('Agency ID required');
+                alert('Prime Contractor ID required');
                 history.back();
                 return;
             }
@@ -139,15 +139,15 @@
 
         async function loadAgencyProfile(id) {
             try {
-                const agency = await DataService.fetch(`/users/${id}`);
+                const prime contractor = await DataService.fetch(`/users/${id}`);
                 const allOpps = await DataService.fetch('/opportunities');
 
-                // Filter opportunities posted by this agency
+                // Filter opportunities posted by this prime contractor
                 const agencyOpps = allOpps.filter(o => o.posted_by == id || o.postedBy == id);
 
-                document.getElementById('agencyName').textContent = agency.organization_name || agency.contact_name || 'Agency Office';
+                document.getElementById('agencyName').textContent = agency.organization_name || agency.contact_name || 'Prime Contractor Office';
                 document.getElementById('agencyTagline').textContent = agency.district_name || `District ${agency.district}`;
-                document.getElementById('agencyDescription').textContent = agency.description || 'This agency manages various transportation projects and contracting opportunities for the California Department of Transportation.';
+                document.getElementById('agencyDescription').textContent = agency.description || 'This prime contractor manages various transportation projects and contracting opportunities for the California Department of Transportation.';
 
                 document.getElementById('agencyDistrict').textContent = agency.district_name || `District ${agency.district}`;
                 document.getElementById('agencyContact').textContent = agency.contact_name || 'Procurement Officer';
@@ -176,8 +176,8 @@
                 }
 
             } catch (error) {
-                console.error('Error loading agency:', error);
-                alert('Failed to load agency profile.');
+                console.error('Error loading prime contractor:', error);
+                alert('Failed to load prime contractor profile.');
             }
         }
     </script>

@@ -128,12 +128,12 @@
             const opportunityId = params.get('id');
             const user = Auth.getUser();
 
-            if (!opportunityId || !user || user.type !== 'agency') {
+            if (!opportunityId || !user || user.type !== 'prime contractor') {
                 location.href = 'manage-opportunities.html';
                 return;
             }
 
-            Navigation.init('agency');
+            Navigation.init('prime contractor');
             loadAppliedVendors(opportunityId);
         });
 
@@ -165,7 +165,7 @@
             listEl.innerHTML = apps.map(app => `
                 <div class="vendor-item-card">
                     <div class="vendor-info-main">
-                        <h3>${app.business_name || app.vendor_name || 'Anonymous Vendor'}</h3>
+                        <h3>${app.business_name || app.vendor_name || 'Anonymous Small Business'}</h3>
                         <div class="vendor-meta">
                             <span>👤 ${app.contact_name || 'N/A'}</span>
                             <span>📅 Applied: ${new Date(app.applied_date).toLocaleDateString()}</span>

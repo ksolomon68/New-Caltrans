@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Create your vendor account on CaltransBizConnect to access contracting opportunities.">
-    <title>Vendor Registration - CaltransBizConnect</title>
+        content="Create your small business account on CaltransBizConnect to access contracting opportunities.">
+    <title>Small Business Registration - CaltransBizConnect</title>
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/design-system.css?v=2.0.4">
     <link rel="stylesheet" href="css/main.css?v=2.0.4">
@@ -45,7 +45,7 @@
     <main id="main-content" class="auth-page">
         <div class="auth-container">
             <div class="auth-header">
-                <h1>Create Your Vendor Account</h1>
+                <h1>Create Your Small Business Account</h1>
                 <p>Join CaltransBizConnect to access contracting opportunities</p>
             </div>
 
@@ -186,12 +186,12 @@
                         <div class="form-group">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="isSBE" name="isSBE">
-                                <span>My business is SBE certified</span>
+                                <span>My business is Small Business certified</span>
                             </label>
                         </div>
 
                         <div class="form-group" id="sbeNumberGroup" style="display: none;">
-                            <label for="sbeNumber" class="form-label">SBE Certification Number</label>
+                            <label for="sbeNumber" class="form-label">Small Business Certification Number</label>
                             <input type="text" id="sbeNumber" name="sbeNumber" class="form-input">
                         </div>
                     </fieldset>
@@ -299,7 +299,7 @@
                         <li><a href="https://www.californiaucp.com" target="_blank" rel="noopener noreferrer">California
                                 UCP &nearrow;</a></li>
                         <li><a href="https://www.ecfr.gov/current/title-49/subtitle-A/part-26" target="_blank"
-                                rel="noopener noreferrer">Federal SBE Regs &nearrow;</a></li>
+                                rel="noopener noreferrer">Federal Small Business Regs &nearrow;</a></li>
                     </ul>
                 </div>
             </div>
@@ -315,7 +315,7 @@
     <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Show/hide SBE number field
+        // Show/hide Small Business number field
         document.getElementById('isSBE').addEventListener('change', function () {
             document.getElementById('sbeNumberGroup').style.display = this.checked ? 'block' : 'none';
         });
