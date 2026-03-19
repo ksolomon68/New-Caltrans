@@ -359,6 +359,7 @@
                             <div id="primeContractorActions" class="contact-card-actions" style="display: none;">
                                 <button type="button" class="btn btn-primary" id="btnMessage">Send Message</button>
                                 <button type="button" class="btn btn-outline" id="btnEmail">Direct Email</button>
+                                <button type="button" class="btn btn-secondary" id="btnInviteSB" style="display: none;" onclick="showInviteModal()">Invite to Opportunity</button>
                             </div>
                         </section>
 
@@ -483,6 +484,27 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Invite to Opportunity Modal -->
+            <div id="inviteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                <div style="background: var(--card-bg); padding: var(--space-xl); border-radius: var(--border-radius-lg); width: 90%; max-width: 500px;">
+                    <h3 style="margin-top: 0;">Invite to Apply</h3>
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-md);">Select one of your opportunities to invite this Small Business to apply.</p>
+                    
+                    <div style="margin-bottom: var(--space-md);">
+                        <label style="display: block; margin-bottom: 4px; font-weight: 600;">Select Opportunity</label>
+                        <select id="inviteOppSelect" class="form-control" style="width: 100%; padding: 8px;">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: var(--space-lg);">
+                        <button class="btn btn-outline" onclick="document.getElementById('inviteModal').style.display='none'">Cancel</button>
+                        <button class="btn btn-primary" onclick="sendInviteToSB()">Send Invitation</button>
+                    </div>
+                </div>
+            </div>
+            
         </main>
     </div>
 
@@ -675,6 +697,80 @@
                 const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
                 window.open(`${API_BASE}/small-businesses/${data.id}/capability-statement`, '_blank');
             };
+
+            const currentUser = Auth.getUser();
+            if (currentUser && currentUser.type === 'prime_contractor') {
+                document.getElementById('primeContractorActions').style.display = 'flex';
+                document.getElementById('btnInviteSB').style.display = 'inline-flex';
+                window.targetSmallBusinessId = data.id; // Store for the modal to use
+            }
+        }
+
+        async function showInviteModal() {
+            document.getElementById('inviteModal').style.display = 'flex';
+            const select = document.getElementById('inviteOppSelect');
+            select.innerHTML = '<option value="">Loading your active opportunities...</option>';
+            
+            try {
+                const primeId = Auth.getUser().id;
+                const sbId = window.targetSmallBusinessId;
+                const res = await fetch(`${APP_CONFIG.API_URL}/opportunities/prime/${primeId}/for-sb/${sbId}`);
+                const opportunities = await res.json();
+                
+                if (opportunities.length === 0) {
+                    select.innerHTML = '<option value="">You have no active opportunities</option>';
+                    return;
+                }
+                
+                select.innerHTML = '<option value="">-- Select an Opportunity --</option>' + 
+                    opportunities.map(opp => {
+                        if (opp.has_applied) {
+                            return `<option value="${opp.id}" disabled>${opp.title} (Already Applied)</option>`;
+                        } else {
+                            return `<option value="${opp.id}">${opp.title}</option>`;
+                        }
+                    }).join('');
+            } catch (e) {
+                select.innerHTML = '<option value="">Error loading opportunities</option>';
+            }
+        }
+
+        async function sendInviteToSB() {
+            const select = document.getElementById('inviteOppSelect');
+            const opportunityId = select.value;
+            const smallBusinessId = window.targetSmallBusinessId;
+            
+            if (!opportunityId) {
+                alert('Please select an opportunity.');
+                return;
+            }
+            
+            const user = Auth.getUser();
+            const btn = document.querySelector('#inviteModal .btn-primary');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            try {
+                const res = await fetch(`${APP_CONFIG.API_URL}/opportunities/${opportunityId}/invite`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
+                    body: JSON.stringify({ smallBusinessId })
+                });
+                
+                if (res.ok) {
+                    alert('Invitation sent successfully!');
+                    document.getElementById('inviteModal').style.display = 'none';
+                } else {
+                    const error = await res.json();
+                    alert('Error sending invite: ' + (error.error || 'Unknown error'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Connection error. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Invitation';
+            }
         }
 
         /**

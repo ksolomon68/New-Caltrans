@@ -43,6 +43,26 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// Get prime contractor's opportunities with application status for a specific small business
+router.get('/prime/:primeId/for-sb/:smallBusinessId', async (req, res) => {
+    const { primeId, smallBusinessId } = req.params;
+    try {
+        const [rows] = await db.execute(`
+            SELECT 
+                o.id, o.title, o.status,
+                IF(a.id IS NOT NULL, 1, 0) as has_applied
+            FROM opportunities o
+            LEFT JOIN applications a ON a.opportunity_id = o.id AND a.small_business_id = ?
+            WHERE o.posted_by = ?
+            ORDER BY o.posted_date DESC
+        `, [smallBusinessId, primeId]);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching prime opportunities for SB:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Post new opportunity
 router.post('/', requireRole('prime_contractor'), async (req, res) => {
     const {
@@ -230,7 +250,7 @@ router.post('/:id/invite', requireRole('prime_contractor'), async (req, res) => 
     const { id: opportunityId } = req.params;
     const { smallBusinessId } = req.body;
     const senderId = req.user.id;
-    const senderBusinessName = req.user.business_name || req.user.organization_name;
+    const senderBusinessName = req.user.business_name || req.user.organization_name || 'Prime Contractor';
 
     if (!smallBusinessId) {
         return res.status(400).json({ error: 'Small Business ID is required' });
