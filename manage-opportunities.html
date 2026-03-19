@@ -326,9 +326,10 @@
                             <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;margin-left:1rem;">
                                 <span style="padding:0.2rem 0.6rem;border-radius:9999px;font-size:0.75rem;font-weight:700;background:${color}22;color:${color};text-transform:uppercase;">${status.replace('_',' ')}</span>
                                 ${isPending ? `
-                                    <button class="btn btn-small" style="background:#10b981;color:white;" onclick="setAppStatus('${app.application_id}','approved','${oppId}',this)">Approve</button>
-                                    <button class="btn btn-small" style="background:#ef4444;color:white;" onclick="setAppStatus('${app.application_id}','declined','${oppId}',this)">Decline</button>
+                                    <button class="btn btn-small" style="background:#10b981;color:white;" onclick="setAppStatus('${app.application_id}','approved','${app.small_business_id}','${oppId}',this)">Approve</button>
+                                    <button class="btn btn-small" style="background:#ef4444;color:white;" onclick="setAppStatus('${app.application_id}','declined','${app.small_business_id}','${oppId}',this)">Decline</button>
                                 ` : ''}
+                                <button class="btn btn-small btn-outline" onclick="messageApplicant('${app.small_business_id}','${oppId}')">Message</button>
                                 <a href="small-business-profile.html?id=${app.small_business_id}" class="btn btn-small btn-outline" target="_blank">Profile</a>
                             </div>
                         </div>`;
@@ -340,7 +341,8 @@
             }
         }
 
-        window.setAppStatus = async function (appId, newStatus, oppId, btn) {
+        window.setAppStatus = async function (appId, newStatus, sbId, oppId, btn) {
+            const user = Auth.getUser();
             btn.disabled = true;
             try {
                 await DataService.fetch(`/applications/${appId}`, {
@@ -348,12 +350,35 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: newStatus })
                 });
+
+                // Notify the small business via message
+                const label = newStatus === 'approved' ? 'approved' : 'declined';
+                const oppTitle = btn.closest('[id^="apps-"]') ? '' : '';
+                const msgBody = newStatus === 'approved'
+                    ? `Congratulations! Your application has been approved. We look forward to working with you. Please check your application page for next steps.`
+                    : `Thank you for your application. After careful review, we have decided to move forward with another candidate at this time. We encourage you to apply to future opportunities.`;
+
+                await DataService.fetch('/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderId: user.id,
+                        receiverId: sbId,
+                        subject: `Your application has been ${label}`,
+                        body: msgBody
+                    })
+                }).catch(() => {}); // Non-blocking — don't fail if message fails
+
                 await loadApplicationsForOpp(oppId);
             } catch (err) {
                 console.error('Error updating application status:', err);
                 alert('Failed to update status. Please try again.');
                 btn.disabled = false;
             }
+        };
+
+        window.messageApplicant = function (sbId, oppId) {
+            window.location.href = `messages.html?recipient=${sbId}&ref_type=opportunity&ref_id=${oppId}`;
         };
     </script>
   <script src="js/accessibility-widget.js"></script>

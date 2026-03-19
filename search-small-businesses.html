@@ -299,30 +299,23 @@
 
             <!-- Invite Modal -->
             <div id="inviteModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
-                <div style="background:white;border-radius:var(--border-radius-lg);padding:var(--space-xl);max-width:520px;width:90%;max-height:80vh;overflow-y:auto;position:relative;">
+                <div style="background:white;border-radius:var(--border-radius-lg);padding:var(--space-xl);max-width:500px;width:90%;max-height:80vh;overflow-y:auto;position:relative;">
                     <button onclick="closeInviteModal()" style="position:absolute;top:var(--space-md);right:var(--space-md);border:none;background:none;font-size:1.5rem;cursor:pointer;">&times;</button>
                     <h2 style="color:var(--color-primary);margin-bottom:var(--space-md);">Invite to Apply</h2>
                     <p style="color:var(--text-muted);margin-bottom:var(--space-lg);">Inviting: <strong id="inviteBusinessName"></strong></p>
                     <div class="form-group" style="margin-bottom:var(--space-lg);">
                         <label for="inviteOppSelect" style="display:block;font-weight:600;margin-bottom:var(--space-xs);">Select an Open Opportunity</label>
-                        <select id="inviteOppSelect" onchange="updateInviteLink()" style="width:100%;padding:var(--space-sm);border:1px solid var(--color-border-dark);border-radius:var(--border-radius-sm);font-size:1rem;">
-                            <option value="">— Select an opportunity —</option>
+                        <select id="inviteOppSelect" style="width:100%;padding:var(--space-sm);border:1px solid var(--color-border-dark);border-radius:var(--border-radius-sm);font-size:1rem;">
+                            <option value="">Loading your opportunities...</option>
                         </select>
                     </div>
-                    <div id="inviteLinkBox" style="display:none;margin-bottom:var(--space-lg);padding:var(--space-md);background:var(--color-bg-secondary);border-radius:var(--border-radius-md);">
-                        <label style="display:block;font-weight:600;margin-bottom:var(--space-xs);font-size:0.9rem;">Share this link with the small business:</label>
-                        <div style="display:flex;gap:var(--space-sm);align-items:center;">
-                            <input type="text" id="inviteLinkInput" readonly style="flex:1;padding:var(--space-sm);border:1px solid var(--color-border-dark);border-radius:var(--border-radius-sm);font-size:0.85rem;background:white;">
-                            <button class="btn btn-small btn-outline" onclick="copyInviteLink()">Copy</button>
-                        </div>
-                        <div style="margin-top:var(--space-md);">
-                            <a id="inviteEmailLink" href="#" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;">
-                                📧 Open in Email Client
-                            </a>
-                        </div>
+                    <div class="form-group" style="margin-bottom:var(--space-lg);">
+                        <label for="inviteNote" style="display:block;font-weight:600;margin-bottom:var(--space-xs);">Personal Message (optional)</label>
+                        <textarea id="inviteNote" rows="3" style="width:100%;padding:var(--space-sm);border:1px solid var(--color-border-dark);border-radius:var(--border-radius-sm);" placeholder="Hi! We'd love for you to apply to our opportunity — your qualifications are a great fit."></textarea>
                     </div>
                     <div style="display:flex;gap:var(--space-md);justify-content:flex-end;">
-                        <button class="btn btn-outline" onclick="closeInviteModal()">Close</button>
+                        <button class="btn btn-outline" onclick="closeInviteModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="sendInvite()" id="sendInviteBtn">Send Invitation</button>
                     </div>
                 </div>
             </div>
@@ -532,7 +525,6 @@
         // Invite mode state
         window._inviteMode = false;
         let _inviteTargetId = null;
-        let _inviteTargetEmail = null;
         let _primeOpps = [];
 
         // Initialize small business search
@@ -661,7 +653,7 @@
                             <button class="profile-btn" onclick="viewSmallBusinessProfile('${sb.id}', event)">
                                 View Full Profile &rarr;
                             </button>
-                            ${window._inviteMode ? `<button class="profile-btn" style="background:var(--color-secondary);color:#000;" onclick="openInviteModal('${sb.id}', '${name.replace(/'/g, "\\'")}', '${(sb.email || '').replace(/'/g, "\\'")}', event)">✉️ Invite to Apply</button>` : ''}
+                            ${window._inviteMode ? `<button class="profile-btn" style="background:var(--color-secondary);color:#000;" onclick="openInviteModal('${sb.id}', '${name.replace(/'/g, "\\'")}', event)">✉️ Invite to Apply</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -697,16 +689,14 @@
             window.location.href = `messages.html?recipient=${id}`;
         };
 
-        window.openInviteModal = function (sbId, sbName, sbEmail, event) {
+        window.openInviteModal = function (sbId, sbName, event) {
             if (event) event.stopPropagation();
             _inviteTargetId = sbId;
-            _inviteTargetEmail = sbEmail || '';
             document.getElementById('inviteBusinessName').textContent = sbName;
-            document.getElementById('inviteLinkBox').style.display = 'none';
 
             const select = document.getElementById('inviteOppSelect');
             if (_primeOpps.length === 0) {
-                select.innerHTML = '<option value="">No open opportunities found — post one first.</option>';
+                select.innerHTML = '<option value="">No open opportunities found. Post one first.</option>';
             } else {
                 select.innerHTML = '<option value="">— Select an opportunity —</option>' +
                     _primeOpps.map(o => `<option value="${o.id}">${o.title}</option>`).join('');
@@ -718,40 +708,51 @@
         window.closeInviteModal = function () {
             document.getElementById('inviteModal').style.display = 'none';
             _inviteTargetId = null;
-            _inviteTargetEmail = null;
+            document.getElementById('inviteNote').value = '';
         };
 
-        window.updateInviteLink = function () {
+        window.sendInvite = async function () {
             const oppId = document.getElementById('inviteOppSelect').value;
-            const linkBox = document.getElementById('inviteLinkBox');
-            if (!oppId) { linkBox.style.display = 'none'; return; }
+            if (!oppId) { alert('Please select an opportunity.'); return; }
+
+            const note = document.getElementById('inviteNote').value.trim();
+            const user = Auth.getUser();
+            if (!user) return;
 
             const opp = _primeOpps.find(o => String(o.id) === String(oppId));
             const oppTitle = opp ? opp.title : 'an opportunity';
-            const link = `${window.location.origin}/small-business-applications.html?apply=${oppId}`;
 
-            document.getElementById('inviteLinkInput').value = link;
+            const btn = document.getElementById('sendInviteBtn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
 
-            const subject = encodeURIComponent(`Invitation to Apply: ${oppTitle}`);
-            const body = encodeURIComponent(`We'd like to invite you to apply for our opportunity: "${oppTitle}".\n\nClick the link below to apply directly:\n${link}`);
-            const mailto = _inviteTargetEmail
-                ? `mailto:${_inviteTargetEmail}?subject=${subject}&body=${body}`
-                : `mailto:?subject=${subject}&body=${body}`;
-            document.getElementById('inviteEmailLink').href = mailto;
+            try {
+                // Send a message to the small business with the opportunity link
+                const message = note
+                    ? `${note}\n\nView the opportunity here: ${window.location.origin}/opportunity-details.html?id=${oppId}`
+                    : `We'd like to invite you to apply for our opportunity: "${oppTitle}". Click here to view and apply: ${window.location.origin}/opportunity-details.html?id=${oppId}`;
 
-            linkBox.style.display = 'block';
-        };
+                await DataService.fetch('/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderId: user.id,
+                        receiverId: _inviteTargetId,
+                        opportunityId: oppId,
+                        subject: `Invitation to Apply: ${oppTitle}`,
+                        body: message
+                    })
+                });
 
-        window.copyInviteLink = function () {
-            const input = document.getElementById('inviteLinkInput');
-            navigator.clipboard.writeText(input.value).then(() => {
-                const btn = input.nextElementSibling;
-                btn.textContent = 'Copied!';
-                setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-            }).catch(() => {
-                input.select();
-                document.execCommand('copy');
-            });
+                alert('Invitation sent successfully!');
+                closeInviteModal();
+            } catch (err) {
+                console.error('Error sending invite:', err);
+                alert('Failed to send invitation. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Invitation';
+            }
         };
     </script>
 

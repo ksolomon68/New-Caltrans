@@ -13,6 +13,7 @@ const Navigation = {
                 { label: 'Search Opportunities', href: 'search-opportunities.html', icon: '🏢' },
                 { label: 'My Applications', href: 'small-business-applications.html', icon: '📋' },
                 { label: 'Saved Items', href: 'saved-opportunities.html', icon: '⭐' },
+                { label: 'Messages', href: 'messages.html', icon: '✉️' },
                 { label: 'My Profile', href: 'small-business-profile.html', icon: '👤' },
                 { label: 'Settings', href: 'small-business-settings.html', icon: '⚙️' }
             ]
@@ -24,6 +25,7 @@ const Navigation = {
                 { label: 'Post Opportunity', href: 'post-opportunity.html', icon: '➕' },
                 { label: 'Manage Postings', href: 'manage-opportunities.html', icon: '📂' },
                 { label: 'Search Small Businesses', href: 'search-small-businesses.html', icon: '🔍' },
+                { label: 'Messages', href: 'messages.html', icon: '📬' },
                 { label: 'Analytics', href: 'prime-contractor-analytics.html', icon: '📈' },
                 { label: 'Settings', href: 'prime-contractor-settings.html', icon: '⚙️' }
             ]

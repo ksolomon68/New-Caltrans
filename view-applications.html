@@ -92,6 +92,29 @@
                 </div>
             </div>
 
+            <!-- Message Modal -->
+            <div id="messageModal" class="modal"
+                style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+                <div
+                    style="background: white; margin: 10% auto; padding: var(--space-xl); border-radius: var(--border-radius-lg); width: 90%; max-width: 600px;">
+                    <h2 id="modalTitle" style="color: var(--color-primary); margin-bottom: var(--space-md);">Send
+                        Message</h2>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="msgSubject" class="form-control"
+                            style="width: 100%; margin-bottom: var(--space-md);">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="msgBody" class="form-control"
+                            style="width: 100%; height: 150px; margin-bottom: var(--space-md);"></textarea>
+                    </div>
+                    <div style="display: flex; gap: var(--space-md); justify-content: flex-end;">
+                        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" id="sendBtn">Send Message</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -154,11 +177,59 @@
                     </div>
                     <div class="small-business-actions">
                         <button class="btn btn-outline btn-small" onclick="location.href='small-business-profile.html?id=${app.small_business_id}'">View Profile</button>
+                        <button class="btn btn-primary btn-small" onclick="openMessageModal('${app.small_business_id}', '${app.business_name || app.business_name}')">Message</button>
                     </div>
                 </div>
             `).join('');
         }
 
+        let currentRecipientId = null;
+        let currentOpportunityId = null;
+
+        function openMessageModal(smallBusinessId, businessName) {
+            currentRecipientId = smallBusinessId;
+            currentOpportunityId = new URLSearchParams(window.location.search).get('id');
+            document.getElementById('modalTitle').textContent = `Message to ${businessName}`;
+            document.getElementById('msgSubject').value = `Re: Application for Opportunity ${currentOpportunityId}`;
+            document.getElementById('messageModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+
+        document.getElementById('sendBtn').onclick = async () => {
+            const sender = Auth.getUser();
+            const subject = document.getElementById('msgSubject').value;
+            const body = document.getElementById('msgBody').value;
+
+            if (!body) return alert('Please enter a message');
+
+            try {
+                const response = await fetch(`${APP_CONFIG.API_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderId: sender.id,
+                        receiverId: currentRecipientId,
+                        opportunityId: currentOpportunityId,
+                        subject: subject,
+                        body: body
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Message sent successfully!');
+                    closeModal();
+                } else {
+                    const err = await response.json();
+                    alert(`Error: ${err.error}`);
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Connection error. Please try again.');
+            }
+        };
     </script>
   <script src="js/accessibility-widget.js"></script>
 </body>

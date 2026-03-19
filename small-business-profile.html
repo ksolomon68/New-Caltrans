@@ -357,7 +357,8 @@
 
                             <!-- Prime Contractor Contact Actions -->
                             <div id="primeContractorActions" class="contact-card-actions" style="display: none;">
-                                <button type="button" class="btn btn-primary" id="btnEmail">Direct Email</button>
+                                <button type="button" class="btn btn-primary" id="btnMessage">Send Message</button>
+                                <button type="button" class="btn btn-outline" id="btnEmail">Direct Email</button>
                             </div>
                         </section>
 
@@ -664,6 +665,9 @@
             }
 
             // Setup Contact Handlers
+            document.getElementById('btnMessage').onclick = () => {
+                location.href = `messages.html?recipient=${data.id}`;
+            };
             document.getElementById('btnEmail').onclick = () => {
                 location.href = `mailto:${data.email}`;
             };
