@@ -148,7 +148,10 @@ async function initDatabase() {
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 sender_id INT NOT NULL,
                 receiver_id INT NOT NULL,
+                sender_business_name VARCHAR(255),
+                receiver_business_name VARCHAR(255),
                 opportunity_id VARCHAR(100),
+                message_type ENUM('invite', 'application', 'reply') DEFAULT 'reply',
                 subject VARCHAR(255),
                 body TEXT NOT NULL,
                 is_read TINYINT DEFAULT 0,
@@ -177,6 +180,21 @@ async function initDatabase() {
             CREATE TABLE IF NOT EXISTS work_categories (
                 id VARCHAR(100) PRIMARY KEY,
                 name VARCHAR(100) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
+        // 8. Notifications Table
+        console.log('CaltransBizConnect DB: Ensuring "notifications" table exists...');
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS notifications (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                message_id INT,
+                is_read TINYINT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX (user_id),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         `);
 
@@ -216,7 +234,10 @@ async function initDatabase() {
             `ALTER TABLE users ADD COLUMN IF NOT EXISTS zip VARCHAR(20)`,
             `ALTER TABLE users ADD COLUMN IF NOT EXISTS years_in_business VARCHAR(50)`,
             `ALTER TABLE users ADD COLUMN IF NOT EXISTS certifications TEXT`,
-            `ALTER TABLE users ADD COLUMN IF NOT EXISTS saved_opportunities TEXT`
+            `ALTER TABLE users ADD COLUMN IF NOT EXISTS saved_opportunities TEXT`,
+            `ALTER TABLE messages ADD COLUMN IF NOT EXISTS sender_business_name VARCHAR(255)`,
+            `ALTER TABLE messages ADD COLUMN IF NOT EXISTS receiver_business_name VARCHAR(255)`,
+            `ALTER TABLE messages ADD COLUMN IF NOT EXISTS message_type ENUM('invite', 'application', 'reply') DEFAULT 'reply'`
         ];
         for (const sql of migrations) {
             await db.execute(sql).catch(() => {}); // Ignore if column already exists

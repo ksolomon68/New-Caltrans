@@ -1,5 +1,6 @@
 const express = require('express');
 const { db } = require('../database');
+const { requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // Get application by ID
@@ -60,7 +61,7 @@ router.get('/', async (req, res) => {
 });
 
 // Submit new application / interest
-router.post('/', async (req, res) => {
+router.post('/', requireRole('small_business'), async (req, res) => {
     const { opportunityId, smallBusinessId, notes } = req.body;
 
     if (!opportunityId || !smallBusinessId) {
@@ -68,11 +69,16 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Find prime contractor ID from opportunity
-        const [oppRows] = await db.execute('SELECT posted_by FROM opportunities WHERE id = ?', [opportunityId]);
+        // Find prime contractor ID and Opportunity details
+        const [oppRows] = await db.execute('SELECT title, posted_by FROM opportunities WHERE id = ?', [opportunityId]);
         if (oppRows.length === 0) return res.status(404).json({ error: 'Opportunity not found' });
-
         const opp = oppRows[0];
+
+        // Fetch Prime's business name
+        const [primeRows] = await db.execute('SELECT organization_name, business_name FROM users WHERE id = ?', [opp.posted_by]);
+        const receiverBusinessName = primeRows[0]?.organization_name || primeRows[0]?.business_name || 'Prime Contractor';
+
+        const senderBusinessName = req.user.business_name || req.user.contact_name;
 
         const sql = `
             INSERT INTO applications (opportunity_id, small_business_id, prime_contractor_id, notes)
@@ -80,6 +86,21 @@ router.post('/', async (req, res) => {
         `;
 
         await db.execute(sql, [opportunityId, smallBusinessId, opp.posted_by, notes || null]);
+
+        // Create message for Prime Contractor
+        const body = `We have submitted an application for the opportunity: ${opp.title}.\n\nAdditional Notes: ${notes || 'None provided.'}`;
+        
+        const [msgResult] = await db.execute(`
+            INSERT INTO messages (sender_id, receiver_id, sender_business_name, receiver_business_name, opportunity_id, message_type, subject, body)
+            VALUES (?, ?, ?, ?, ?, 'application', ?, ?)
+        `, [smallBusinessId, opp.posted_by, senderBusinessName, receiverBusinessName, opportunityId, `New Application: ${opp.title}`, body]);
+
+        // Create notification for Prime Contractor
+        await db.execute(`
+            INSERT INTO notifications (user_id, message_id)
+            VALUES (?, ?)
+        `, [opp.posted_by, msgResult.insertId]);
+
         res.status(201).json({ message: 'Interest submitted successfully' });
     } catch (error) {
         console.error('Error submitting application:', error);

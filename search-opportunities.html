@@ -493,9 +493,11 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: var(--space-sm); justify-content: flex-end;">
-                            <button class="btn btn-outline btn-small save-btn" onclick="event.stopPropagation(); window.toggleSave('${opp.id}', this)">
-                                ${window.savedOpportunityIds.has(opp.id) ? 'Unsave' : 'Save'}
-                            </button>
+                            ${Auth.getUser()?.type === 'small_business' ? `
+                                <button class="btn btn-outline btn-small save-btn" onclick="event.stopPropagation(); window.toggleSave('${opp.id}', this)">
+                                    ${window.savedOpportunityIds && window.savedOpportunityIds.has(opp.id) ? 'Unsave' : 'Save'}
+                                </button>
+                            ` : ''}
                             <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); window.loadDetail('${opp.id}')">View Details</button>
                         </div>
                     `;

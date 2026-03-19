@@ -134,6 +134,12 @@
                 return;
             }
 
+            if (user && user.type === 'prime_contractor' && String(user.id) !== String(primeContractorId)) {
+                alert('Access Denied: Prime Contractors cannot view other Prime Contractor profiles.');
+                window.location.href = 'dashboard-prime-contractor.html';
+                return;
+            }
+
             await loadPrimeContractorProfile(primeContractorId);
         });
 

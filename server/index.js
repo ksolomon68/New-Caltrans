@@ -73,10 +73,10 @@ const startServer = async () => {
         app.use('/api/users', require('./routes/users'));
         app.use('/api/messages', require('./routes/messages'));
         app.use('/api/applications', require('./routes/applications'));
+        app.use('/api/notifications', require('./routes/notifications'));
         app.use('/api/admin', require('./routes/admin'));
         app.use('/api/upload-cs', require('./routes/upload'));
         app.use('/api/small-businesses', require('./routes/small-businesses'));
-        app.use('/api/small-businesses', require('./routes/small-businesses')); // Backward compatibility
         app.use('/api/cms', require('./routes/cms'));
         app.use('/api/filters', require('./routes/filters'));
 

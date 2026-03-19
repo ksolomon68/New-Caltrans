@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/dashboard-new.css">
     <link rel="stylesheet" href="css/dashboard-common.css">
     <style>
+        /* (Existing messages styles) */
         .messages-container {
             display: grid;
             grid-template-columns: 350px 1fr;
@@ -51,12 +52,14 @@
         .message-item-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: var(--space-xs);
         }
 
         .message-sender {
             color: var(--color-primary);
             font-size: 1rem;
+            font-weight: 600;
         }
 
         .message-time {
@@ -79,6 +82,7 @@
             display: flex;
             flex-direction: column;
             padding: var(--space-2xl);
+            overflow-y: auto;
         }
 
         .empty-state {
@@ -95,6 +99,17 @@
             border-top: 1px solid var(--color-border-light);
             padding-top: var(--space-xl);
         }
+        
+        .badge-type {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .badge-invite { background: #e0f2fe; color: #0369a1; }
+        .badge-application { background: #dcfce7; color: #15803d; }
+        .badge-reply { background: #f3f4f6; color: #374151; }
 
         @media (max-width: 900px) {
             .messages-container {
@@ -145,28 +160,28 @@
     <script>
         let allMessages = [];
         let currentUserId = null;
+        let currentUser = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const user = Auth.getUser();
-            if (!user) {
+            currentUser = Auth.getUser();
+            if (!currentUser) {
                 location.href = 'index.html';
                 return;
             }
-            currentUserId = user.id;
+            currentUserId = currentUser.id;
 
             // Set personalized greeting
             const greetingEl = document.getElementById('userGreeting');
             if (greetingEl) {
-                const name = user.contact_name || user.business_name || user.email.split('@')[0];
+                const name = currentUser.business_name || currentUser.organization_name || currentUser.contact_name || currentUser.email.split('@')[0];
                 greetingEl.textContent = `Welcome back, ${name}!`;
             }
 
-            Navigation.init(user.type);
+            Navigation.init(currentUser.type);
 
-            // Setup New Message Button
+            // Fetch and setup New Message Button
             const header = document.querySelector('.header-top');
             if (header) {
-                // Check if button already exists to avoid duplicates
                 if (!document.getElementById('newMessageBtn')) {
                     const btn = document.createElement('button');
                     btn.id = 'newMessageBtn';
@@ -174,7 +189,6 @@
                     btn.textContent = 'New Message';
                     btn.onclick = () => composeMessage();
                     btn.style.marginLeft = 'auto'; // Push to right if in flex container
-                    // Try to append to a suitable place in header or main
                     const title = document.querySelector('.page-title');
                     if (title) {
                         title.style.display = 'flex';
@@ -198,9 +212,16 @@
             }
         });
 
+        const getHeaders = () => ({
+            'Content-Type': 'application/json',
+            'x-user-id': currentUserId
+        });
+
         async function loadInbox() {
             try {
-                const response = await fetch(`${APP_CONFIG.API_URL}/messages/user/${currentUserId}?type=inbox`);
+                const response = await fetch(`${APP_CONFIG.API_URL}/messages/user/${currentUserId}?type=inbox`, {
+                    headers: getHeaders()
+                });
                 allMessages = await response.json();
                 renderInbox();
             } catch (error) {
@@ -210,7 +231,7 @@
 
         function renderInbox() {
             const listEl = document.getElementById('inboxList');
-            if (!allMessages || allMessages.length === 0) {
+            if (!allMessages || allMessages.length === 0 || allMessages.error) {
                 listEl.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">No messages found</div>';
                 return;
             }
@@ -218,23 +239,49 @@
             listEl.innerHTML = allMessages.map(msg => `
                 <div class="message-item ${msg.is_read ? '' : 'unread'}" onclick="viewMessage('${msg.id}')">
                     <div class="message-item-header">
-                        <span class="message-sender">${msg.sender_name || 'Unknown'}</span>
+                        <span class="message-sender">${msg.sender_business_name || 'System User'}</span>
+                        <span class="badge-type badge-${msg.message_type || 'reply'}">${msg.message_type || 'message'}</span>
+                    </div>
+                    <div style="font-size: 0.9rem; margin-bottom: 4px; display: flex; justify-content: space-between;">
+                        <strong>${msg.subject || '(No Subject)'}</strong>
                         <span class="message-time">${new Date(msg.created_at).toLocaleDateString()}</span>
                     </div>
-                    <div style="font-size: 0.9rem; margin-bottom: 2px;">${msg.subject || '(No Subject)'}</div>
                     <div class="message-preview">${msg.body || ''}</div>
                 </div>
             `).join('');
         }
 
-        function composeMessage(recipientId = '', subject = '', oppId = '') {
+        async function composeMessage(recipientId = '', subject = '', oppId = '') {
             const detailEl = document.getElementById('messageView');
+            detailEl.innerHTML = '<div class="empty-state">Loading recipients...</div>';
+            
+            let usersOptions = '<option value="">Select a Business</option>';
+            try {
+                // Determine opposite role for direct messaging
+                const targetRole = currentUser.type === 'prime_contractor' ? 'small_business' : 'prime_contractor';
+                const res = await fetch(`${APP_CONFIG.API_URL}/users?type=${targetRole}`, { headers: getHeaders() });
+                const users = await res.json();
+                usersOptions += users.map(u => `<option value="${u.id}" ${u.id == recipientId ? 'selected' : ''}>${u.business_name || u.organization_name}</option>`).join('');
+            } catch (e) {
+                console.warn('Could not load users for select', e);
+            }
+
+            let recipientInputHtml = `
+                <select id="composeTo" class="form-control" style="width: 100%;">
+                    ${usersOptions}
+                </select>
+            `;
+            if(recipientId && !usersOptions.includes('selected')) {
+                // Fallback if recipient not in list
+                recipientInputHtml = `<input type="hidden" id="composeTo" value="${recipientId}"><input type="text" class="form-control" style="width: 100%;" value="Pre-selected Recipient" readonly>`;
+            }
+
             detailEl.innerHTML = `
                 <h2 style="margin-bottom: var(--space-lg);">New Message</h2>
                 
                 <div style="margin-bottom: var(--space-md);">
-                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">To (User ID)</label>
-                    <input type="text" id="composeTo" class="form-control" style="width: 100%;" value="${recipientId}" ${recipientId ? 'readonly' : ''} placeholder="Enter User ID">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">To (Business)</label>
+                    ${recipientInputHtml}
                 </div>
 
                 <div style="margin-bottom: var(--space-md);">
@@ -266,13 +313,13 @@
             try {
                 const response = await fetch(`${APP_CONFIG.API_URL}/messages`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getHeaders(),
                     body: JSON.stringify({
-                        senderId: currentUserId,
                         receiverId: receiverId,
-                        opportunity_id: oppId || null,
+                        opportunityId: oppId || null,
                         subject: subject,
-                        body: body
+                        body: body,
+                        messageType: 'reply'
                     })
                 });
 
@@ -304,22 +351,29 @@
 
             // Mark as read if unread
             if (!msg.is_read) {
-                fetch(`${APP_CONFIG.API_URL}/messages/${id}/read`, { method: 'PUT' });
+                fetch(`${APP_CONFIG.API_URL}/messages/${id}/read`, { method: 'PUT', headers: getHeaders() });
                 msg.is_read = 1;
                 renderInbox(); // Refresh list to remove bold styling
             }
+
+            const activeItems = document.querySelectorAll('.message-item');
+            activeItems.forEach(i => i.classList.remove('active'));
+            // Could add active class back here based on event target
 
             const detailEl = document.getElementById('messageView');
             detailEl.innerHTML = `
                 <div style="margin-bottom: var(--space-xl);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h2 style="color: var(--color-primary); margin: 0;">${msg.subject || '(No Subject)'}</h2>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <span class="badge-type badge-${msg.message_type || 'reply'}">${msg.message_type || 'message'}</span>
+                                <h2 style="color: var(--color-primary); margin: 0;">${msg.subject || '(No Subject)'}</h2>
+                            </div>
                             <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
-                                From: <strong>${msg.sender_name || 'User ' + msg.sender_id}</strong> • ${new Date(msg.created_at).toLocaleString()}
+                                From: <strong style="color: var(--text-primary);">${msg.sender_business_name || 'System User'}</strong> • ${new Date(msg.created_at).toLocaleString()}
                             </div>
                         </div>
-                        ${msg.opportunity_id ? `<span class="badge badge-secondary">Opp ID: ${msg.opportunity_id}</span>` : ''}
+                        ${msg.opportunity_id && msg.message_type === 'invite' ? `<a href="opportunity-details.html?id=${msg.opportunity_id}" target="_blank" class="btn btn-primary btn-small" style="text-decoration:none;">Apply Now</a>` : msg.opportunity_id ? `<a href="opportunity-details.html?id=${msg.opportunity_id}" target="_blank" class="btn btn-outline btn-small" style="text-decoration:none;">View Opportunity</a>` : ''}
                     </div>
                 </div>
 
@@ -344,13 +398,13 @@
             try {
                 const response = await fetch(`${APP_CONFIG.API_URL}/messages`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getHeaders(),
                     body: JSON.stringify({
-                        senderId: currentUserId,
                         receiverId: receiverId,
-                        opportunity_id: oppId || null,
+                        opportunityId: oppId || null,
                         subject: subject,
-                        body: body
+                        body: body,
+                        messageType: 'reply'
                     })
                 });
 

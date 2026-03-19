@@ -158,10 +158,31 @@
                     </div>
 
                     <div class="action-bar" style="flex-wrap: wrap;">
-                        <button id="saveBtn" class="btn btn-outline" onclick="toggleSave()">Save Opportunity</button>
+                        <button id="saveBtn" class="btn btn-outline" onclick="toggleSave()" style="display:none;">Save Opportunity</button>
                         <button id="applyBtn" class="btn btn-primary" onclick="applyForOpportunity()" style="display:none;">Apply for This Opportunity</button>
-                        <button id="viewPrimeContractorBtn" class="btn btn-outline" onclick="viewPrimeContractorProfile()">View Prime Contractor Profile</button>
-                        <button id="contactPrimeContractorBtn" class="btn btn-secondary" onclick="contactPrimeContractor()">Contact Prime Contractor</button>
+                        <button id="viewPrimeContractorBtn" class="btn btn-outline" onclick="viewPrimeContractorProfile()" style="display:none;">View Prime Contractor Profile</button>
+                        <button id="contactPrimeContractorBtn" class="btn btn-secondary" onclick="contactPrimeContractor()" style="display:none;">Contact Prime Contractor</button>
+                        <button id="inviteBtn" class="btn btn-secondary" style="display:none;" onclick="showInviteModal()">Invite Small Business to Apply</button>
+                    </div>
+                </div>
+
+                <!-- Invite Modal -->
+                <div id="inviteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                    <div style="background: var(--card-bg); padding: var(--space-xl); border-radius: var(--border-radius-lg); width: 90%; max-width: 500px;">
+                        <h3 style="margin-top: 0;">Invite Small Business to Apply</h3>
+                        <p style="color: var(--text-muted); margin-bottom: var(--space-md);">Select a small business to send an invitation.</p>
+                        
+                        <div style="margin-bottom: var(--space-md);">
+                            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Select Business</label>
+                            <select id="inviteSelect" class="form-control" style="width: 100%; padding: 8px;">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: var(--space-lg);">
+                            <button class="btn btn-outline" onclick="document.getElementById('inviteModal').style.display='none'">Cancel</button>
+                            <button class="btn btn-primary" onclick="sendInvite()">Send Invitation</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -264,17 +285,22 @@
             const description = opp.scope_summary || opp.scopeSummary || 'No description provided.';
             document.getElementById('oppDescription').innerHTML = description.replace(/\n/g, '<br>');
 
-            // Save Toggle State
-            updateSaveButton();
-
-            // Show Apply button for small businesses only, hide for prime/admin
             const user = Auth.getUser();
-            const applyBtn = document.getElementById('applyBtn');
-            if (applyBtn && user && user.type === 'small_business') {
+
+            if (user && user.type === 'small_business') {
+                document.getElementById('saveBtn').style.display = 'inline-flex';
+                document.getElementById('viewPrimeContractorBtn').style.display = 'inline-flex';
+                document.getElementById('contactPrimeContractorBtn').style.display = 'inline-flex';
+                updateSaveButton();
+
                 const status = (opp.status || 'published').toLowerCase();
                 if (status === 'published' || status === 'open') {
-                    applyBtn.style.display = 'inline-flex';
+                    const applyBtn = document.getElementById('applyBtn');
+                    if(applyBtn) applyBtn.style.display = 'inline-flex';
                 }
+            } else if (user && user.type === 'prime_contractor') {
+                // Prime contractors can invite businesses
+                document.getElementById('inviteBtn').style.display = 'inline-flex';
             }
         }
 
@@ -362,6 +388,64 @@
                 window.location.href = `prime-contractor-profile.html?id=${primeContractorId}`;
             } else {
                 alert('Prime Contractor information not available.');
+            }
+        }
+
+        async function showInviteModal() {
+            document.getElementById('inviteModal').style.display = 'flex';
+            const select = document.getElementById('inviteSelect');
+            select.innerHTML = '<option value="">Loading small businesses...</option>';
+            
+            try {
+                const res = await fetch(`${APP_CONFIG.API_URL}/users?type=small_business`);
+                const businesses = await res.json();
+                
+                if (businesses.length === 0) {
+                    select.innerHTML = '<option value="">No small businesses found</option>';
+                    return;
+                }
+                
+                select.innerHTML = '<option value="">-- Select a Small Business --</option>' + 
+                    businesses.map(b => `<option value="${b.id}">${b.business_name || b.organization_name || b.contact_name}</option>`).join('');
+            } catch (e) {
+                select.innerHTML = '<option value="">Error loading businesses</option>';
+            }
+        }
+
+        async function sendInvite() {
+            const select = document.getElementById('inviteSelect');
+            const smallBusinessId = select.value;
+            
+            if (!smallBusinessId) {
+                alert('Please select a small business.');
+                return;
+            }
+            
+            const user = Auth.getUser();
+            const btn = document.querySelector('#inviteModal .btn-primary');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            try {
+                const res = await fetch(`${APP_CONFIG.API_URL}/opportunities/${currentOpportunity.id}/invite`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
+                    body: JSON.stringify({ smallBusinessId })
+                });
+                
+                if (res.ok) {
+                    alert('Invitation sent successfully!');
+                    document.getElementById('inviteModal').style.display = 'none';
+                } else {
+                    const error = await res.json();
+                    alert('Error sending invite: ' + (error.error || 'Unknown error'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Connection error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Invitation';
             }
         }
     </script>

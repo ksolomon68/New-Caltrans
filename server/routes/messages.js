@@ -1,5 +1,6 @@
 const express = require('express');
 const { db } = require('../database');
+const { requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // Send a message (Contact Form)
@@ -18,19 +19,43 @@ router.post('/contact', async (req, res) => {
 });
 
 // Send internal message
-router.post('/', async (req, res) => {
-    const { senderId, receiverId, opportunityId, subject, body } = req.body;
+router.post('/', requireRole('any'), async (req, res) => {
+    const { receiverId, opportunityId, subject, body, messageType } = req.body;
+    const senderId = req.user.id;
+    const senderBusinessName = req.user.business_name || req.user.organization_name || 'User ' + senderId;
 
-    if (!senderId || !receiverId || !body) {
+    if (!receiverId || !body) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
+        // Fetch receiver's business name
+        const [receiverRows] = await db.execute('SELECT business_name, organization_name FROM users WHERE id = ?', [receiverId]);
+        if (receiverRows.length === 0) return res.status(404).json({ error: 'Receiver not found' });
+        
+        const receiverBusinessName = receiverRows[0].business_name || receiverRows[0].organization_name || 'User ' + receiverId;
+
         const sql = `
-            INSERT INTO messages (sender_id, receiver_id, opportunity_id, subject, body)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO messages (sender_id, receiver_id, sender_business_name, receiver_business_name, opportunity_id, message_type, subject, body)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        const [result] = await db.execute(sql, [senderId, receiverId, opportunityId || null, subject || null, body]);
+        const [result] = await db.execute(sql, [
+            senderId, 
+            receiverId, 
+            senderBusinessName, 
+            receiverBusinessName, 
+            opportunityId || null, 
+            messageType || 'reply',
+            subject || null, 
+            body
+        ]);
+
+        // Insert notification
+        await db.execute(`
+            INSERT INTO notifications (user_id, message_id)
+            VALUES (?, ?)
+        `, [receiverId, result.insertId]);
+
         res.status(201).json({ id: result.insertId, message: 'Message sent successfully' });
     } catch (error) {
         console.error('Error sending message:', error);
@@ -39,16 +64,19 @@ router.post('/', async (req, res) => {
 });
 
 // Get messages for a user (Inbox/Sent)
-router.get('/user/:userId', async (req, res) => {
+router.get('/user/:userId', requireRole('any'), async (req, res) => {
+    // Ensure user can only fetch their own messages
+    if (req.user.id != req.params.userId) {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const { userId } = req.params;
     const { type } = req.query; // 'inbox' or 'sent'
 
     try {
         let query = `
-            SELECT m.*, s.business_name as sender_name, r.business_name as receiver_name, o.title as opportunity_title
+            SELECT m.*, o.title as opportunity_title
             FROM messages m
-            JOIN users s ON m.sender_id = s.id
-            JOIN users r ON m.receiver_id = r.id
             LEFT JOIN opportunities o ON m.opportunity_id = o.id
             WHERE 
         `;

@@ -1,5 +1,6 @@
 const express = require('express');
 const { db } = require('../database');
+const { requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // Get all opportunities
@@ -43,7 +44,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Post new opportunity
-router.post('/', async (req, res) => {
+router.post('/', requireRole('prime_contractor'), async (req, res) => {
     const {
         id, title, scopeSummary, district, districtName,
         category, categoryName, subcategory, estimatedValue,
@@ -106,7 +107,7 @@ router.post('/:id/approve', async (req, res) => {
 });
 
 // Update opportunity
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireRole('prime_contractor'), async (req, res) => {
     const { id } = req.params;
     const {
         title, scopeSummary, district, districtName,
@@ -141,7 +142,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete opportunity
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireRole('prime_contractor'), async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -176,7 +177,7 @@ router.get('/saved/:smallBusinessId', async (req, res) => {
 });
 
 // Save an opportunity
-router.post('/save', async (req, res) => {
+router.post('/save', requireRole('small_business'), async (req, res) => {
     const { smallBusinessId, opportunityId } = req.body;
     if (!smallBusinessId || !opportunityId) {
         return res.status(400).json({ error: 'Small Business ID and Opportunity ID are required' });
@@ -194,7 +195,7 @@ router.post('/save', async (req, res) => {
 });
 
 // Unsave an opportunity
-router.post('/unsave', async (req, res) => {
+router.post('/unsave', requireRole('small_business'), async (req, res) => {
     const { smallBusinessId, opportunityId } = req.body;
     if (!smallBusinessId || !opportunityId) {
         return res.status(400).json({ error: 'Small Business ID and Opportunity ID are required' });
@@ -211,7 +212,7 @@ router.post('/unsave', async (req, res) => {
 });
 
 // Unsave an opportunity (DELETE method)
-router.delete('/unsave/:smallBusinessId/:opportunityId', async (req, res) => {
+router.delete('/unsave/:smallBusinessId/:opportunityId', requireRole('small_business'), async (req, res) => {
     const { smallBusinessId, opportunityId } = req.params;
     try {
         const [result] = await db.execute('DELETE FROM saved_opportunities WHERE small_business_id = ? AND opportunity_id = ?', [smallBusinessId, opportunityId]);
@@ -220,6 +221,50 @@ router.delete('/unsave/:smallBusinessId/:opportunityId', async (req, res) => {
         }
         res.json({ message: 'Opportunity removed from saved list' });
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Invite Small Business to Apply
+router.post('/:id/invite', requireRole('prime_contractor'), async (req, res) => {
+    const { id: opportunityId } = req.params;
+    const { smallBusinessId } = req.body;
+    const senderId = req.user.id;
+    const senderBusinessName = req.user.business_name || req.user.organization_name;
+
+    if (!smallBusinessId) {
+        return res.status(400).json({ error: 'Small Business ID is required' });
+    }
+
+    try {
+        // Fetch receiver's business name
+        const [sbRows] = await db.execute('SELECT business_name FROM users WHERE id = ? AND type = "small_business"', [smallBusinessId]);
+        if (sbRows.length === 0) return res.status(404).json({ error: 'Small Business not found' });
+        const receiverBusinessName = sbRows[0].business_name;
+
+        // Fetch opportunity details
+        const [oppRows] = await db.execute('SELECT title FROM opportunities WHERE id = ?', [opportunityId]);
+        if (oppRows.length === 0) return res.status(404).json({ error: 'Opportunity not found' });
+        const oppTitle = oppRows[0].title;
+
+        const appUrl = process.env.PUBLIC_URL || 'http://localhost:3001';
+        const body = `You have been invited to apply to the opportunity: ${oppTitle} (ID: ${opportunityId}).\n\nCTA Link to Apply: ${appUrl}/opportunity-details.html?id=${opportunityId}\n\nPlease review the details and submit your application if interested.`;
+        
+        // Insert Message
+        const [msgResult] = await db.execute(`
+            INSERT INTO messages (sender_id, receiver_id, sender_business_name, receiver_business_name, opportunity_id, message_type, subject, body)
+            VALUES (?, ?, ?, ?, ?, 'invite', ?, ?)
+        `, [senderId, smallBusinessId, senderBusinessName, receiverBusinessName, opportunityId, `Invitation to Apply: ${oppTitle}`, body]);
+
+        // Insert Notification
+        await db.execute(`
+            INSERT INTO notifications (user_id, message_id)
+            VALUES (?, ?)
+        `, [smallBusinessId, msgResult.insertId]);
+
+        res.status(200).json({ message: 'Invitation sent successfully' });
+    } catch (error) {
+        console.error('Error sending invite:', error);
         res.status(500).json({ error: error.message });
     }
 });

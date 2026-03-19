@@ -76,6 +76,7 @@ const Navigation = {
         this.renderSidebar(role);
         this.renderHeader(role);
         this.setupMobileToggle();
+        this.initNotifications();
     },
 
     renderSidebar(role) {
@@ -168,6 +169,19 @@ const Navigation = {
                 <span class="header-portal-title" style="font-size: 0.85rem; color: var(--color-text-secondary); margin-left: 0.5rem;">${config.title}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 1rem;">
+                
+                <!-- Notification Bell -->
+                <div class="notification-container" style="position: relative; margin-right: 10px;">
+                    <button id="notification-bell" class="btn btn-outline btn-small" style="position: relative; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;" aria-label="Notifications">
+                        <span style="font-size: 1.2rem;">🔔</span>
+                        <span id="notification-badge" class="badge" style="position: absolute; top: -5px; right: -5px; background: red; color: white; display: none; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">0</span>
+                    </button>
+                    <div id="notification-dropdown" class="notification-dropdown" style="display: none; position: absolute; top: 100%; right: 0; width: 300px; background: var(--card-bg, #fff); border: 1px solid var(--color-border, #ddd); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; max-height: 400px; overflow-y: auto;">
+                        <div style="padding: 10px; border-bottom: 1px solid var(--color-border, #ddd); font-weight: bold;">Notifications</div>
+                        <div id="notification-list" style="padding: 10px;">Loading...</div>
+                    </div>
+                </div>
+
                 <div class="header-user-info">
                     <div style="font-weight: 600; font-size: 0.9rem; color: var(--color-text-primary);">${userName}</div>
                     <div style="font-size: 0.75rem; color: var(--color-text-secondary); text-transform: capitalize;">${config.title}</div>
@@ -211,6 +225,84 @@ const Navigation = {
             overlay.className = 'sidebar-overlay';
             overlay.addEventListener('click', () => this.closeSidebar());
             document.body.appendChild(overlay);
+        }
+    },
+
+    initNotifications() {
+        const user = JSON.parse(localStorage.getItem('caltrans_user'));
+        if (!user) return;
+        
+        const bell = document.getElementById('notification-bell');
+        const dropdown = document.getElementById('notification-dropdown');
+        if (!bell || !dropdown) return;
+
+        bell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        this.fetchNotifications(user.id);
+        
+        // Poll every 30 seconds
+        setInterval(() => this.fetchNotifications(user.id), 30000);
+    },
+
+    async fetchNotifications(userId) {
+        try {
+            const url = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+            const res = await fetch(`${url}/notifications/user/${userId}`, {
+                headers: { 'x-user-id': userId }
+            });
+            if (!res.ok) return;
+            const notifications = await res.json();
+            
+            const badge = document.getElementById('notification-badge');
+            const list = document.getElementById('notification-list');
+            if (badge) {
+                if (notifications.length > 0) {
+                    badge.textContent = notifications.length;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            if (list) {
+                if (notifications.length === 0) {
+                    list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 10px;">No new notifications</div>';
+                } else {
+                    list.innerHTML = notifications.map(n => `
+                        <div class="notification-item" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;" onclick="Navigation.markNotificationRead('${n.id}', ${n.message_id}, ${userId})">
+                            <div style="font-size: 0.8rem; color: var(--color-primary); font-weight: bold;">${n.message_type ? n.message_type.toUpperCase() : 'NEW MESSAGE'}</div>
+                            <div style="font-size: 0.9rem;">From: ${n.sender_business_name || 'System'}</div>
+                            <div style="font-size: 0.8rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.subject || 'No subject'}</div>
+                            <div style="font-size: 0.7rem; color: #999; margin-top: 4px;">${new Date(n.created_at).toLocaleString()}</div>
+                        </div>
+                    `).join('');
+                }
+            }
+        } catch (e) {
+            console.error('Failed to fetch notifications', e);
+        }
+    },
+
+    async markNotificationRead(id, messageId, userId) {
+        try {
+            const url = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+            await fetch(`${url}/notifications/${id}/read`, {
+                method: 'POST',
+                headers: { 'x-user-id': userId }
+            });
+            // Redirect to messages
+            window.location.href = `messages.html?id=${messageId || ''}`;
+        } catch (e) {
+            console.error(e);
         }
     }
 };
