@@ -98,8 +98,9 @@ const Navigation = {
 
         config.items.forEach(item => {
             const isActive = currentPath === item.href ? 'active' : '';
+            const ariaCurrent = isActive ? 'aria-current="page"' : '';
             html += `
-                <a href="${item.href}" class="nav-item ${isActive}" style="
+                <a href="${item.href}" class="nav-item ${isActive}" ${ariaCurrent} style="
                     display: flex;
                     align-items: center;
                     gap: 0.75rem;
@@ -111,7 +112,7 @@ const Navigation = {
                     font-weight: ${isActive ? '600' : '500'};
                     transition: all 0.2s ease;
                 ">
-                    <span style="font-size: 1.25rem;">${item.icon}</span>
+                    <span aria-hidden="true" style="font-size: 1.25rem;">${item.icon}</span>
                     <span>${item.label}</span>
                 </a>
             `;
@@ -153,32 +154,32 @@ const Navigation = {
 
         header.innerHTML = `
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <button id="mobile-toggle" class="mobile-toggle-btn" aria-label="Open navigation menu">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button id="mobile-toggle" class="mobile-toggle-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                         <line x1="4" y1="12" x2="20" y2="12"></line>
                         <line x1="4" y1="6" x2="20" y2="6"></line>
                         <line x1="4" y1="18" x2="20" y2="18"></line>
                     </svg>
                 </button>
                 <div class="header-logo" style="display: flex; align-items: center;">
-                    <a href="index.html" style="text-decoration: none; display: flex; align-items: center;">
-                        <img src="assets/caltrans-logo.png" alt="Caltrans" style="height: 32px; width: auto; display: block;">
+                    <a href="index.html" style="text-decoration: none; display: flex; align-items: center;" aria-label="CaltransBizConnect Home">
+                        <img src="assets/caltrans-logo.png" alt="Caltrans logo" style="height: 32px; width: auto; display: block;">
                         <span style="font-weight: 700; color: var(--color-primary); font-size: 1.1rem; letter-spacing: -0.01em; margin-left: 0.5rem; border-left: 1px solid var(--color-border); padding-left: 0.5rem;">BizConnect</span>
                     </a>
                 </div>
-                <span class="header-portal-title" style="font-size: 0.85rem; color: var(--color-text-secondary); margin-left: 0.5rem;">${config.title}</span>
+                <span class="header-portal-title" aria-hidden="true" style="font-size: 0.85rem; color: var(--color-text-secondary); margin-left: 0.5rem;">${config.title}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 1rem;">
                 
                 <!-- Notification Bell -->
                 <div class="notification-container" style="position: relative; margin-right: 10px;">
-                    <button id="notification-bell" class="btn btn-outline btn-small" style="position: relative; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;" aria-label="Notifications">
-                        <span style="font-size: 1.2rem;">🔔</span>
-                        <span id="notification-badge" class="badge" style="position: absolute; top: -5px; right: -5px; background: red; color: white; display: none; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">0</span>
+                    <button id="notification-bell" class="btn btn-outline btn-small" style="position: relative; border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" aria-label="Notifications" aria-expanded="false" aria-controls="notification-dropdown" aria-haspopup="true">
+                        <span aria-hidden="true" style="font-size: 1.2rem;">🔔</span>
+                        <span id="notification-badge" role="status" aria-live="polite" class="badge" style="position: absolute; top: -5px; right: -5px; background: red; color: white; display: none; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">0</span>
                     </button>
-                    <div id="notification-dropdown" class="notification-dropdown" style="display: none; position: absolute; top: 100%; right: 0; width: 300px; background: var(--card-bg, #fff); border: 1px solid var(--color-border, #ddd); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; max-height: 400px; overflow-y: auto;">
+                    <div id="notification-dropdown" role="menu" aria-label="Notifications" class="notification-dropdown" style="display: none; position: absolute; top: 100%; right: 0; width: 300px; background: var(--card-bg, #fff); border: 1px solid var(--color-border, #ddd); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; max-height: 400px; overflow-y: auto;">
                         <div style="padding: 10px; border-bottom: 1px solid var(--color-border, #ddd); font-weight: bold;">Notifications</div>
-                        <div id="notification-list" style="padding: 10px;">Loading...</div>
+                        <div id="notification-list" aria-live="polite" style="padding: 10px;">Loading...</div>
                     </div>
                 </div>
 
@@ -215,14 +216,42 @@ const Navigation = {
     setupMobileToggle() {
         const toggle = document.getElementById('mobile-toggle');
         if (toggle) {
-            toggle.addEventListener('click', () => this.openSidebar());
+            toggle.addEventListener('click', () => {
+                const isOpen = document.querySelector('.sidebar')?.classList.contains('active');
+                if (isOpen) {
+                    this.closeSidebar();
+                    toggle.setAttribute('aria-expanded', 'false');
+                    toggle.setAttribute('aria-label', 'Open navigation menu');
+                } else {
+                    this.openSidebar();
+                    toggle.setAttribute('aria-expanded', 'true');
+                    toggle.setAttribute('aria-label', 'Close navigation menu');
+                }
+            });
         }
+
+        // Esc key closes the sidebar and restores focus
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar && sidebar.classList.contains('active')) {
+                    this.closeSidebar();
+                    const toggle = document.getElementById('mobile-toggle');
+                    if (toggle) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                        toggle.setAttribute('aria-label', 'Open navigation menu');
+                        toggle.focus();
+                    }
+                }
+            }
+        });
 
         // Create overlay for closing sidebar when clicked outside
         if (!document.getElementById('sidebar-overlay')) {
             const overlay = document.createElement('div');
             overlay.id = 'sidebar-overlay';
             overlay.className = 'sidebar-overlay';
+            overlay.setAttribute('aria-hidden', 'true');
             overlay.addEventListener('click', () => this.closeSidebar());
             document.body.appendChild(overlay);
         }
@@ -238,12 +267,25 @@ const Navigation = {
 
         bell.addEventListener('click', (e) => {
             e.stopPropagation();
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            const isOpen = dropdown.style.display !== 'none';
+            dropdown.style.display = isOpen ? 'none' : 'block';
+            bell.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
         });
 
+        // Close when clicking outside
         document.addEventListener('click', (e) => {
             if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.style.display = 'none';
+                bell.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Esc key closes dropdown
+        dropdown.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                dropdown.style.display = 'none';
+                bell.setAttribute('aria-expanded', 'false');
+                bell.focus();
             }
         });
 

@@ -258,14 +258,14 @@
                     </h3>
 
                     <div class="filter-group">
-                        <label for="districtFilter">📍 District/Region</label>
+                        <label for="districtFilter"><span aria-hidden="true">📍</span> District/Region</label>
                         <select id="districtFilter" name="district">
                             <option value="">All Districts</option>
                         </select>
                     </div>
 
                     <div class="filter-group">
-                        <label for="categoryFilter">🏗️ Work Category</label>
+                        <label for="categoryFilter"><span aria-hidden="true">🏗️</span> Work Category</label>
                         <select id="categoryFilter" name="category">
                             <option value="">All Categories</option>
                         </select>
@@ -282,9 +282,11 @@
                     </div>
 
                     <div class="filter-group">
-                        <label for="keywordFilter">🔍 Keywords</label>
+                        <label for="keywordFilter"><span aria-hidden="true">🔍</span> Keywords</label>
                         <input type="text" id="keywordFilter" name="keywords"
-                            placeholder="Search by title, description, or ID...">
+                            placeholder="Search by title, description, or ID..."
+                            aria-describedby="keywordHint">
+                        <span id="keywordHint" class="sr-only">Type to filter results by title, description, or opportunity ID</span>
                     </div>
 
                     <div class="search-actions">
@@ -294,13 +296,13 @@
                 </div>
 
                 <!-- Results Section -->
-                <div class="results-section">
+                <div class="results-section" aria-label="Search results">
                     <div class="results-header">
-                        <h3>Search Results</h3>
-                        <p id="resultsCount" class="text-muted"><strong>Loading...</strong></p>
+                        <h2>Search Results</h2>
+                        <p id="resultsCount" role="status" aria-live="polite" class="text-muted"><strong>Loading...</strong></p>
                     </div>
 
-                    <div id="opportunityList" class="opportunity-grid">
+                    <div id="opportunityList" class="opportunity-grid" aria-live="polite" aria-relevant="additions removals">
                         <!-- Opportunities will be loaded here by JavaScript -->
                     </div>
 

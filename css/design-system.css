@@ -352,6 +352,15 @@ li {
   pointer-events: none;
 }
 
+/* WCAG 2.5.5: Minimum touch target size */
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+.btn-small {
+  min-height: 36px; /* exception for dense UIs */
+}
+
 /* ============================================
    FORM ELEMENTS
    ============================================ */
@@ -393,9 +402,16 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  outline: none;
+  outline: 3px solid var(--color-primary);
+  outline-offset: 0;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 90, 140, 0.1);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* WCAG: Ensure native select appearance is not suppressed */
+select {
+  appearance: auto;
+  -webkit-appearance: auto;
 }
 
 input[aria-invalid="true"],
@@ -760,10 +776,11 @@ tr:hover {
   outline-offset: 2px;
 }
 
-/* Focus visible for keyboard navigation */
+/* Focus visible for keyboard navigation — 3px minimum for WCAG 2.4.7 */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 3px solid var(--color-primary);
   outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* Ensure interactive elements always have a visible focus state */
@@ -773,7 +790,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 3px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 2px;
 }
