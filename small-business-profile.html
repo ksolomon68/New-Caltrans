@@ -367,16 +367,6 @@
                             <div class="section-header">
                                 <h2><span>📜</span> Certifications</h2>
                             </div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="certificationNumber">Certification Number</label>
-                                    <input type="text" id="certificationNumber" name="certification_number"
-                                        class="form-control" placeholder="e.g. 1234567">
-                                    <div class="readonly-value" id="view_certificationNumber" style="display: none;">--
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Dynamic Certifications List -->
                             <div class="edit-only">
                                 <fieldset style="border: none; padding: 0; margin-top: var(--space-lg);">
@@ -595,7 +585,6 @@
                 'address': data.address || '',
                 'email': data.email || '',
                 'phone': data.phone || '',
-                'certificationNumber': data.certification_number || ''
             };
 
             for (const id in mapping) {
@@ -643,7 +632,6 @@
                 'lastName': data.contact_name ? data.contact_name.split(' ').slice(1).join(' ') : 'N/A',
                 'email': data.email || 'N/A',
                 'phone': data.phone || 'N/A',
-                'certificationNumber': data.certification_number || 'N/A'
             };
 
             for (const id in mapping) {
@@ -841,8 +829,7 @@
                 data.contact_name,
                 data.phone,
                 data.address,
-                data.capability_statement,
-                data.certification_number
+                data.capability_statement
             ];
 
             const completed = fields.filter(f => f && f.length > 0).length;

@@ -310,6 +310,8 @@
 
                 const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
 
+                const isActive = status === 'active' || status === 'verified';
+                const isSuspended = status === 'suspended';
                 row.innerHTML = `
                     <td>
                         <div style="font-weight: 600; color: var(--color-primary);">${displayName}</div>
@@ -318,8 +320,10 @@
                     <td>${typeBadge}</td>
                     <td><span style="color: ${statusColor};">● ${statusLabel}</span></td>
                     <td>${new Date(u.created_at || Date.now()).toLocaleDateString()}</td>
-                    <td>
+                    <td style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
                         <button class="btn btn-small btn-outline" onclick="openManageModal(${u.id})">Manage</button>
+                        ${!isActive ? `<button class="btn btn-small btn-outline" style="color:var(--color-success);border-color:var(--color-success);" onclick="setUserStatus(${u.id},'active',this)">Approve</button>` : ''}
+                        ${!isSuspended ? `<button class="btn btn-small btn-outline" style="color:var(--color-error);border-color:var(--color-error);" onclick="setUserStatus(${u.id},'suspended',this)">Deactivate</button>` : ''}
                     </td>
                 `;
                 userTableBody.appendChild(row);
@@ -446,6 +450,27 @@
             } catch (error) {
                 console.error('Error deleting user:', error);
                 alert('Error deleting user: ' + error.message);
+            }
+        };
+
+        window.setUserStatus = async function(userId, newStatus, btn) {
+            const label = newStatus === 'active' ? 'approve' : 'deactivate';
+            if (!confirm(`Are you sure you want to ${label} this user?`)) return;
+            btn.disabled = true;
+            const adminUser = Auth.getUser();
+            try {
+                await DataService.fetch(`/admin/users/${userId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Email': adminUser ? adminUser.email : ''
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                loadUsers();
+            } catch (err) {
+                alert('Failed to update status: ' + (err.message || ''));
+                btn.disabled = false;
             }
         };
     </script>

@@ -298,22 +298,22 @@
                     <div class="metric-grid">
                         <div class="metric-item">
                             <span class="metric-icon">📝</span>
-                            <div class="metric-value">8</div>
-                            <div class="metric-label">Posted Opportunities</div>
+                            <div class="metric-value" id="metricPosted">—</div>
+                            <div class="metric-label">My Posted Opportunities</div>
                         </div>
                         <div class="metric-item">
-                            <span class="metric-icon">👀</span>
-                            <div class="metric-value">156</div>
-                            <div class="metric-label">Small Businesses Registered</div>
+                            <span class="metric-icon">📋</span>
+                            <div class="metric-value" id="metricApps">—</div>
+                            <div class="metric-label">Total Applications</div>
                         </div>
                         <div class="metric-item">
-                            <span class="metric-icon">🏢</span>
-                            <div class="metric-value">23</div>
-                            <div class="metric-label">Pending Reviews</div>
+                            <span class="metric-icon">⏳</span>
+                            <div class="metric-value" id="metricPending">—</div>
+                            <div class="metric-label">Pending Applications</div>
                         </div>
                         <div class="metric-item">
                             <span class="metric-icon">✅</span>
-                            <div class="metric-value">4</div>
+                            <div class="metric-value" id="metricAwarded">—</div>
                             <div class="metric-label">Awarded Contracts</div>
                         </div>
                     </div>
@@ -388,6 +388,13 @@
                             </div>
                         </div>
                         <div class="metric-item">
+                            <span class="metric-icon">📋</span>
+                            <div class="metric-action">
+                                <a href="manage-opportunities.html" class="metric-value">Manage</a>
+                                <div class="metric-label">Opportunities</div>
+                            </div>
+                        </div>
+                        <div class="metric-item">
                             <span class="metric-icon">🔍</span>
                             <div class="metric-action">
                                 <a href="search-small-businesses.html" class="metric-value">Search</a>
@@ -395,17 +402,10 @@
                             </div>
                         </div>
                         <div class="metric-item">
-                            <span class="metric-icon">📈</span>
-                            <div class="metric-action">
-                                <a href="prime-contractor-reports.html" class="metric-value">View</a>
-                                <div class="metric-label">Full Reports</div>
-                            </div>
-                        </div>
-                        <div class="metric-item">
                             <span class="metric-icon">⚙️</span>
                             <div class="metric-action">
-                                <a href="prime-contractor-settings.html" class="metric-value">Admin</a>
-                                <div class="metric-label">Settings</div>
+                                <a href="prime-contractor-settings.html" class="metric-value">Settings</a>
+                                <div class="metric-label">Profile & Preferences</div>
                             </div>
                         </div>
                     </div>
@@ -423,7 +423,8 @@
         // Initialize Prime Contractor Analytics dashboard with enhanced design
         document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(() => {
-                Navigation.init('prime_contractor');
+                const _navUser = JSON.parse(localStorage.getItem('caltrans_user'));
+                Navigation.init(_navUser ? _navUser.type : 'prime_contractor');
                 initAnalyticsData();
             }, 50);
         });
@@ -432,42 +433,31 @@
             if (!user) return;
 
             try {
-                // Set organization name in welcome section
-                const orgName = user.organization_name || user.business_name || user.contact_name || 'Prime Contractor Partner';
-                const welcomeEl = document.querySelector('.hero-welcome h1');
-                if (welcomeEl) {
-                    welcomeEl.textContent = orgName;
-                }
+                const [opps, apps] = await Promise.all([
+                    DataService.fetch('/opportunities').catch(() => []),
+                    DataService.fetch(`/applications?primeContractorId=${user.id}`).catch(() => [])
+                ]);
 
-                // Animate metrics on load
+                const myOpps = Array.isArray(opps)
+                    ? opps.filter(o => String(o.posted_by) === String(user.id) || String(o.postedBy) === String(user.id))
+                    : [];
+                const myApps = Array.isArray(apps) ? apps : [];
+                const pending = myApps.filter(a => a.status === 'pending').length;
+                const awarded = myApps.filter(a => a.status === 'awarded' || a.status === 'approved').length;
+
+                document.getElementById('metricPosted').textContent = myOpps.length;
+                document.getElementById('metricApps').textContent = myApps.length;
+                document.getElementById('metricPending').textContent = pending;
+                document.getElementById('metricAwarded').textContent = awarded;
+
                 setTimeout(() => {
-                    animateMetrics();
                     animateTrends();
-                    initEngagementChart();
-                }, 500);
+                    initEngagementChart(myOpps.length, myApps.length, pending, awarded);
+                }, 300);
 
             } catch (error) {
                 console.error('Error initializing analytics data:', error);
             }
-        }
-
-        // Animate metric values
-        function animateMetrics() {
-            const metrics = [
-                { target: 8, delay: 200 },
-                { target: 156, delay: 400 },
-                { target: 23, delay: 600 },
-                { target: 4, delay: 800 }
-            ];
-
-            metrics.forEach((metric, index) => {
-                setTimeout(() => {
-                    const element = document.querySelector(`.metric-item:nth-child(${index + 1}) .metric-value`);
-                    if (element) {
-                        animateValue(element, 0, metric.target);
-                    }
-                }, metric.delay);
-            });
         }
 
         // Animate trend cards
@@ -482,7 +472,7 @@
         }
 
         // Initialize engagement metrics chart
-        function initEngagementChart() {
+        function initEngagementChart(posted, totalApps, pending, awarded) {
             const canvas = document.getElementById('engagementChart');
             if (!canvas) return;
 
@@ -490,14 +480,11 @@
             const width = canvas.width;
             const height = canvas.height;
 
-            // Simple bar chart data
             const data = [
-                { label: 'Jan', value: 45 },
-                { label: 'Feb', value: 62 },
-                { label: 'Mar', value: 78 },
-                { label: 'Apr', value: 94 },
-                { label: 'May', value: 156 },
-                { label: 'Jun', value: 142 }
+                { label: 'Posted', value: posted || 0 },
+                { label: 'Applications', value: totalApps || 0 },
+                { label: 'Pending', value: pending || 0 },
+                { label: 'Awarded', value: awarded || 0 }
             ];
 
             const maxValue = Math.max(...data.map(d => d.value));

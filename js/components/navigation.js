@@ -36,7 +36,7 @@ const Navigation = {
                 { label: 'Dashboard', href: 'dashboard-admin.html', icon: '🏠' },
                 { label: 'User Management', href: 'admin-users.html', icon: '👥' },
                 { label: 'Opportunity Approval', href: 'manage-opportunities.html', icon: '✅' },
-                { label: 'System Settings', href: 'prime-contractor-settings.html', icon: '⚙️' }
+                { label: 'Analytics', href: 'prime-contractor-analytics.html', icon: '📊' }
             ]
         },
         staff: {
