@@ -313,7 +313,7 @@
                             </div>
                         </div>
                         <div class="search-actions">
-                            <button class="btn btn-primary btn-large" onclick="searchSmall Businesses()"
+                            <button class="btn btn-primary btn-large" onclick="searchSmallBusinesses()"
                                 style="display: flex; align-items: center; gap: var(--space-sm);">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2.5">
@@ -340,7 +340,7 @@
 
                 <!-- Results Count -->
                 <div id="searchResults" style="margin: var(--space-md) 0; color: var(--text-muted);">
-                    <strong>All small businesses</strong> (showing 2 results)
+                    <strong>Loading...</strong>
                 </div>
             </section>
 
@@ -379,16 +379,10 @@
                 }
             </style>
 
-            <!-- Small Business Grid -->
+            <!-- Small Business Grid — populated by JS from MySQL -->
             <section id="smallBusinessGrid" class="small-business-grid">
-                <!-- Sample Small Business 1 -->
-                <div class="enhanced-card">
-                    <div class="small-business-info">
-                        <div class="small-business-details">
-                            <div class="small-business-name">
-                                <span class="small-business-name::before"></span>
-                                Vertex Construction & Engineering
-                            </div>
+                <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">Loading small businesses...</div>
+            <!-- REMOVED SAMPLE DATA PLACEHOLDER
                             <div class="small-business-contact">
                                 <div class="small-business-contact-item">
                                     <span class="small-business-contact-item::before"></span>
@@ -485,7 +479,7 @@
                             </button>
                         </div>
                     </div>
-                </div>
+                END REMOVED SAMPLE DATA -->
             </section>
         </main>
         <footer id="site-footer" class="site-footer"></footer>
@@ -497,85 +491,81 @@
     <script src="js/utils/data-resilience.js"></script>
     <script src="js/components/navigation.js"></script>
     <script>
-        // Initialize small business search with enhanced design
+        // Initialize small business search
         document.addEventListener('DOMContentLoaded', async function () {
-            // Get current user and initialize appropriate navigation
             const user = JSON.parse(localStorage.getItem('caltrans_user'));
             const userRole = user ? user.type : 'staff';
-
             setTimeout(() => {
                 Navigation.init(userRole);
-                loadSmall Businesses();
+                loadSmallBusinesses();
             }, 50);
+
+            // Wire up search input — trigger on Enter key
+            const searchInput = document.getElementById('smallBusinessSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') searchSmallBusinesses();
+                });
+            }
         });
 
-        // Load small businesses from API and display them
-        async function loadSmall Businesses() {
-            try {
-                // Use DataService for resilient fetching
-                const data = await DataService.fetch('/small-businesses?type=small business');
-                if (!data || !Array.isArray(data)) {
-                    throw new Error('Invalid small business data received');
-                }
-                const small businesses = data;
-                displaySmall Businesses(small businesses);
+        // Load small businesses from MySQL via API
+        async function loadSmallBusinesses(params = {}) {
+            const gridEl = document.getElementById('smallBusinessGrid');
+            const resultsEl = document.getElementById('searchResults');
+            gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">Loading...</div>';
 
+            try {
+                const query = new URLSearchParams(params).toString();
+                const data = await DataService.fetch(`/small-businesses${query ? '?' + query : ''}`);
+                if (!data || !Array.isArray(data)) throw new Error('No data');
+                displaySmallBusinesses(data, resultsEl, gridEl);
             } catch (error) {
                 console.error('Error loading small businesses:', error);
-                document.getElementById('smallBusinessGrid').innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--color-error);">
-                        <p>Error loading small businesses. Please try again later.</p>
-                        <button class="btn btn-primary" onclick="window.location.reload()" style="margin-top: 1rem;">Retry</button>
-                    </div>
-                `;
+                gridEl.innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--color-error);">
+                        <p>Error loading small businesses. Please try again.</p>
+                        <button class="btn btn-primary" onclick="loadSmallBusinesses()" style="margin-top:1rem;">Retry</button>
+                    </div>`;
+                resultsEl.innerHTML = '<strong>Error</strong> loading results';
             }
         }
 
-        // Display small business cards
-        function displaySmall Businesses(small businesses) {
-            const gridEl = document.getElementById('smallBusinessGrid');
-            const resultsEl = document.getElementById('searchResults');
+        // Render cards from MySQL data
+        function displaySmallBusinesses(data, resultsEl, gridEl) {
+            if (!gridEl) gridEl = document.getElementById('smallBusinessGrid');
+            if (!resultsEl) resultsEl = document.getElementById('searchResults');
 
-            if (small businesses.length === 0) {
-                gridEl.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">No small businesses found matching your search criteria.</div>';
-                resultsEl.innerHTML = '<strong>No small businesses</strong> found';
+            if (data.length === 0) {
+                gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">No small businesses found matching your criteria.</div>';
+                resultsEl.innerHTML = '<strong>0 small businesses</strong> found';
                 return;
             }
 
-            resultsEl.innerHTML = `<strong>${small businesses.length} small businesses</strong> found`;
+            resultsEl.innerHTML = `<strong>${data.length} small business${data.length !== 1 ? 'es' : ''}</strong> found`;
             gridEl.innerHTML = '';
 
-            small businesses.forEach(small business => {
+            data.forEach(sb => {
                 const card = document.createElement('div');
                 card.className = 'enhanced-card small-business-card';
-                card.style.cssText = 'margin-bottom: var(--space-lg); cursor: pointer; display: flex; flex-direction: column;';
-                card.dataset.smallBusinessId = small business.id;
+                card.style.cssText = 'cursor:pointer;display:flex;flex-direction:column;';
+                card.dataset.smallBusinessId = sb.id;
 
-                // Ensure data exists
-                const name = small business.business_name || small business.organization_name || small business.name || 'Unknown Business';
-                const location = small business.location || (small business.city && small business.state ? `${small business.city}, ${small business.state}` : (small business.districts ? `District ${small business.districts}` : 'Various Districts'));
-                const phone = small business.phone || 'Contact for info';
-                const email = small business.email || 'No email provided';
-                const certs = small business.certifications || small business.certification_number || 'Small Business Certified';
-                const description = small business.description || small business.tagline || 'Specializing in high-quality transportation and engineering solutions for public works projects across California.';
-                const years = small business.years_in_business || '5+ years';
-                const rating = small business.rating || 4.8;
-                const reviews = small business.review_count || 12;
-                const hasCapabilityStatement = small business.has_capability_statement !== false;
+                const name = sb.business_name || sb.organization_name || sb.contact_name || 'Unknown Business';
+                const districtList = Array.isArray(sb.districts) ? sb.districts : (sb.districts ? [sb.districts] : []);
+                const location = districtList.length ? districtList.map(d => `District ${d}`).join(', ') : (sb.city || 'Various Districts');
+                const phone = sb.phone || 'Contact for info';
+                const certs = sb.certifications || sb.certification_number || 'Small Business Certified';
+                const description = sb.business_description || 'Specializing in transportation and infrastructure projects across California.';
+                const years = sb.years_in_business ? `Est. ${sb.years_in_business} yrs` : '';
+                const hasCS = !!sb.capability_statement;
 
-                // Robust services handling: handle both string (needs split) and array (already parsed)
-                let services = ['Construction Services'];
-                if (small business.services) {
-                    services = Array.isArray(small business.services) ? small business.services : (typeof small business.services === 'string' ? small business.services.split(',') : [small business.services]);
-                } else if (small business.categories) {
-                    services = Array.isArray(small business.categories) ? small business.categories : (typeof small business.categories === 'string' ? small business.categories.split(',') : [small business.categories]);
-                }
+                const categoryList = Array.isArray(sb.categories) ? sb.categories : (sb.categories ? [sb.categories] : ['General Contractor']);
+                const services = categoryList.filter(Boolean);
 
-                // Make entire card clickable
                 card.addEventListener('click', (e) => {
-                    // Prevent navigation if a button or link is clicked specifically
                     if (!e.target.closest('button') && !e.target.closest('a')) {
-                        viewSmall BusinessProfile(small business.id);
+                        viewSmallBusinessProfile(sb.id);
                     }
                 });
 
@@ -584,82 +574,60 @@
                         <div class="small-business-details">
                             <div class="small-business-header">
                                 <div class="small-business-name">${name}</div>
-                                ${hasCapabilityStatement ? `<div title="Capability Statement Available" style="font-size: 1.2rem; margin-top: 4px;">📄</div>` : ''}
+                                ${hasCS ? '<div title="Capability Statement Available" style="font-size:1.2rem;">📄</div>' : ''}
                             </div>
-                            
-                            <div style="font-size: 0.8rem; color: var(--color-primary); font-weight: 700; text-transform: uppercase; margin-bottom: var(--space-sm);">
-                                ${services[0] || 'General Contractor'} | Est. ${years}
+                            <div style="font-size:0.8rem;color:var(--color-primary);font-weight:700;text-transform:uppercase;margin-bottom:var(--space-sm);">
+                                ${services[0] || 'General Contractor'}${years ? ' | ' + years : ''}
                             </div>
-
                             <div class="small-business-contact">
                                 <div class="small-business-contact-item">📍 ${location}</div>
                                 <div class="small-business-contact-item">📞 ${phone}</div>
-                                <div class="small-business-contact-item" style="font-weight: 600;">🛡️ Certs: ${certs}</div>
+                                <div class="small-business-contact-item" style="font-weight:600;">🛡️ ${certs}</div>
                             </div>
-
-                            <div class="small-business-description" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: var(--space-md);">
-                                ${description.length > 100 ? description.substring(0, 100) + '...' : description}
+                            <div style="font-size:0.9rem;color:var(--color-text-secondary);line-height:1.4;margin:var(--space-sm) 0 var(--space-md);">
+                                ${description.length > 120 ? description.substring(0, 120) + '…' : description}
                             </div>
-
                             <div class="service-tags">
-                                ${services.slice(0, 3).map(service => `<span class="service-tag">${service.trim()}</span>`).join('')}
+                                ${services.slice(0, 3).map(s => `<span class="service-tag">${s.trim()}</span>`).join('')}
                             </div>
                         </div>
-
-                        <div class="small-business-rating">
-                            <div class="rating-stars">
-                                <span style="color: var(--color-warning);">⭐</span>
-                            </div>
-                            <span style="font-weight: 700;">${rating}</span>
-                            <span style="color: var(--text-muted); font-size: 0.8rem;">(${reviews} reviews)</span>
-                        </div>
-
-                        <div class="small-business-actions">
-                            <button class="profile-btn" onclick="viewSmall BusinessProfile('${small business.id}', event)">
+                        <div class="small-business-actions" style="margin-top:var(--space-md);">
+                            <button class="profile-btn" onclick="viewSmallBusinessProfile('${sb.id}', event)">
                                 View Full Profile &rarr;
                             </button>
                         </div>
                     </div>
                 `;
-
                 gridEl.appendChild(card);
             });
         }
 
-        // Real data loading for search results
-        async function loadOpportunitiesForSearch() {
-            try {
-                const user = Auth.getUser();
-                const opps = await DataService.fetch('/opportunities');
-
-                // If small business, also fetch saved list
-                let savedIds = new Set();
-                if (user && user.type === 'small_business') {
-                    const saved = await DataService.fetch(`/opportunities/saved/${user.id}`);
-                    savedIds = new Set(saved.map(o => o.id));
-                }
-
-                renderOpps(opps, savedIds);
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
+        // Search button handler — reads filters and reloads
+        function searchSmallBusinesses() {
+            const searchVal = (document.getElementById('smallBusinessSearch') || {}).value || '';
+            const params = {};
+            if (searchVal.trim()) params.search = searchVal.trim();
+            loadSmallBusinesses(params);
         }
 
-        // View small business profile
-        window.viewSmall BusinessProfile = function (smallBusinessId, event) {
-            if (event) {
-                event.stopPropagation();
-            }
-            // Navigate to small business profile page
-            window.location.href = `small-business-profile.html?id=${smallBusinessId}`;
+        // Clear search and reload all
+        function clearSearch() {
+            const searchInput = document.getElementById('smallBusinessSearch');
+            if (searchInput) searchInput.value = '';
+            loadSmallBusinesses();
+        }
+
+        // Navigate to profile page
+        window.viewSmallBusinessProfile = function (id, event) {
+            if (event) event.stopPropagation();
+            window.location.href = `small-business-profile.html?id=${id}`;
         };
 
-        window.contactSmall Business = function (smallBusinessId, event) {
-            if (event) {
-                event.stopPropagation();
-            }
-            // For demo, show contact info - in real app would open contact form or modal
-            alert(`Contact feature would open communication options for small business ID: ${smallBusinessId}`);
+        window.contactSmallBusiness = function (id, event) {
+            if (event) event.stopPropagation();
+            const user = Auth.getUser();
+            if (!user) { alert('Please log in to contact a Small Business.'); window.location.href = 'login.html'; return; }
+            window.location.href = `messages.html?recipient=${id}`;
         };
     </script>
 
