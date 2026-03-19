@@ -294,7 +294,7 @@
                 <div style="flex:1;font-weight:500;color:var(--color-text-primary);">
                     <strong>Invite Mode</strong> — Browse the directory and click <strong>Invite to Apply</strong> on any small business to send them a direct invitation to one of your open opportunities.
                 </div>
-                <a href="search-small-businesses.html" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.85rem;text-decoration:underline;">Exit Invite Mode</a>
+                <a href="dashboard-prime-contractor.html" style="background:none;border:none;cursor:pointer;color:var(--color-primary);font-size:0.85rem;font-weight:600;text-decoration:underline;">← Back to Dashboard</a>
             </div>
 
             <!-- Invite Modal -->
@@ -735,7 +735,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         senderId: user.id,
-                        recipientId: _inviteTargetId,
+                        receiverId: _inviteTargetId,
+                        opportunityId: oppId,
                         subject: `Invitation to Apply: ${oppTitle}`,
                         body: message
                     })

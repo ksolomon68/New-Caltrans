@@ -137,6 +137,27 @@ router.get('/small-business/:smallBusinessId', async (req, res) => {
     }
 });
 
+// Update application status (Prime Contractor: approve/decline; Admin: any status)
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const allowed = ['pending', 'under_review', 'approved', 'declined', 'awarded'];
+    if (!status || !allowed.includes(status)) {
+        return res.status(400).json({ error: `Invalid status. Must be one of: ${allowed.join(', ')}` });
+    }
+    try {
+        const [result] = await db.execute(
+            'UPDATE applications SET status = ? WHERE id = ?',
+            [status, id]
+        );
+        if (result.affectedRows === 0) return res.status(404).json({ error: 'Application not found' });
+        res.json({ success: true, status });
+    } catch (error) {
+        console.error('Error updating application status:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Withdraw (delete) an application — only allowed while status is 'pending'
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;

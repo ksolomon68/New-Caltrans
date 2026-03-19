@@ -180,15 +180,35 @@
             submitBtn.disabled = true;
 
             try {
+                const oppId = formData.get('opportunityId');
                 await DataService.fetch('/applications', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        opportunityId: formData.get('opportunityId'),
+                        opportunityId: oppId,
                         smallBusinessId: user.id,
                         notes: formData.get('coverLetter')
                     })
                 });
+
+                // Notify the prime contractor via message (non-blocking)
+                DataService.fetch(`/opportunities/${oppId}`).then(opp => {
+                    if (!opp || !opp.posted_by) return;
+                    const sbName = user.business_name || user.contact_name || 'A small business';
+                    const oppTitle = opp.title || 'your opportunity';
+                    DataService.fetch('/messages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            senderId: user.id,
+                            receiverId: opp.posted_by,
+                            opportunityId: oppId,
+                            subject: `New Application: ${oppTitle}`,
+                            body: `${sbName} has submitted an application for "${oppTitle}". Log in to review it in Manage Opportunities.`
+                        })
+                    }).catch(() => {});
+                }).catch(() => {});
+
                 alert('Application submitted successfully!');
                 closeApplicationModal();
                 loadApplications();

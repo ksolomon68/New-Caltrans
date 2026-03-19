@@ -153,7 +153,7 @@
                     `;
                 } else {
                     actionButtons = `
-                        <div style="display: flex; gap: 0.5rem;">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
                             <select class="form-control" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.8rem;" onchange="updateOpportunityStatus('${opp.id}', this.value)">
                                 <option value="published" ${opp.status === 'published' ? 'selected' : ''}>Active / Published</option>
                                 <option value="closed" ${opp.status === 'closed' ? 'selected' : ''}>Closed</option>
@@ -161,6 +161,7 @@
                             </select>
                             <button class="btn btn-small btn-primary" onclick="viewOpportunity('${opp.id}')">View</button>
                             <button class="btn btn-small btn-outline" onclick="editOpportunity('${opp.id}')">Edit</button>
+                            <button class="btn btn-small" style="background:var(--color-primary);color:white;" onclick="toggleApplications('${opp.id}', this)">Applications <span id="appCount-${opp.id}">...</span></button>
                         </div>
                     `;
                 }
@@ -191,11 +192,29 @@
                         <div style="display: flex; gap: var(--space-sm); justify-content: flex-end; align-items: center; border-top: 1px solid var(--color-border-light); padding-top: var(--space-md);">
                             ${actionButtons}
                         </div>
+                        <div id="apps-${opp.id}" style="display:none; margin-top:var(--space-md); border-top:1px solid var(--color-border-light); padding-top:var(--space-md);">
+                            <div id="appsList-${opp.id}"><em style="color:var(--text-muted);">Loading applications...</em></div>
+                        </div>
                     </div>
                 `;
             });
 
             listEl.innerHTML = html;
+
+            // Pre-load application counts for prime contractor
+            if (!isAdmin) {
+                opportunities.forEach(opp => {
+                    DataService.fetch(`/applications/opportunity/${opp.id}`)
+                        .then(apps => {
+                            const el = document.getElementById(`appCount-${opp.id}`);
+                            if (el && Array.isArray(apps)) el.textContent = `(${apps.length})`;
+                        })
+                        .catch(() => {
+                            const el = document.getElementById(`appCount-${opp.id}`);
+                            if (el) el.textContent = '';
+                        });
+                });
+            }
         }
 
         window.updateOpportunityStatus = async function (id, newStatus) {
@@ -244,6 +263,122 @@
 
         window.editOpportunity = function (opportunityId) {
             window.location.href = `post-opportunity.html?id=${opportunityId}`;
+        };
+
+        // ── Applications Panel ──────────────────────────────────────────────
+
+        const _appPanelOpen = {};
+
+        window.toggleApplications = async function (oppId, btn) {
+            const panel = document.getElementById(`apps-${oppId}`);
+            if (!panel) return;
+
+            if (_appPanelOpen[oppId]) {
+                panel.style.display = 'none';
+                _appPanelOpen[oppId] = false;
+                return;
+            }
+
+            panel.style.display = 'block';
+            _appPanelOpen[oppId] = true;
+            await loadApplicationsForOpp(oppId);
+        };
+
+        async function loadApplicationsForOpp(oppId) {
+            const listEl = document.getElementById(`appsList-${oppId}`);
+            if (!listEl) return;
+
+            try {
+                const apps = await DataService.fetch(`/applications/opportunity/${oppId}`);
+                const countEl = document.getElementById(`appCount-${oppId}`);
+
+                if (!Array.isArray(apps) || apps.length === 0) {
+                    listEl.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:1rem;">No applications yet.</p>';
+                    if (countEl) countEl.textContent = '(0)';
+                    return;
+                }
+
+                if (countEl) countEl.textContent = `(${apps.length})`;
+
+                const statusColors = {
+                    pending:      '#f59e0b',
+                    under_review: '#3b82f6',
+                    approved:     '#10b981',
+                    awarded:      '#10b981',
+                    declined:     '#ef4444'
+                };
+
+                listEl.innerHTML = `
+                    <h4 style="margin:0 0 var(--space-md);color:var(--color-primary);">Applications (${apps.length})</h4>
+                    ${apps.map(app => {
+                        const name = app.business_name || app.contact_name || 'Unknown Business';
+                        const status = app.status || 'pending';
+                        const color = statusColors[status] || '#6b7280';
+                        const date = app.applied_date ? new Date(app.applied_date).toLocaleDateString() : '—';
+                        const isPending = status === 'pending' || status === 'under_review';
+                        return `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-md);background:var(--color-bg-secondary);border-radius:var(--border-radius-md);margin-bottom:var(--space-sm);">
+                            <div style="flex:1;">
+                                <div style="font-weight:600;">${name}</div>
+                                <div style="font-size:0.8rem;color:var(--text-muted);">Applied: ${date}</div>
+                                ${app.notes ? `<div style="font-size:0.85rem;color:var(--color-text-secondary);margin-top:0.25rem;font-style:italic;">"${app.notes.substring(0,120)}${app.notes.length > 120 ? '…' : ''}"</div>` : ''}
+                            </div>
+                            <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;margin-left:1rem;">
+                                <span style="padding:0.2rem 0.6rem;border-radius:9999px;font-size:0.75rem;font-weight:700;background:${color}22;color:${color};text-transform:uppercase;">${status.replace('_',' ')}</span>
+                                ${isPending ? `
+                                    <button class="btn btn-small" style="background:#10b981;color:white;" onclick="setAppStatus('${app.application_id}','approved','${app.small_business_id}','${oppId}',this)">Approve</button>
+                                    <button class="btn btn-small" style="background:#ef4444;color:white;" onclick="setAppStatus('${app.application_id}','declined','${app.small_business_id}','${oppId}',this)">Decline</button>
+                                ` : ''}
+                                <button class="btn btn-small btn-outline" onclick="messageApplicant('${app.small_business_id}','${oppId}')">Message</button>
+                                <a href="small-business-profile.html?id=${app.small_business_id}" class="btn btn-small btn-outline" target="_blank">Profile</a>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                `;
+            } catch (err) {
+                console.error('Error loading applications:', err);
+                document.getElementById(`appsList-${oppId}`).innerHTML = '<p style="color:var(--color-error);">Failed to load applications.</p>';
+            }
+        }
+
+        window.setAppStatus = async function (appId, newStatus, sbId, oppId, btn) {
+            const user = Auth.getUser();
+            btn.disabled = true;
+            try {
+                await DataService.fetch(`/applications/${appId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                // Notify the small business via message
+                const label = newStatus === 'approved' ? 'approved' : 'declined';
+                const oppTitle = btn.closest('[id^="apps-"]') ? '' : '';
+                const msgBody = newStatus === 'approved'
+                    ? `Congratulations! Your application has been approved. We look forward to working with you. Please check your application page for next steps.`
+                    : `Thank you for your application. After careful review, we have decided to move forward with another candidate at this time. We encourage you to apply to future opportunities.`;
+
+                await DataService.fetch('/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderId: user.id,
+                        receiverId: sbId,
+                        subject: `Your application has been ${label}`,
+                        body: msgBody
+                    })
+                }).catch(() => {}); // Non-blocking — don't fail if message fails
+
+                await loadApplicationsForOpp(oppId);
+            } catch (err) {
+                console.error('Error updating application status:', err);
+                alert('Failed to update status. Please try again.');
+                btn.disabled = false;
+            }
+        };
+
+        window.messageApplicant = function (sbId, oppId) {
+            window.location.href = `messages.html?recipient=${sbId}&ref_type=opportunity&ref_id=${oppId}`;
         };
     </script>
   <script src="js/accessibility-widget.js"></script>
