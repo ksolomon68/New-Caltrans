@@ -27,22 +27,6 @@ router.get('/prime-contractor/:id', async (req, res) => {
     }
 });
 
-// Get single opportunity by ID
-router.get('/:id', async (req, res) => {
-    const { id } = req.params;
-    if (id === 'prime_contractor' || id === 'saved' || id === 'save' || id === 'unsave') return res.status(404).json({ error: 'Not found' });
-
-    try {
-        const [rows] = await db.execute('SELECT * FROM opportunities WHERE id = ?', [id]);
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'Opportunity not found' });
-        }
-        res.json(rows[0]);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 // Get prime contractor's opportunities with application status for a specific small business
 router.get('/prime/:primeId/for-sb/:smallBusinessId', async (req, res) => {
     const { primeId, smallBusinessId } = req.params;
@@ -59,6 +43,22 @@ router.get('/prime/:primeId/for-sb/:smallBusinessId', async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error('Error fetching prime opportunities for SB:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get single opportunity by ID
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    if (id === 'prime_contractor' || id === 'saved' || id === 'save' || id === 'unsave') return res.status(404).json({ error: 'Not found' });
+
+    try {
+        const [rows] = await db.execute('SELECT * FROM opportunities WHERE id = ?', [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Opportunity not found' });
+        }
+        res.json(rows[0]);
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
