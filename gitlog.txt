@@ -1,0 +1,43 @@
+commit 1e8bc4e9fd5b948c79078a209ba8f236b3e6c2eb
+Author: Keisha Solomon <ks@evobrand.net>
+Date:   Sat Mar 21 18:14:36 2026 -0500
+
+    feat: password reset, contact forms, security hardening, and UI improvements
+    
+    - Add password reset flow (forgot-password, reset-password pages + API routes)
+    - Add functional contact and report-issue forms (POST /api/contact/submit)
+    - Add email service (nodemailer) with branded templates for welcome, reset, and confirmation emails
+    - Send welcome email on registration
+    - Security: JWT auth middleware, helmet, rate limiting, CORS restriction, remove .env.production from git
+    - Fix XSS in CMS admin JS; replace x-admin-email header with JWT bearer tokens
+    - Increase base font size to 20px, container width to 1600px, hero height to 80vh
+    - Increase admin CMS sidebar font and widen sidebar to 280px
+    - Increase accessibility widget and CMS font sizes
+    - Fix button text overflow on all pages
+    - Wire up report-issue.html form submission
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+commit a4b7f7abcced580b4b1da15c06d883c0a2728207
+Author: Keisha Solomon <ks@evobrand.net>
+Date:   Thu Mar 19 13:46:02 2026 -0500
+
+    feat: prevent duplicate invites and remove explicit link from message body
+
+commit 8ce45889a574015eb21d6d0454cbdf3885cc4c9f
+Author: Keisha Solomon <ks@evobrand.net>
+Date:   Thu Mar 19 13:41:51 2026 -0500
+
+    feat: unified invitation logic, improved message copy, and fixed application auth bug
+
+commit 8a4125bbbf589f7e48391ec2059c8a5d8383e233
+Author: Keisha Solomon <ks@evobrand.net>
+Date:   Thu Mar 19 06:05:22 2026 -0500
+
+    fix: update invite message copy, fix application submit 401 error (auth middleware + x-user-id header)
+
+commit 24b9a2992cb58bd807918e51ea17551df5be4920
+Author: Keisha Solomon <ks@evobrand.net>
+Date:   Thu Mar 19 05:43:08 2026 -0500
+
+    WCAG 2.1 AA accessibility refactor: focus rings, modal dialogs, ARIA attributes, focus trapping, nav a11y

@@ -12,7 +12,9 @@
       "Bash(curl -s http://localhost:3002/api/cms/global)",
       "Bash(node -e \"const d=require\\(''''fs''''\\).readFileSync\\(''''/dev/stdin'''',''''utf8''''\\); const j=JSON.parse\\(d\\); console.log\\(''''Global OK - site:'''', j.site.name\\)\")",
       "Bash(curl -s http://localhost:3002/api/cms/pages)",
-      "Bash(curl -s http://localhost:3002/admin-cms.html)"
+      "Bash(curl -s http://localhost:3002/admin-cms.html)",
+      "Bash(node server/index.js)",
+      "Bash(npm install:*)"
     ]
   }
 }

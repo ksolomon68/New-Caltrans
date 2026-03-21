@@ -18,7 +18,16 @@ document.addEventListener('DOMContentLoaded', async function () {
             ? window.DataService.fetch.bind(window.DataService)
             : async (url) => {
                 const res = await fetch(url);
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                if (!res.ok) {
+                    let errMsg = `HTTP error! status: ${res.status}`;
+                    try {
+                        const errData = await res.json();
+                        errMsg = errData.error || errMsg;
+                    } catch (e) {
+                         // Fallback if not JSON
+                    }
+                    throw new Error(errMsg);
+                }
                 return res.json();
             };
 

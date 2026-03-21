@@ -8,7 +8,14 @@ const DataService = {
 
         try {
             const response = await fetch(url, options);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+                let errMsg = `HTTP error! status: ${response.status}`;
+                try {
+                    const errData = await response.json();
+                    errMsg = errData.error || errMsg;
+                } catch (e) {}
+                throw new Error(errMsg);
+            }
             return await response.json();
         } catch (error) {
             console.error(`CaltransBizConnect: Fetch failed for ${endpoint}:`, error);
