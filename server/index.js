@@ -4,6 +4,8 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 const { initDatabase, getDb } = require('./database');
@@ -16,19 +18,43 @@ const PORT = process.env.PORT || 3001;
 
 const startServer = async () => {
     try {
-        // Basic Middleware
-        app.use(cors());
-        app.use(express.json());
+        // Security Headers
+        app.use(helmet({
+            contentSecurityPolicy: false // disabled to allow inline scripts in HTML pages
+        }));
+
+        // CORS — restrict to production domain and localhost
+        const allowedOrigins = [
+            'https://caltransbizconnect.org',
+            'https://www.caltransbizconnect.org',
+            'http://localhost:3001',
+            'http://127.0.0.1:3001'
+        ];
+        app.use(cors({
+            origin: (origin, callback) => {
+                if (!origin || allowedOrigins.includes(origin)) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
+            credentials: true
+        }));
+
+        // Rate limiting on auth endpoints
+        const authLimiter = rateLimit({
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: 20,                   // 20 attempts per window
+            standardHeaders: true,
+            legacyHeaders: false,
+            message: { error: 'Too many requests, please try again later.' }
+        });
+
+        app.use(express.json({ limit: '1mb' }));
 
         // Maintenance Mode Middleware
         app.use((req, res, next) => {
-            // Check for admin bypass query param
-            if (req.query.admin === 'true') {
-                res.cookie('admin_bypass', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
-                return res.redirect(req.path);
-            }
-            
-            // Check bypass mechanisms
+            // Check bypass mechanisms (localhost only — no query param bypass)
             const hasBypassCookie = req.headers.cookie && req.headers.cookie.includes('admin_bypass=true');
             const isAllowedIP = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip);
             
@@ -65,10 +91,11 @@ const startServer = async () => {
         // Serve Static Files
         const publicPath = path.join(__dirname, '../');
         console.log('CaltransBizConnect: Serving static files from:', publicPath);
-        app.use(express.static(publicPath));
+        app.use(express.static(publicPath, { etag: false, lastModified: false, setHeaders(res) { res.setHeader('Cache-Control', 'no-cache'); } }));
 
         // Routes
-        app.use('/api/auth', require('./routes/auth'));
+        app.use('/api/auth', authLimiter, require('./routes/auth'));
+        app.use('/api/cms/login', authLimiter);
         app.use('/api/opportunities', require('./routes/opportunities'));
         app.use('/api/users', require('./routes/users'));
         app.use('/api/messages', require('./routes/messages'));
@@ -79,17 +106,17 @@ const startServer = async () => {
         app.use('/api/small-businesses', require('./routes/small-businesses'));
         app.use('/api/cms', require('./routes/cms'));
         app.use('/api/filters', require('./routes/filters'));
+        app.use('/api/password-reset', require('./routes/password-reset'));
+        app.use('/api/contact', require('./routes/contact'));
 
         // Health Check
         app.get('/api/health', async (req, res) => {
             let dbStatus = 'ok';
-            let dbError = null;
             try {
                 const db = getDb();
                 await db.execute('SELECT 1');
             } catch (e) {
                 dbStatus = 'error';
-                dbError = e.message;
             }
             const uploadsDir = path.join(__dirname, '../uploads');
             let uploadsWritable = false;
@@ -102,12 +129,9 @@ const startServer = async () => {
                 // not writable
             }
             res.json({
-                status: 'ok',
-                version: VERSION,
-                database: { status: dbStatus, error: dbError },
-                uploads: { path: uploadsDir, exists: fs.existsSync(uploadsDir), writable: uploadsWritable },
-                env: process.env.NODE_ENV || 'production',
-                passenger: !!(process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO)
+                status: dbStatus === 'ok' && uploadsWritable ? 'ok' : 'degraded',
+                database: dbStatus,
+                uploads: uploadsWritable ? 'ok' : 'error'
             });
         });
 

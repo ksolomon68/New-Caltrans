@@ -72,7 +72,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   overflow-y: auto;
   font-family: Arial, Calibri, sans-serif;
-  font-size: 14px;
+  font-size: 18px;
   color: #000000;
   display: none;
 }
@@ -107,14 +107,14 @@
 }
 
 .a11y-panel-title {
-  font-size: 15px;
+  font-size: 19px;
   font-weight: 700;
   margin: 0;
   color: #ffffff;
 }
 
 .a11y-panel-shortcut {
-  font-size: 11px;
+  font-size: 13px;
   opacity: 0.85;
   margin-top: 2px;
   color: #ffffff;
@@ -161,7 +161,7 @@
 }
 
 .a11y-section-title {
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -198,7 +198,7 @@
 }
 
 .a11y-control-label {
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 500;
   color: #000000;
   flex: 1 1 auto;
@@ -221,7 +221,7 @@
   color: #000000;
   border-radius: 5px;
   padding: 4px 9px;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   font-family: Arial, sans-serif;

@@ -1,6 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { db } = require('../database');
+const { JWT_SECRET } = require('../middleware/auth');
+const { sendEmail, getWelcomeEmail } = require('../config/email');
 const router = express.Router();
 
 // Register user
@@ -58,13 +61,26 @@ router.post('/register', async (req, res) => {
         ]);
 
         console.log(`CaltransBizConnect Auth: Registration successful for ${email}, ID: ${result.insertId}`);
+
+        // Send welcome email (non-blocking)
+        const userName = profileData.contactName || profileData.contact_name || profileData.businessName || profileData.business_name || 'there';
+        const { html: welcomeHtml, text: welcomeText } = getWelcomeEmail(userName, type);
+        sendEmail({ to: email, subject: 'Welcome to CaltransBizConnect!', html: welcomeHtml, text: welcomeText })
+            .catch(err => console.error('CaltransBizConnect Auth: Welcome email failed:', err.message));
         const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
         const newUser = rows[0];
         const { password_hash: _, ...userWithoutPassword } = newUser;
 
+        const token = jwt.sign(
+            { id: newUser.id, email: newUser.email, type: newUser.type },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
+            token,
             user: userWithoutPassword
         });
     } catch (error) {
@@ -112,9 +128,17 @@ router.post('/login', async (req, res) => {
 
         console.log(`CaltransBizConnect Auth: Login successful for ${email}`);
         const { password_hash, ...userWithoutPassword } = user;
+
+        const token = jwt.sign(
+            { id: user.id, email: user.email, type: user.type },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
         res.json({
             success: true,
             message: 'Login successful',
+            token,
             user: userWithoutPassword
         });
     } catch (error) {

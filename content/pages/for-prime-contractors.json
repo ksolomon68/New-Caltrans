@@ -1,7 +1,7 @@
 {
   "slug": "for-prime-contractors",
   "isSystem": true,
-  "updatedAt": "2026-03-17T19:30:31.291Z",
+  "updatedAt": "2026-03-21T20:48:24.247Z",
   "meta": {
     "title": "For Prime Contractors - CaltransBizConnect",
     "description": "Prime Contractors: Post opportunities, find qualified Small Businesses, and manage your contracting needs."
@@ -80,6 +80,16 @@
     },
     {
       "id": "hero-1773775831281",
+      "type": "hero",
+      "fields": {
+        "title": "",
+        "subtitle": "",
+        "backgroundImage": "",
+        "backgroundImageAlt": ""
+      }
+    },
+    {
+      "id": "hero-1774126104234",
       "type": "hero",
       "fields": {
         "title": "",

@@ -114,7 +114,7 @@
   /* 160px - Increased */
 
   /* Layout */
-  --container-max-width: 1280px;
+  --container-max-width: 1600px;
   --container-padding: var(--space-lg);
 
   --border-radius-sm: 4px;
@@ -158,7 +158,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 20px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-padding-top: 5rem; /* Offset for sticky header (~80px) */
@@ -279,7 +279,8 @@ li {
   border-radius: var(--border-radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .btn:focus {

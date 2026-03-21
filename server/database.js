@@ -7,9 +7,6 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.production'), override: t
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 console.log('CaltransBizConnect DB: Initializing MySQL Connection Pool...');
-console.log('DB Host:', process.env.DB_HOST || 'localhost');
-console.log('DB User:', process.env.DB_USER);
-console.log('DB Name:', process.env.DB_NAME);
 
 let pool;
 
@@ -198,6 +195,24 @@ async function initDatabase() {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         `);
 
+        // 9. CMS FAQs Table
+        console.log('CaltransBizConnect DB: Ensuring "cms_faqs" table exists...');
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS cms_faqs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                category VARCHAR(100) NOT NULL DEFAULT 'General',
+                question TEXT NOT NULL,
+                answer LONGTEXT NOT NULL,
+                sort_order INT DEFAULT 0,
+                status ENUM('active', 'inactive') DEFAULT 'active',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_faq_category (category),
+                INDEX idx_faq_status (status),
+                INDEX idx_faq_sort (sort_order)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
         // Terminlogy Migrations for existing live databases
         console.log('CaltransBizConnect DB: Running terminology data migrations...');
         try {
@@ -244,7 +259,38 @@ async function initDatabase() {
         }
         console.log('CaltransBizConnect DB: Migrations complete.');
 
+        // Password Reset Tokens Table
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS password_reset_tokens (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                token VARCHAR(255) NOT NULL UNIQUE,
+                expires_at DATETIME NOT NULL,
+                used BOOLEAN DEFAULT FALSE,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_token (token),
+                INDEX idx_user_id (user_id),
+                INDEX idx_expires_at (expires_at),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        `);
+
         console.log('CaltransBizConnect DB: All MySQL tables initialized successfully.');
+
+        // Cleanup expired tokens every hour
+        setInterval(async () => {
+            try {
+                const db = getDb();
+                const [result] = await db.execute(
+                    'DELETE FROM password_reset_tokens WHERE expires_at < NOW() OR used = TRUE'
+                );
+                if (result.affectedRows > 0) {
+                    console.log(`CaltransBizConnect DB: Cleaned up ${result.affectedRows} expired/used reset tokens.`);
+                }
+            } catch (e) {
+                console.error('CaltransBizConnect DB: Token cleanup error:', e.message);
+            }
+        }, 60 * 60 * 1000);
     } catch (err) {
         console.error('CaltransBizConnect DB CRITICAL ERROR: Database initialization failed.');
         console.error(err);

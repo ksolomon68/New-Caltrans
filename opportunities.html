@@ -5,8 +5,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
-    content="Browse current contracting opportunities across all Caltrans districts. Filter by region, work category, and due date.">
-  <title>Opportunities - CaltransBizConnect</title>
+    content="Browse active Caltrans subcontracting opportunities for certified small businesses. Filter by district, category, and timeline. Apply directly through our platform.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://caltransbizconnect.org/opportunities.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://caltransbizconnect.org/opportunities.html">
+  <meta property="og:title" content="Current Opportunities | California Transportation Contracts | CaltransBizConnect">
+  <meta property="og:description" content="Browse active Caltrans subcontracting opportunities for certified small businesses. Filter by district, category, and timeline. Apply directly through our platform.">
+  <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://caltransbizconnect.org/opportunities.html">
+  <meta name="twitter:title" content="Current Opportunities | California Transportation Contracts | CaltransBizConnect">
+  <meta name="twitter:description" content="Browse active Caltrans subcontracting opportunities for certified small businesses. Filter by district, category, and timeline. Apply directly through our platform.">
+  <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
+  <title>Current Opportunities | California Transportation Contracts | CaltransBizConnect</title>
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/design-system.css">
   <link rel="stylesheet" href="css/main.css">
@@ -412,6 +424,54 @@
     }
   </script>
   <script src="js/accessibility-widget.js"></script>
+
+  <!-- Organization Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "GovernmentOrganization",
+    "name": "CaltransBizConnect",
+    "url": "https://caltransbizconnect.org",
+    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
+    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "1120 N Street, MS-79",
+      "addressLocality": "Sacramento",
+      "addressRegion": "CA",
+      "postalCode": "95814",
+      "addressCountry": "US"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": "smallbusinesses@dot.ca.gov",
+      "telephone": "+1-916-324-1700"
+    }
+  }
+  </script>
+
+  <!-- BreadcrumbList Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://caltransbizconnect.org/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Opportunities",
+        "item": "https://caltransbizconnect.org/opportunities.html"
+      }
+    ]
+  }
+  </script>
 </body>
 
 </html>

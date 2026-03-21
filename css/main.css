@@ -114,7 +114,7 @@ body {
     padding: 0;
     margin: 0;
     align-items: center;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 }
 
 .main-nav a {
@@ -125,7 +125,7 @@ body {
     border-radius: var(--border-radius-md);
     transition: all 0.3s ease;
     position: relative;
-    font-size: 0.8rem;
+    font-size: 1rem;
     letter-spacing: 0.2px;
     white-space: nowrap;
 }
@@ -375,7 +375,7 @@ body {
     background-color: var(--color-primary-dark);
     color: var(--color-text-inverse);
     padding: var(--space-3xl) 0;
-    min-height: 60vh;
+    min-height: 80vh;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -420,7 +420,7 @@ body {
 .hero .container {
     position: relative;
     z-index: 2;
-    max-width: 900px;
+    max-width: var(--container-max-width);
 }
 
 .hero-title {
@@ -438,7 +438,6 @@ body {
     margin-bottom: var(--space-xl);
     color: var(--color-text-inverse);
     line-height: 1.5;
-    max-width: 700px;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -624,7 +623,7 @@ body {
 /* Action Tiles (Enhanced for a Robust, Premium Look) */
 .action-tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--space-xl);
     margin: var(--space-2xl) 0;
 }
@@ -1050,6 +1049,12 @@ body {
 
     .dashboard-nav li {
         margin-bottom: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .action-tiles {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 

@@ -23,8 +23,12 @@ const express = require('express');
 const path    = require('path');
 const fs      = require('fs');
 const multer  = require('multer');
+const jwt     = require('jsonwebtoken');
+const { db }  = require('../database');
 
 const router = express.Router();
+
+const CMS_JWT_SECRET = process.env.JWT_SECRET || 'caltrans-fallback-secret-change-in-production';
 
 // ─── Directory paths ────────────────────────────────────────────────────────
 const ROOT_DIR    = path.join(__dirname, '../../');
@@ -84,42 +88,42 @@ router.post('/login', (req, res) => {
         return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const isAdminEmail = (
-        email.toLowerCase().includes('admin') ||
-        email === 'ks@evobrand.net'
-    );
-
-    if (!isAdminEmail) {
-        return res.status(403).json({ error: 'This account does not have CMS admin access' });
-    }
-
     const requiredPassword = process.env.CMS_ADMIN_PASSWORD;
 
-    if (requiredPassword && password !== requiredPassword) {
-        return res.status(401).json({ error: 'Invalid password' });
+    if (!requiredPassword) {
+        return res.status(500).json({ error: 'CMS_ADMIN_PASSWORD is not configured on the server' });
     }
 
-    // No CMS_ADMIN_PASSWORD set → local dev mode, accept any password
-    res.json({ success: true, email, message: 'CMS login successful' });
+    if (password !== requiredPassword) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+        { email, type: 'caltrans_admin' },
+        CMS_JWT_SECRET,
+        { expiresIn: '8h' }
+    );
+
+    res.json({ success: true, token, email, message: 'CMS login successful' });
 });
 
 // ─── Admin auth middleware ────────────────────────────────────────────────────
-/**
- * Reuses the same admin-email pattern as server/routes/admin.js
- * @param {import('express').Request}  req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
- */
 function requireAdmin(req, res, next) {
-    const email = req.headers['x-admin-email'];
-    const isAdmin = email && (
-        email.toLowerCase().includes('admin') ||
-        email === 'ks@evobrand.net'
-    );
-    if (!isAdmin) {
-        return res.status(403).json({ error: 'Admin access required' });
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
     }
-    next();
+    try {
+        const decoded = jwt.verify(token, CMS_JWT_SECRET);
+        if (decoded.type !== 'caltrans_admin' && decoded.type !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
+    }
 }
 
 // ─── File helpers ─────────────────────────────────────────────────────────────
@@ -379,6 +383,150 @@ router.delete('/media/:filename', requireAdmin, (req, res) => {
     if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
 
     res.json({ success: true, message: `"${filename}" deleted` });
+});
+
+// ─── FAQ MANAGER ─────────────────────────────────────────────────────────────
+
+/** GET /api/cms/faqs — list all FAQs ordered by category + sort_order */
+router.get('/faqs', requireAdmin, async (_req, res) => {
+    try {
+        const [rows] = await db.execute(
+            'SELECT * FROM cms_faqs ORDER BY category, sort_order, id'
+        );
+        res.json(rows);
+    } catch (err) {
+        console.error('CMS FAQs GET error:', err);
+        res.status(500).json({ error: 'Failed to fetch FAQs' });
+    }
+});
+
+/** GET /api/cms/faq-categories — distinct active categories */
+router.get('/faq-categories', requireAdmin, async (_req, res) => {
+    try {
+        const [rows] = await db.execute(
+            "SELECT DISTINCT category FROM cms_faqs WHERE status = 'active' ORDER BY category"
+        );
+        res.json(rows.map(r => r.category));
+    } catch (err) {
+        console.error('CMS FAQ categories GET error:', err);
+        res.status(500).json({ error: 'Failed to fetch categories' });
+    }
+});
+
+/** POST /api/cms/faqs — create a new FAQ */
+router.post('/faqs', requireAdmin, async (req, res) => {
+    const { category, question, answer, status } = req.body || {};
+
+    if (!category || !question || !answer) {
+        return res.status(400).json({ error: 'category, question, and answer are required' });
+    }
+
+    try {
+        // Place new FAQ at the end of its category
+        const [[{ next_order }]] = await db.execute(
+            'SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_order FROM cms_faqs WHERE category = ?',
+            [category]
+        );
+        const [result] = await db.execute(
+            `INSERT INTO cms_faqs (category, question, answer, status, sort_order)
+             VALUES (?, ?, ?, ?, ?)`,
+            [category.trim(), question.trim(), answer, status || 'active', next_order]
+        );
+        res.status(201).json({ id: result.insertId, message: 'FAQ created' });
+    } catch (err) {
+        console.error('CMS FAQ POST error:', err);
+        res.status(500).json({ error: 'Failed to create FAQ' });
+    }
+});
+
+/** PUT /api/cms/faqs/:id — update an existing FAQ */
+router.put('/faqs/:id', requireAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { category, question, answer, status } = req.body || {};
+
+    if (!category || !question || !answer) {
+        return res.status(400).json({ error: 'category, question, and answer are required' });
+    }
+
+    try {
+        const [result] = await db.execute(
+            `UPDATE cms_faqs SET category = ?, question = ?, answer = ?, status = ? WHERE id = ?`,
+            [category.trim(), question.trim(), answer, status || 'active', id]
+        );
+        if (result.affectedRows === 0) return res.status(404).json({ error: 'FAQ not found' });
+        res.json({ message: 'FAQ updated' });
+    } catch (err) {
+        console.error('CMS FAQ PUT error:', err);
+        res.status(500).json({ error: 'Failed to update FAQ' });
+    }
+});
+
+/** DELETE /api/cms/faqs/:id — delete a FAQ */
+router.delete('/faqs/:id', requireAdmin, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await db.execute('DELETE FROM cms_faqs WHERE id = ?', [id]);
+        if (result.affectedRows === 0) return res.status(404).json({ error: 'FAQ not found' });
+        res.json({ message: 'FAQ deleted' });
+    } catch (err) {
+        console.error('CMS FAQ DELETE error:', err);
+        res.status(500).json({ error: 'Failed to delete FAQ' });
+    }
+});
+
+/** POST /api/cms/faqs/reorder — bulk update sort_order */
+router.post('/faqs/reorder', requireAdmin, async (req, res) => {
+    const { updates } = req.body || {};
+    if (!Array.isArray(updates)) {
+        return res.status(400).json({ error: 'updates array required' });
+    }
+    try {
+        for (const { id, sort_order } of updates) {
+            await db.execute('UPDATE cms_faqs SET sort_order = ? WHERE id = ?', [sort_order, id]);
+        }
+        res.json({ message: 'Order saved' });
+    } catch (err) {
+        console.error('CMS FAQ reorder error:', err);
+        res.status(500).json({ error: 'Failed to reorder FAQs' });
+    }
+});
+
+/** GET /api/cms/faqs/export — download FAQs as JSON (public for faq.html renderer) */
+router.get('/faqs/export', async (_req, res) => {
+    try {
+        const [rows] = await db.execute(
+            "SELECT id, category, question, answer, sort_order FROM cms_faqs WHERE status = 'active' ORDER BY category, sort_order"
+        );
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', 'attachment; filename=faqs-export.json');
+        res.json(rows);
+    } catch (err) {
+        console.error('CMS FAQ export error:', err);
+        res.status(500).json({ error: 'Failed to export FAQs' });
+    }
+});
+
+/** GET /api/cms/stats — dashboard stats */
+router.get('/stats', requireAdmin, async (_req, res) => {
+    try {
+        const [[{ pages }]]  = await db.execute(
+            "SELECT COUNT(*) AS pages FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'cms_faqs'"
+        );
+        // Count JSON page files
+        const pageFiles = fs.existsSync(PAGES_DIR)
+            ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.json')).length
+            : 0;
+        const [[{ faqs }]]   = await db.execute("SELECT COUNT(*) AS faqs FROM cms_faqs WHERE status = 'active'");
+        const [[{ users }]]  = await db.execute("SELECT COUNT(*) AS users FROM users WHERE status = 'active'");
+        const mediaFiles = fs.existsSync(MEDIA_DIR)
+            ? fs.readdirSync(MEDIA_DIR).filter(f => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(f)).length
+            : 0;
+
+        res.json({ pages: pageFiles, faqs, media: mediaFiles, users });
+    } catch (err) {
+        console.error('CMS stats error:', err);
+        res.status(500).json({ error: 'Failed to fetch stats' });
+    }
 });
 
 // ─── Utility ──────────────────────────────────────────────────────────────────

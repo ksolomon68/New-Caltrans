@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../database');
 const bcrypt = require('bcryptjs');
+const { requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
 // Root admin endpoint
@@ -8,20 +9,6 @@ router.get('/', (req, res) => {
     res.json({ message: 'Admin API is working' });
 });
 
-// Middleware to check if user is admin
-const requireAdmin = (req, res, next) => {
-    const adminEmail = req.headers['x-admin-email'];
-    console.log(`Admin middleware: ${req.method} ${req.originalUrl}`);
-
-    const isAdminEmail = adminEmail && (adminEmail.toLowerCase().includes('admin') || adminEmail === 'ks@evobrand.net');
-
-    if (!isAdminEmail) {
-        console.log('Admin access denied');
-        return res.status(403).json({ error: 'Admin access required' });
-    }
-    console.log('Admin access granted');
-    next();
-};
 
 // Get admin dashboard data
 router.get('/dashboard', requireAdmin, async (req, res) => {

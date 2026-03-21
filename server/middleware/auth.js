@@ -1,47 +1,56 @@
-const { db } = require('../database');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'caltrans-fallback-secret-change-in-production';
 
 /**
- * Middleware to require a specific role.
- * Extracts user ID from headers (x-user-id), or body/query (userId, senderId)
+ * Middleware to require authentication via JWT bearer token.
+ * allowedRole: 'small_business' | 'prime_contractor' | 'admin' | 'caltrans_admin' | 'any'
  */
 function requireRole(allowedRole) {
-    return async (req, res, next) => {
-        // Find user ID from various possible locations in request
-        const userId = req.headers['x-user-id'] || 
-                       req.body.userId || 
-                       req.body.senderId || 
-                       req.body.smallBusinessId ||
-                       req.query.userId || 
-                       req.params.userId;
+    return (req, res, next) => {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-        if (!userId) {
-            return res.status(401).json({ error: 'Unauthorized: User ID not provided' });
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized: No token provided' });
         }
 
         try {
-            const [rows] = await db.execute('SELECT id, type, business_name FROM users WHERE id = ?', [userId]);
-            const user = rows[0];
+            const decoded = jwt.verify(token, JWT_SECRET);
+            req.user = decoded; // { id, email, type }
 
-            if (!user) {
-                return res.status(401).json({ error: 'Unauthorized: Invalid user' });
+            if (allowedRole !== 'any' && decoded.type !== allowedRole) {
+                return res.status(403).json({ error: `Forbidden: Requires ${allowedRole} role` });
             }
 
-            if (user.type !== allowedRole && allowedRole !== 'any') {
-                return res.status(403).json({ 
-                    error: `Forbidden: Requires ${allowedRole} role` 
-                });
-            }
-
-            // Attach user to request for downstream use
-            req.user = user;
             next();
-        } catch (error) {
-            console.error('Role validation error:', error);
-            res.status(500).json({ error: 'Internal server error during role validation' });
+        } catch (err) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
         }
     };
 }
 
-module.exports = {
-    requireRole
-};
+/**
+ * Middleware to require admin role via JWT.
+ */
+function requireAdmin(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.type !== 'admin' && decoded.type !== 'caltrans_admin') {
+            return res.status(403).json({ error: 'Forbidden: Admin access required' });
+        }
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
+    }
+}
+
+module.exports = { requireRole, requireAdmin, JWT_SECRET };

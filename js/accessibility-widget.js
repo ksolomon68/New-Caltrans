@@ -113,7 +113,11 @@
   }
 
   function applyTextSize() {
-    document.documentElement.style.fontSize = (prefs.textSize / 100 * 16) + 'px';
+    if (prefs.textSize === TEXT_SIZE_MIN) {
+      document.documentElement.style.fontSize = '';
+    } else {
+      document.documentElement.style.fontSize = (prefs.textSize / 100 * 16) + 'px';
+    }
   }
 
   function applyClasses() {

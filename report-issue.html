@@ -4,8 +4,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Report a technical issue or broken link on CaltransBizConnect.">
-  <title>Report Site Issue - CaltransBizConnect</title>
+  <meta name="description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team will respond within one business day.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://caltransbizconnect.org/report-issue.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://caltransbizconnect.org/report-issue.html">
+  <meta property="og:title" content="Report a Site Issue | CaltransBizConnect">
+  <meta property="og:description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team will respond within one business day.">
+  <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://caltransbizconnect.org/report-issue.html">
+  <meta name="twitter:title" content="Report a Site Issue | CaltransBizConnect">
+  <meta name="twitter:description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team will respond within one business day.">
+  <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
+  <title>Report a Site Issue | CaltransBizConnect</title>
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/design-system.css">
   <link rel="stylesheet" href="css/main.css">
@@ -196,7 +208,7 @@
 
   <script src="js/config.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/accessibility-widget.js"></script>
   <script>
     // Auto-populate page URL
     const referrer = document.referrer;
@@ -205,10 +217,67 @@
     }
 
     // Auto-detect browser info
-    const browserInfo = navigator.userAgent;
-    document.getElementById('browser').value = browserInfo;
+    document.getElementById('browser').value = navigator.userAgent;
+
+    const issueForm = document.getElementById('issueForm');
+    const submitBtn = issueForm.querySelector('button[type="submit"]');
+
+    issueForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      issueForm.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+      const issueType = document.getElementById('issueType').value;
+      const pageUrl = document.getElementById('pageUrl').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const browser = document.getElementById('browser').value.trim();
+      const contactEmail = document.getElementById('contactEmail').value.trim();
+
+      let valid = true;
+      if (!issueType) { document.getElementById('issueType').nextElementSibling.textContent = 'Please select an issue type.'; valid = false; }
+      if (!pageUrl) { document.getElementById('pageUrl').nextElementSibling.textContent = 'Page URL is required.'; valid = false; }
+      if (!description) { document.getElementById('description').nextElementSibling.textContent = 'Description is required.'; valid = false; }
+      if (!valid) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      const messageBody = [
+        'Issue Type: ' + issueType,
+        'Page URL: ' + pageUrl,
+        '',
+        'Description:',
+        description,
+        '',
+        'Browser/Device: ' + (browser || 'Not provided'),
+        'Contact Email: ' + (contactEmail || 'Not provided')
+      ].join('\n');
+
+      try {
+        const res = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'Site Issue Report',
+            email: contactEmail || 'noreply@caltransbizconnect.org',
+            subject: 'Site Issue Report: ' + issueType,
+            message: messageBody
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          issueForm.innerHTML = '<div style="padding:var(--space-lg);background:#e8f5e9;border:1px solid #4caf50;border-radius:var(--border-radius-md);color:#1b5e20;" role="alert"><strong>Issue reported!</strong> Thank you. Our team will review it and respond within 1 business day' + (contactEmail ? ' to ' + contactEmail : '') + '.</div>';
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Issue Report';
+          document.getElementById('description').nextElementSibling.textContent = data.message || 'An error occurred. Please try again.';
+        }
+      } catch {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Issue Report';
+        document.getElementById('description').nextElementSibling.textContent = 'Unable to submit. Please email us directly at smallbusinesses@dot.ca.gov';
+      }
+    });
   </script>
-  <script src="js/accessibility-widget.js"></script>
 </body>
 
 </html>

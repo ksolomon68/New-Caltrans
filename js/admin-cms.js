@@ -8,7 +8,7 @@
  *  • Building new pages from component templates
  *  • Style-guide enforcement (font, font-size, alt-text)
  *
- * Authentication: uses existing x-admin-email header pattern.
+ * Authentication: uses JWT bearer token issued by /api/cms/login.
  * Credentials are stored in sessionStorage (cleared on tab close).
  *
  * @module admin-cms
@@ -93,7 +93,7 @@ async function handleLogin(e) {
 
         if (!res.ok) throw new Error(data.error || 'Login failed');
 
-        currentAdmin = { email };
+        currentAdmin = { email, token: data.token };
         sessionStorage.setItem('cms_admin', JSON.stringify(currentAdmin));
         showShell();
     } catch (err) {
@@ -116,11 +116,8 @@ async function showShell() {
           <span>CMS Admin</span>
         </a>
         <div class="cms-header-actions">
-          <button class="cms-btn cms-btn-outline cms-btn-sm" id="sidebar-toggle"
-                  aria-expanded="false" aria-controls="cms-sidebar"
-                  style="color:#fff;border-color:rgba(255,255,255,.5)">☰ Menu</button>
-          <span class="cms-header-user" aria-label="Logged in as ${currentAdmin.email}">
-            ${currentAdmin.email}
+          <span class="cms-header-user" aria-label="Logged in as ${escHtml(currentAdmin.email)}">
+            ${escHtml(currentAdmin.email)}
           </span>
           <button class="cms-btn cms-btn-sm" id="logout-btn"
                   style="background:rgba(255,255,255,.15);color:#fff;border-color:transparent">
@@ -142,6 +139,7 @@ async function showShell() {
         <div class="cms-nav-section">
           <span class="cms-nav-label">Site</span>
           <ul class="cms-page-list">
+            <li><a href="#" data-tab="faqs"><span aria-hidden="true">❓</span> FAQ Manager</a></li>
             <li><a href="#" data-tab="global"><span aria-hidden="true">⚙️</span> Global Settings</a></li>
             <li><a href="#" data-tab="media"><span aria-hidden="true">🖼️</span> Media Library</a></li>
             <li><a href="#" data-tab="builder"><span aria-hidden="true">🏗️</span> Page Builder</a></li>
@@ -171,7 +169,6 @@ async function showShell() {
 
     // Wire up events
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
-    document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
 
     document.querySelectorAll('[data-tab]').forEach(link => {
         link.addEventListener('click', e => {
@@ -185,13 +182,6 @@ async function showShell() {
     // Load initial data
     await Promise.all([loadSchema(), loadGlobal()]);
     navigateTab('pages');
-}
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('cms-sidebar');
-    const btn     = document.getElementById('sidebar-toggle');
-    const open    = sidebar.classList.toggle('open');
-    btn.setAttribute('aria-expanded', String(open));
 }
 
 function setActiveNavLink(activeLink) {
@@ -211,6 +201,7 @@ async function navigateTab(tab, extra) {
     switch (tab) {
         case 'pages':   await renderPagesList(main);          break;
         case 'edit':    await renderPageEditor(main, extra);  break;
+        case 'faqs':    await renderFAQManager(main);         break;
         case 'global':  await renderGlobalSettings(main);     break;
         case 'media':   await renderMediaLibrary(main);       break;
         case 'builder': await renderPageBuilder(main);        break;
@@ -1032,7 +1023,7 @@ async function doUpload(onSelect) {
     try {
         const res = await fetch(`${API}/cms/media`, {
             method:  'POST',
-            headers: { 'x-admin-email': currentAdmin.email },
+            headers: { 'Authorization': `Bearer ${currentAdmin?.token || ''}` },
             body:    formData
         });
         const data = await res.json();
@@ -1269,11 +1260,409 @@ async function loadSchema() {
  * @param {object} [body]
  * @returns {Promise<any>}
  */
+// ── FAQ Manager ─────────────────────────────────────────────────────────────
+
+/** State for the FAQ manager */
+let faqData = [];          // all FAQs from server
+let faqCategories = [];    // distinct category names
+let faqFilterCat = 'all';  // current category filter
+let faqSearch = '';        // current search query
+let faqSortable = null;    // Sortable.js instance
+
+async function renderFAQManager(container) {
+    container.innerHTML = `
+    <div class="cms-faq-module">
+      <div class="cms-flex-between cms-mb">
+        <h2 style="margin:0;color:var(--cms-primary)">❓ FAQ Manager</h2>
+        <div class="cms-flex cms-gap-sm">
+          <a href="#" id="faq-export-btn" class="cms-btn cms-btn-outline cms-btn-sm">⬇ Export JSON</a>
+          <button class="cms-btn cms-btn-secondary" id="add-faq-btn">+ Add FAQ</button>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="cms-faq-toolbar">
+        <div class="cms-flex cms-gap-sm" style="flex:1;flex-wrap:wrap">
+          <select id="faq-cat-filter" class="cms-select" style="width:auto;min-width:160px">
+            <option value="all">All Categories</option>
+          </select>
+          <input id="faq-search" class="cms-input" type="search"
+                 placeholder="Search questions…" style="flex:1;min-width:180px"
+                 value="">
+        </div>
+        <div class="cms-flex cms-gap-sm">
+          <span class="cms-text-muted cms-text-sm" id="faq-count"></span>
+        </div>
+      </div>
+
+      <!-- List -->
+      <div class="cms-panel">
+        <div class="cms-panel-body" style="padding:.5rem">
+          <div id="faq-list">
+            <div class="cms-loading-state"><div class="cms-spinner"></div> Loading FAQs…</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    document.getElementById('add-faq-btn').addEventListener('click', () => openFAQModal(null));
+    document.getElementById('faq-cat-filter').addEventListener('change', e => {
+        faqFilterCat = e.target.value;
+        renderFAQList();
+    });
+    document.getElementById('faq-search').addEventListener('input', e => {
+        faqSearch = e.target.value.toLowerCase().trim();
+        renderFAQList();
+    });
+    document.getElementById('faq-export-btn').addEventListener('click', e => {
+        e.preventDefault();
+        window.open(`${API}/cms/faqs/export`, '_blank');
+    });
+
+    await loadFAQs();
+}
+
+async function loadFAQs() {
+    try {
+        [faqData, faqCategories] = await Promise.all([
+            apiFetch('GET', '/cms/faqs'),
+            apiFetch('GET', '/cms/faq-categories')
+        ]);
+        rebuildCategoryFilter();
+        renderFAQList();
+    } catch (err) {
+        const list = document.getElementById('faq-list');
+        if (list) list.innerHTML = `<div class="cms-alert cms-alert-error">Failed to load FAQs: ${escHtml(err.message)}</div>`;
+    }
+}
+
+function rebuildCategoryFilter() {
+    const sel = document.getElementById('faq-cat-filter');
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="all">All Categories</option>';
+    // Show all distinct categories from data (not just active ones)
+    const allCats = [...new Set(faqData.map(f => f.category))].sort();
+    allCats.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        sel.appendChild(opt);
+    });
+    sel.value = allCats.includes(current) ? current : 'all';
+}
+
+function getFilteredFAQs() {
+    return faqData
+        .filter(f => faqFilterCat === 'all' || f.category === faqFilterCat)
+        .filter(f => {
+            if (!faqSearch) return true;
+            return f.question.toLowerCase().includes(faqSearch) ||
+                   stripHtmlFAQ(f.answer).toLowerCase().includes(faqSearch);
+        })
+        .sort((a, b) => a.sort_order - b.sort_order || a.id - b.id);
+}
+
+function stripHtmlFAQ(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    return d.textContent || '';
+}
+
+function renderFAQList() {
+    const list    = document.getElementById('faq-list');
+    const countEl = document.getElementById('faq-count');
+    if (!list) return;
+
+    const items = getFilteredFAQs();
+    if (countEl) countEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+
+    if (items.length === 0) {
+        list.innerHTML = `
+        <div class="cms-faq-empty">
+          <div style="font-size:2.5rem;margin-bottom:.5rem">❓</div>
+          <p class="cms-text-muted">
+            ${faqData.length === 0 ? 'No FAQs yet. Click "+ Add FAQ" to get started.' : 'No FAQs match your filters.'}
+          </p>
+        </div>`;
+        if (faqSortable) { faqSortable.destroy(); faqSortable = null; }
+        return;
+    }
+
+    list.innerHTML = items.map(faq => `
+    <div class="cms-faq-item" data-id="${faq.id}" data-sort="${faq.sort_order}">
+      <span class="cms-faq-handle" title="Drag to reorder" aria-hidden="true">⠿</span>
+      <div class="cms-faq-body">
+        <div class="cms-faq-meta">
+          <span class="cms-faq-cat-badge">${escHtml(faq.category)}</span>
+          <span class="cms-badge ${faq.status === 'active' ? 'cms-badge-active' : 'cms-badge-inactive'}">
+            ${faq.status}
+          </span>
+        </div>
+        <div class="cms-faq-question">${escHtml(faq.question)}</div>
+        <div class="cms-faq-answer-preview">${truncateFAQ(stripHtmlFAQ(faq.answer), 120)}</div>
+      </div>
+      <div class="cms-faq-actions">
+        <button class="cms-btn cms-btn-primary cms-btn-sm" data-faq-edit="${faq.id}">Edit</button>
+        <button class="cms-btn cms-btn-danger cms-btn-sm" data-faq-delete="${faq.id}">Delete</button>
+      </div>
+    </div>`).join('');
+
+    // Wire edit/delete buttons
+    list.querySelectorAll('[data-faq-edit]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const faq = faqData.find(f => f.id === parseInt(btn.dataset.faqEdit, 10));
+            if (faq) openFAQModal(faq);
+        });
+    });
+    list.querySelectorAll('[data-faq-delete]').forEach(btn => {
+        btn.addEventListener('click', () => deleteFAQ(parseInt(btn.dataset.faqDelete, 10)));
+    });
+
+    // Init/refresh Sortable
+    if (faqSortable) { faqSortable.destroy(); faqSortable = null; }
+    if (window.Sortable && (faqFilterCat !== 'all' || !faqSearch)) {
+        faqSortable = window.Sortable.create(list, {
+            animation: 150,
+            handle: '.cms-faq-handle',
+            ghostClass: 'cms-faq-ghost',
+            onEnd: saveFAQOrder
+        });
+    }
+}
+
+function truncateFAQ(text, max) {
+    return text.length > max ? text.slice(0, max) + '…' : text;
+}
+
+async function saveFAQOrder() {
+    const items  = document.querySelectorAll('#faq-list .cms-faq-item');
+    const updates = Array.from(items).map((el, i) => ({ id: parseInt(el.dataset.id, 10), sort_order: i }));
+    try {
+        await apiFetch('POST', '/cms/faqs/reorder', { updates });
+        // Update local cache
+        updates.forEach(u => {
+            const f = faqData.find(x => x.id === u.id);
+            if (f) f.sort_order = u.sort_order;
+        });
+        showToast('Order saved', 'success');
+    } catch (err) {
+        showToast('Failed to save order: ' + err.message, 'error');
+    }
+}
+
+/** Open add/edit modal */
+function openFAQModal(faq) {
+    const isEdit  = !!faq;
+    const catOpts = [...new Set([...faqCategories, ...faqData.map(f => f.category), 'General', 'Small Businesses', 'Prime Contractors', 'Registration', 'Applications', 'Technical Support'])]
+        .sort()
+        .map(c => `<option value="${escHtml(c)}" ${faq && faq.category === c ? 'selected' : ''}>${escHtml(c)}</option>`)
+        .join('');
+
+    // Remove any existing modal
+    document.querySelectorAll('.cms-modal-backdrop').forEach(el => el.remove());
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'cms-modal-backdrop';
+    backdrop.innerHTML = `
+    <div class="cms-modal" role="dialog" aria-modal="true"
+         aria-labelledby="faq-modal-title" style="max-width:680px">
+      <div class="cms-modal-header">
+        <h2 class="cms-modal-title" id="faq-modal-title">${isEdit ? 'Edit FAQ' : 'Add FAQ'}</h2>
+        <button class="cms-btn cms-btn-outline cms-btn-sm" id="faq-modal-close"
+                aria-label="Close">✕</button>
+      </div>
+
+      <div class="cms-form-group">
+        <label class="cms-label cms-label-required" for="faq-cat-input">Category</label>
+        <div class="cms-flex cms-gap-sm">
+          <select id="faq-cat-select" class="cms-select" style="flex:1">
+            ${catOpts}
+            <option value="__new__">+ New category…</option>
+          </select>
+          <input id="faq-cat-input" class="cms-input cms-hidden" placeholder="New category name"
+                 style="flex:1" value="${faq ? escHtml(faq.category) : ''}">
+        </div>
+      </div>
+
+      <div class="cms-form-group">
+        <label class="cms-label cms-label-required" for="faq-question-input">Question</label>
+        <textarea id="faq-question-input" class="cms-textarea" rows="2"
+                  placeholder="Enter the FAQ question…">${faq ? escHtml(faq.question) : ''}</textarea>
+      </div>
+
+      <div class="cms-form-group">
+        <label class="cms-label cms-label-required" for="faq-answer-input">Answer</label>
+        <div class="cms-faq-editor-toolbar">
+          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="bold"><b>B</b></button>
+          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="italic"><i>I</i></button>
+          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="ul">• List</button>
+          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="link">🔗 Link</button>
+        </div>
+        <textarea id="faq-answer-input" class="cms-textarea" rows="8"
+                  placeholder="Enter the FAQ answer (HTML supported)…">${faq ? escHtml(faq.answer) : ''}</textarea>
+        <div class="cms-input-hint">Basic HTML supported: &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a href=""&gt;, &lt;br&gt;</div>
+      </div>
+
+      <div class="cms-form-group">
+        <label class="cms-label" for="faq-status-input">Status</label>
+        <select id="faq-status-input" class="cms-select" style="width:auto">
+          <option value="active"   ${!faq || faq.status === 'active'   ? 'selected' : ''}>Active</option>
+          <option value="inactive" ${faq && faq.status === 'inactive'  ? 'selected' : ''}>Inactive (hidden)</option>
+        </select>
+      </div>
+
+      <div class="cms-flex-between cms-mt">
+        <button class="cms-btn cms-btn-outline" id="faq-modal-cancel">Cancel</button>
+        <button class="cms-btn cms-btn-secondary" id="faq-modal-save">
+          <span id="faq-save-spinner" class="cms-spinner cms-hidden" aria-hidden="true"></span>
+          ${isEdit ? '💾 Update FAQ' : '✔ Create FAQ'}
+        </button>
+      </div>
+    </div>`;
+
+    document.body.appendChild(backdrop);
+
+    // Focus first field
+    setTimeout(() => {
+        const q = document.getElementById('faq-question-input');
+        if (q) q.focus();
+    }, 50);
+
+    // Close handlers
+    const closeFn = () => backdrop.remove();
+    document.getElementById('faq-modal-close').addEventListener('click', closeFn);
+    document.getElementById('faq-modal-cancel').addEventListener('click', closeFn);
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeFn(); });
+
+    // Category select → show/hide new input
+    const catSel = document.getElementById('faq-cat-select');
+    const catInp = document.getElementById('faq-cat-input');
+    if (faq) {
+        // If editing, pre-select the existing category
+        const existsInList = Array.from(catSel.options).some(o => o.value === faq.category);
+        if (!existsInList) {
+            catSel.value = '__new__';
+            catInp.classList.remove('cms-hidden');
+        } else {
+            catSel.value = faq.category;
+        }
+    }
+    catSel.addEventListener('change', () => {
+        const isNew = catSel.value === '__new__';
+        catInp.classList.toggle('cms-hidden', !isNew);
+        if (isNew) catInp.focus();
+    });
+
+    // Mini formatting toolbar
+    backdrop.querySelectorAll('[data-fmt]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const ta = document.getElementById('faq-answer-input');
+            const start = ta.selectionStart;
+            const end   = ta.selectionEnd;
+            const sel   = ta.value.slice(start, end);
+            let insert  = '';
+            switch (btn.dataset.fmt) {
+                case 'bold':   insert = `<strong>${sel || 'bold text'}</strong>`; break;
+                case 'italic': insert = `<em>${sel || 'italic text'}</em>`; break;
+                case 'ul':     insert = `<ul>\n  <li>${sel || 'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`; break;
+                case 'link': {
+                    const href = prompt('Enter URL:', 'https://');
+                    if (!href) return;
+                    insert = `<a href="${escHtml(href)}">${sel || 'link text'}</a>`;
+                    break;
+                }
+            }
+            ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
+            ta.focus();
+        });
+    });
+
+    // Save
+    document.getElementById('faq-modal-save').addEventListener('click', () => saveFAQ(faq?.id || null));
+}
+
+async function saveFAQ(faqId) {
+    const catSel    = document.getElementById('faq-cat-select');
+    const catInp    = document.getElementById('faq-cat-input');
+    const question  = (document.getElementById('faq-question-input').value || '').trim();
+    const answer    = (document.getElementById('faq-answer-input').value  || '').trim();
+    const status    = document.getElementById('faq-status-input').value;
+    const category  = catSel.value === '__new__'
+        ? (catInp.value || '').trim()
+        : catSel.value;
+
+    if (!category) { showToast('Please enter a category name', 'error'); catInp.focus(); return; }
+    if (!question) { showToast('Question is required', 'error'); document.getElementById('faq-question-input').focus(); return; }
+    if (!answer)   { showToast('Answer is required', 'error');   document.getElementById('faq-answer-input').focus(); return; }
+
+    const spinner = document.getElementById('faq-save-spinner');
+    const saveBtn = document.getElementById('faq-modal-save');
+    if (spinner) spinner.classList.remove('cms-hidden');
+    if (saveBtn) saveBtn.disabled = true;
+
+    try {
+        if (faqId) {
+            await apiFetch('PUT', `/cms/faqs/${faqId}`, { category, question, answer, status });
+            showToast('FAQ updated', 'success');
+        } else {
+            await apiFetch('POST', '/cms/faqs', { category, question, answer, status });
+            showToast('FAQ created', 'success');
+        }
+        document.querySelectorAll('.cms-modal-backdrop').forEach(el => el.remove());
+        await loadFAQs();
+    } catch (err) {
+        showToast('Save failed: ' + err.message, 'error');
+        if (spinner) spinner.classList.add('cms-hidden');
+        if (saveBtn) saveBtn.disabled = false;
+    }
+}
+
+async function deleteFAQ(faqId) {
+    const faq = faqData.find(f => f.id === faqId);
+    if (!faq) return;
+
+    // Confirm dialog
+    document.querySelectorAll('.cms-modal-backdrop').forEach(el => el.remove());
+    const backdrop = document.createElement('div');
+    backdrop.className = 'cms-modal-backdrop';
+    backdrop.innerHTML = `
+    <div class="cms-modal" role="dialog" aria-modal="true" style="max-width:440px;text-align:center">
+      <div class="cms-modal-header" style="justify-content:center">
+        <h2 class="cms-modal-title">Delete FAQ?</h2>
+      </div>
+      <p class="cms-text-muted" style="margin:.5rem 0 1.25rem">
+        "<strong>${escHtml(truncateFAQ(faq.question, 80))}</strong>"
+        <br>This cannot be undone.
+      </p>
+      <div class="cms-flex" style="gap:.75rem;justify-content:center">
+        <button class="cms-btn cms-btn-outline" id="del-cancel">Cancel</button>
+        <button class="cms-btn cms-btn-danger" id="del-confirm">🗑 Delete</button>
+      </div>
+    </div>`;
+    document.body.appendChild(backdrop);
+
+    document.getElementById('del-cancel').addEventListener('click', () => backdrop.remove());
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
+
+    document.getElementById('del-confirm').addEventListener('click', async () => {
+        try {
+            await apiFetch('DELETE', `/cms/faqs/${faqId}`);
+            backdrop.remove();
+            showToast('FAQ deleted', 'success');
+            await loadFAQs();
+        } catch (err) {
+            showToast('Delete failed: ' + err.message, 'error');
+        }
+    });
+}
+
+// ── API ─────────────────────────────────────────────────────────────────────
 async function apiFetch(method, path, body) {
     const opts = {
         method,
         headers: {
-            'x-admin-email': currentAdmin?.email || '',
+            'Authorization': `Bearer ${currentAdmin?.token || ''}`,
             ...(body ? { 'Content-Type': 'application/json' } : {})
         },
         ...(body ? { body: JSON.stringify(body) } : {})
