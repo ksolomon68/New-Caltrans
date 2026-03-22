@@ -18,9 +18,9 @@ let pool;
 function getDb() {
     if (!pool) {
         try {
-            const dbHost = process.env.DB_HOST || '127.0.0.1';
+            const dbHost = process.env.DB_HOST || 'localhost';
             pool = mysql.createPool({
-                host: dbHost === 'localhost' ? '127.0.0.1' : dbHost,
+                host: dbHost,
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
