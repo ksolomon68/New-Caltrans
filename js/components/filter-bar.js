@@ -142,6 +142,8 @@ function createOpportunityCard(opp) {
     const categoryNameVal = opp.categoryName || opp.category_name;
     const estimatedValueVal = opp.estimatedValue || opp.estimated_value;
     const scopeSummaryVal = opp.scopeSummary || opp.scope_summary;
+    const posterIdVal = opp.posted_by || opp.postedBy;
+    const posterNameVal = opp.poster_name || opp.organization_name || null;
 
     const dueDate = new Date(dueDateVal);
     const today = new Date();
@@ -178,6 +180,9 @@ function createOpportunityCard(opp) {
       <span class="opportunity-meta-item">
         <strong>Due Date:</strong> ${dueDateFormatted} ${dueTimeVal ? 'at ' + dueTimeVal : ''}
       </span>
+      ${posterIdVal ? `<span class="opportunity-meta-item">
+        <strong>Posted by:</strong> <a href="prime-contractor-profile.html?id=${posterIdVal}" style="color:var(--color-primary);">${posterNameVal || 'Prime Contractor'}</a>
+      </span>` : ''}
     </div>
     
     <div class="opportunity-description">

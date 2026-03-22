@@ -154,11 +154,16 @@
                 // Filter opportunities posted by this prime contractor
                 const primeContractorOpps = allOpps.filter(o => o.posted_by == id || o.postedBy == id);
 
-                document.getElementById('primeContractorName').textContent = primeContractor.organization_name || primeContractor.contact_name || 'Prime Contractor Office';
-                document.getElementById('primeContractorTagline').textContent = primeContractor.district_name || `District ${primeContractor.district}`;
-                document.getElementById('primeContractorDescription').textContent = primeContractor.description || 'This prime contractor manages various transportation projects and contracting opportunities for the California Department of Transportation.';
+                const orgName = primeContractor.organization_name || primeContractor.business_name || primeContractor.contact_name || 'Prime Contractor Office';
+                const districtLabel = Array.isArray(primeContractor.districts) && primeContractor.districts.length > 0
+                    ? 'District ' + primeContractor.districts.join(', ')
+                    : primeContractor.district ? `District ${primeContractor.district}` : 'Statewide';
 
-                document.getElementById('primeContractorDistrict').textContent = primeContractor.district_name || `District ${primeContractor.district}`;
+                document.getElementById('primeContractorName').textContent = orgName;
+                document.getElementById('primeContractorTagline').textContent = districtLabel;
+                document.getElementById('primeContractorDescription').textContent = primeContractor.business_description || primeContractor.description || 'This prime contractor manages various transportation projects and contracting opportunities for the California Department of Transportation.';
+
+                document.getElementById('primeContractorDistrict').textContent = districtLabel;
                 document.getElementById('primeContractorContact').textContent = primeContractor.contact_name || 'Procurement Officer';
                 document.getElementById('primeContractorPostCount').textContent = primeContractorOpps.length;
 
