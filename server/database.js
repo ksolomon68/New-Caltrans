@@ -2,12 +2,13 @@ const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Conditionally load the correct environment file based on where we are running
+// First try to load the default .env file
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+// If on a live server, conditionally load .env.production overrides (if it exists)
 const isLive = !!(process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO || process.env.NODE_ENV === 'production');
 if (isLive) {
-    dotenv.config({ path: path.resolve(__dirname, '../.env.production'), override: true });
-} else {
-    dotenv.config({ path: path.resolve(__dirname, '../.env'), override: true });
+    dotenv.config({ path: path.join(__dirname, '../.env.production'), override: true });
 }
 
 console.log('CaltransBizConnect DB: Initializing MySQL Connection Pool...');

@@ -1,12 +1,13 @@
 const path = require('path');
 const dotenv = require('dotenv');
 
-// Conditionally load the correct environment file based on where we are running
+// First try to load the default .env file
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+// If on a live server, conditionally load .env.production overrides (if it exists)
 const isLive = !!(process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO || process.env.NODE_ENV === 'production');
 if (isLive) {
     dotenv.config({ path: path.join(__dirname, '../.env.production'), override: true });
-} else {
-    dotenv.config({ path: path.join(__dirname, '../.env'), override: true });
 }
 const express = require('express');
 const cors = require('cors');
