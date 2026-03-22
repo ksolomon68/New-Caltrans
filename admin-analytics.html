@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Analytics - CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/dashboard-new.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+    <style>
+        body.dashboard-v2 {
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--brand-blue) 0%, var(--color-primary-light) 100%);
+            color: white;
+            padding: var(--space-2xl) var(--space-xl);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(255,255,255,0.1)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect width="100" height="100" fill="url(%23grad)"/></svg>');
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+
+        .enhanced-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--color-border-light);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 2px solid var(--color-bg-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title { font-size: 1.5rem; font-weight: 700; color: var(--color-primary); margin: 0; }
+        .card-subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .metric-box {
+            background: var(--color-bg-secondary);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .metric-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 12px rgba(0,90,140,0.15);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .breakdown-list { list-style: none; margin: 0; padding: 0; }
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        .breakdown-item:last-child { border-bottom: none; }
+        .breakdown-label { color: var(--text-primary); font-weight: 500; display: flex; align-items: center; gap: 0.5rem; }
+        .breakdown-value { font-weight: 700; color: var(--color-primary); font-size: 1.1rem; }
+
+        .bar-track {
+            height: 8px;
+            background: var(--color-bg-tertiary);
+            border-radius: 4px;
+            margin-top: 0.4rem;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+            transition: width 0.8s ease;
+            width: 0%;
+        }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+        .loading-state { text-align: center; padding: 2rem; color: var(--text-muted); }
+    </style>
+    <link rel="stylesheet" href="css/accessibility-widget.css">
+</head>
+
+<body class="dashboard-v2">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="dashboard-container">
+        <header class="header-top" id="header-top"></header>
+
+        <main id="main-content" class="main-content">
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h1 class="page-title">📊 Platform Analytics</h1>
+                    <p>System-wide metrics and performance data across all users and opportunities.</p>
+                </div>
+            </section>
+
+            <!-- Top-line metrics -->
+            <div class="enhanced-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">🌐 Platform Overview</h3>
+                        <div class="card-subtitle">Live counts from the database</div>
+                    </div>
+                    <button class="btn btn-outline btn-small" onclick="loadAnalytics()">🔄 Refresh</button>
+                </div>
+                <div class="metrics-grid" id="topMetrics">
+                    <div class="loading-state">Loading…</div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <!-- Users breakdown -->
+                <div class="enhanced-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">👥 Users by Type</h3>
+                            <div class="card-subtitle">Registered account breakdown</div>
+                        </div>
+                    </div>
+                    <ul class="breakdown-list" id="userBreakdown">
+                        <li class="loading-state">Loading…</li>
+                    </ul>
+                </div>
+
+                <!-- Opportunities breakdown -->
+                <div class="enhanced-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">💼 Opportunities by Status</h3>
+                            <div class="card-subtitle">Current opportunity pipeline</div>
+                        </div>
+                    </div>
+                    <ul class="breakdown-list" id="oppBreakdown">
+                        <li class="loading-state">Loading…</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Recent registrations -->
+            <div class="enhanced-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">🕒 Recent Registrations</h3>
+                        <div class="card-subtitle">Last 10 users to join the platform</div>
+                    </div>
+                    <a href="admin-users.html" class="btn btn-outline btn-small">View All Users</a>
+                </div>
+                <div id="recentUsers">
+                    <div class="loading-state">Loading…</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils/data-resilience.js"></script>
+    <script src="js/components/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const user = Auth.getUser();
+            if (!user || user.type !== 'admin') {
+                window.location.href = 'index.html';
+                return;
+            }
+            setTimeout(() => {
+                Navigation.init('admin');
+                loadAnalytics();
+            }, 50);
+        });
+
+        async function loadAnalytics() {
+            const token = Auth.getToken();
+            const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+            try {
+                const [users, opps] = await Promise.all([
+                    DataService.fetch('/admin/users', { headers: authHeaders }).catch(() => []),
+                    DataService.fetch('/opportunities').catch(() => [])
+                ]);
+
+                renderTopMetrics(users, opps);
+                renderUserBreakdown(users);
+                renderOppBreakdown(opps);
+                renderRecentUsers(users);
+
+            } catch (err) {
+                console.error('Analytics load error:', err);
+            }
+        }
+
+        function renderTopMetrics(users, opps) {
+            const totalUsers = users.length;
+            const totalOpps = opps.length;
+            const activeOpps = opps.filter(o => o.status === 'open' || o.status === 'active').length;
+            const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            const newThisWeek = users.filter(u => new Date(u.created_at) >= oneWeekAgo).length;
+
+            document.getElementById('topMetrics').innerHTML = `
+                <div class="metric-box">
+                    <span class="metric-value" id="m-total-users">${totalUsers}</span>
+                    <span class="metric-label">Total Registered Users</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-value">${totalOpps}</span>
+                    <span class="metric-label">Total Opportunities</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-value">${activeOpps}</span>
+                    <span class="metric-label">Active Opportunities</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-value">${newThisWeek}</span>
+                    <span class="metric-label">New Users This Week</span>
+                </div>
+            `;
+        }
+
+        function renderUserBreakdown(users) {
+            const total = users.length || 1;
+            const counts = {
+                'Small Business': users.filter(u => u.type === 'small_business').length,
+                'Prime Contractor': users.filter(u => u.type === 'prime_contractor').length,
+                'Admin': users.filter(u => u.type === 'admin' || u.type === 'caltrans_admin').length
+            };
+            const icons = { 'Small Business': '🏢', 'Prime Contractor': '🏗️', 'Admin': '🛡️' };
+
+            const html = Object.entries(counts).map(([label, count]) => {
+                const pct = Math.round((count / total) * 100);
+                return `
+                    <li class="breakdown-item">
+                        <div style="flex:1;">
+                            <div class="breakdown-label">${icons[label]} ${label}</div>
+                            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                        </div>
+                        <span class="breakdown-value" style="margin-left:1rem;">${count}</span>
+                    </li>
+                `;
+            }).join('');
+            document.getElementById('userBreakdown').innerHTML = html;
+        }
+
+        function renderOppBreakdown(opps) {
+            const total = opps.length || 1;
+            const statuses = [...new Set(opps.map(o => o.status || 'unknown'))];
+            const icons = { open: '✅', active: '🟢', pending: '⏳', closed: '🔴', awarded: '🏆', unknown: '❓' };
+
+            const rows = statuses.map(s => {
+                const count = opps.filter(o => (o.status || 'unknown') === s).length;
+                const pct = Math.round((count / total) * 100);
+                const label = s.charAt(0).toUpperCase() + s.slice(1);
+                return `
+                    <li class="breakdown-item">
+                        <div style="flex:1;">
+                            <div class="breakdown-label">${icons[s] || '📋'} ${label}</div>
+                            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                        </div>
+                        <span class="breakdown-value" style="margin-left:1rem;">${count}</span>
+                    </li>
+                `;
+            });
+
+            document.getElementById('oppBreakdown').innerHTML = rows.length
+                ? rows.join('')
+                : '<li class="loading-state">No opportunities found.</li>';
+        }
+
+        function renderRecentUsers(users) {
+            const recent = [...users]
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 10);
+
+            if (!recent.length) {
+                document.getElementById('recentUsers').innerHTML = '<div class="loading-state">No users found.</div>';
+                return;
+            }
+
+            const typeLabel = { small_business: 'Small Business', prime_contractor: 'Prime Contractor', admin: 'Admin', caltrans_admin: 'Staff Admin' };
+            const typeBadge = { small_business: 'background:#e0f2fe;color:#0369a1;', prime_contractor: 'background:#fef3c7;color:#92400e;', admin: 'background:#f3e8ff;color:#7e22ce;', caltrans_admin: 'background:#dcfce7;color:#166534;' };
+
+            document.getElementById('recentUsers').innerHTML = `
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="text-align:left;">
+                            <th style="padding:0.75rem;border-bottom:2px solid var(--color-border-light);color:var(--text-muted);font-size:0.85rem;">User / Business</th>
+                            <th style="padding:0.75rem;border-bottom:2px solid var(--color-border-light);color:var(--text-muted);font-size:0.85rem;">Type</th>
+                            <th style="padding:0.75rem;border-bottom:2px solid var(--color-border-light);color:var(--text-muted);font-size:0.85rem;">Joined</th>
+                            <th style="padding:0.75rem;border-bottom:2px solid var(--color-border-light);color:var(--text-muted);font-size:0.85rem;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${recent.map(u => `
+                        <tr style="border-bottom:1px solid var(--color-border-light);">
+                            <td style="padding:0.75rem;">
+                                <div style="font-weight:600;color:var(--color-primary);">${u.business_name || u.organization_name || u.contact_name || '—'}</div>
+                                <div style="font-size:0.8rem;color:var(--text-muted);">${u.email}</div>
+                            </td>
+                            <td style="padding:0.75rem;">
+                                <span style="padding:0.2rem 0.6rem;border-radius:999px;font-size:0.8rem;font-weight:600;${typeBadge[u.type] || ''}">
+                                    ${typeLabel[u.type] || u.type}
+                                </span>
+                            </td>
+                            <td style="padding:0.75rem;color:var(--text-muted);font-size:0.9rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
+                            <td style="padding:0.75rem;"><a href="admin-users.html" class="btn btn-small btn-outline">Manage</a></td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+    </script>
+    <script src="js/accessibility-widget.js"></script>
+</body>
+
+</html>
