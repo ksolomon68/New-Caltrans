@@ -98,6 +98,10 @@ async function login(email, password) {
 
         const userData = data.user || data; // Handle both nested and flat for safety
         localStorage.setItem('caltrans_user', JSON.stringify(userData));
+        // Store JWT token for authenticated API calls
+        if (data.token) {
+            localStorage.setItem('caltrans_token', data.token);
+        }
         console.log('CaltransBizConnect: User logged in:', userData.email);
         return userData;
     } catch (error) {
@@ -131,6 +135,7 @@ window.handleLogout = async function() {
 
     // Clear all client-side storage
     localStorage.removeItem('caltrans_user');
+    localStorage.removeItem('caltrans_token');
     localStorage.removeItem('userId');
     localStorage.removeItem('userType');
     sessionStorage.clear();
@@ -424,6 +429,7 @@ document.addEventListener('DOMContentLoaded', function () {
 window.Auth = {
     isLoggedIn,
     getUser: getCurrentUser,
+    getToken: () => localStorage.getItem('caltrans_token'),
     login,
     logout: window.logout,
     registerSmallBusiness,
