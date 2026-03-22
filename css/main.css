@@ -475,9 +475,10 @@ body {
 /* Pathway Cards (Home Page) */
 .pathway-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 420px));
     gap: var(--space-xl);
     margin-top: var(--space-2xl);
+    justify-content: center;
 }
 
 .pathway-card {
