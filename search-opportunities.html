@@ -610,7 +610,7 @@
             } catch (error) {
                 console.error('Search init error:', error);
                 const listEl = document.getElementById('opportunityList');
-                if (listEl) listEl.innerHTML = '<div style="color:var(--color-error)">Error loading data. Please check your connection.</div>';
+                if (listEl) listEl.innerHTML = `<div style="color:var(--color-error)">Error loading data. Details: ${error.message}</div>`;
             }
         });
     </script>
