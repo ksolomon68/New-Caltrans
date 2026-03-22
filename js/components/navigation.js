@@ -36,8 +36,7 @@ const Navigation = {
                 { label: 'Dashboard', href: 'dashboard-admin.html', icon: '🏠' },
                 { label: 'User Management', href: 'admin-users.html', icon: '👥' },
                 { label: 'Opportunity Approval', href: 'manage-opportunities.html', icon: '✅' },
-                { label: 'Analytics', href: 'admin-analytics.html', icon: '📊' },
-                { label: 'Messages', href: 'messages.html', icon: '✉️' }
+                { label: 'Analytics', href: 'admin-analytics.html', icon: '📊' }
             ]
         },
         staff: {
