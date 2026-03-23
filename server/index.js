@@ -26,8 +26,29 @@ const startServer = async () => {
     try {
         // Security Headers
         app.use(helmet({
-            contentSecurityPolicy: false // disabled to allow inline scripts in HTML pages
+            contentSecurityPolicy: false, // disabled to allow inline scripts in HTML pages
+            hsts: isLive ? {
+                maxAge: 31536000,          // 1 year
+                includeSubDomains: true,
+                preload: true
+            } : false,
+            referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+            permissionsPolicy: false       // let helmet default handle this
         }));
+
+        // Service Worker must be served with no-cache and correct scope header
+        app.get('/sw.js', (req, res, next) => {
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+            res.setHeader('Service-Worker-Allowed', '/');
+            next();
+        });
+
+        // Manifest served with correct MIME type
+        app.get('/manifest.json', (req, res, next) => {
+            res.setHeader('Content-Type', 'application/manifest+json');
+            res.setHeader('Cache-Control', 'no-cache');
+            next();
+        });
 
         // CORS — restrict to production domain and localhost
         const allowedOrigins = [
