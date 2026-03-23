@@ -161,31 +161,36 @@
                             <div class="form-group">
                                 <label for="category" class="required">Category</label>
                                 <select id="category" name="category" class="form-control" required>
-                                    <option value="">Select a category</option>
-                                    <option value="construction">Construction</option>
-                                    <option value="engineering">Engineering</option>
-                                    <option value="consulting">Consulting</option>
-                                    <option value="supplies">Supplies & Materials</option>
-                                    <option value="services">Professional Services</option>
+                                    <option value="">Select Category</option>
+                                    <option value="Construction">Construction</option>
+                                    <option value="Professional Services">Professional Services</option>
+                                    <option value="Support Services">Support Services</option>
+                                    <option value="Consulting">Consulting</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="IT Services">IT Services</option>
+                                    <option value="Environmental">Environmental</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="district" class="required">District</label>
                                     <select id="district" name="district" class="form-control" required>
-                                        <option value="">Select district</option>
-                                        <option value="1">District 1 (Eureka)</option>
-                                        <option value="2">District 2 (Redding)</option>
-                                        <option value="3">District 3 (Marysville)</option>
-                                        <option value="4">District 4 (Bay Area)</option>
-                                        <option value="5">District 5 (San Luis Obispo)</option>
-                                        <option value="6">District 6 (Fresno)</option>
-                                        <option value="7">District 7 (Los Angeles)</option>
-                                        <option value="8">District 8 (San Bernardino)</option>
-                                        <option value="9">District 9 (Bishop)</option>
-                                        <option value="10">District 10 (Stockton)</option>
-                                        <option value="11">District 11 (San Diego)</option>
-                                        <option value="12">District 12 (Orange County)</option>
+                                        <option value="">Select District</option>
+                                        <option value="all">All Districts</option>
+                                        <option value="D01">D01 - Northern</option>
+                                        <option value="D02">D02 - Redding</option>
+                                        <option value="D03">D03 - Marysville</option>
+                                        <option value="D04">D04 - Oakland</option>
+                                        <option value="D05">D05 - San Luis Obispo</option>
+                                        <option value="D06">D06 - Fresno</option>
+                                        <option value="D07">D07 - Los Angeles</option>
+                                        <option value="D08">D08 - San Bernardino</option>
+                                        <option value="D09">D09 - Bishop</option>
+                                        <option value="D10">D10 - Stockton</option>
+                                        <option value="D11">D11 - San Diego</option>
+                                        <option value="D12">D12 - Orange County</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -305,7 +310,59 @@
             document.getElementById('opportunityForm').addEventListener('submit', handleSubmit);
         }
 
+        function showValidationError(fieldId, msg) {
+            const field = document.getElementById(fieldId);
+            if (!field) return;
+            field.focus();
+            field.style.borderColor = 'var(--color-error, #C62828)';
+            let err = field.parentElement.querySelector('.field-error');
+            if (!err) {
+                err = document.createElement('span');
+                err.className = 'field-error';
+                err.style.cssText = 'color:#C62828;font-size:0.82rem;display:block;margin-top:4px;';
+                field.after(err);
+            }
+            err.textContent = msg;
+            setTimeout(() => {
+                field.style.borderColor = '';
+                if (err.parentElement) err.remove();
+            }, 4000);
+        }
+
+        function validateStep(step) {
+            if (step === 1) {
+                const title = document.getElementById('title').value.trim();
+                if (!title) { showValidationError('title', 'Please enter an opportunity title.'); return false; }
+                const category = document.getElementById('category').value;
+                if (!category) { showValidationError('category', 'Please select a category.'); return false; }
+                const district = document.getElementById('district').value;
+                if (!district) { showValidationError('district', 'Please select a district.'); return false; }
+                const dueDate = document.getElementById('dueDate').value;
+                if (!dueDate) { showValidationError('dueDate', 'Please select an application deadline.'); return false; }
+                const due = new Date(dueDate + 'T00:00:00');
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                if (due <= today) { showValidationError('dueDate', 'Deadline must be a future date.'); return false; }
+            }
+            if (step === 2) {
+                const desc = document.getElementById('description').value.trim();
+                if (!desc) { showValidationError('description', 'Please enter a description.'); return false; }
+                if (desc.length < 50) { showValidationError('description', `Description must be at least 50 characters (currently ${desc.length}).`); return false; }
+                const budget = document.getElementById('budget').value.trim();
+                if (!budget) { showValidationError('budget', 'Please enter an estimated budget.'); return false; }
+                const duration = document.getElementById('duration').value.trim();
+                if (!duration) { showValidationError('duration', 'Please enter a project duration.'); return false; }
+            }
+            if (step === 3) {
+                const req = document.getElementById('requirements').value.trim();
+                if (!req) { showValidationError('requirements', 'Please list the requirements.'); return false; }
+            }
+            return true;
+        }
+
         function nextStep(step) {
+            // Validate current step before advancing
+            if (step > currentStep && !validateStep(currentStep)) return;
+
             // Hide current step
             document.getElementById(`formStep${currentStep}`).classList.remove('active');
             document.getElementById(`step${currentStep}`).classList.remove('active');
@@ -391,7 +448,7 @@
                     district: data.district,
                     districtName: districtName,
                     dueDate: data.dueDate,
-                    scopeSummary: data.description,
+                    description: data.description,
                     estimatedValue: data.budget,
                     duration: data.duration,
                     requirements: data.requirements,

@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="css/design-system.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/accessibility-widget.css">
+  <link rel="stylesheet" href="css/opportunities.css">
 </head>
 
 <body>
@@ -371,10 +372,10 @@
         }
 
         const user = getCurrentUser();
-        const isSmall Business = user && user.type === 'small_business';
+        const isSmallBusiness = user && user.type === 'small_business';
 
         let actionBtn = '';
-        if (isSmall Business) {
+        if (isSmallBusiness) {
           let savedOpps = [];
           if (user && user.saved_opportunities) {
             try { savedOpps = JSON.parse(user.saved_opportunities); } catch (e) { savedOpps = user.saved_opportunities; }

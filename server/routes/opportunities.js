@@ -7,8 +7,34 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         console.log('CaltransBizConnect API: Fetching all opportunities');
-        const [rows] = await db.execute('SELECT * FROM opportunities ORDER BY posted_date DESC');
+        let query = 'SELECT * FROM opportunities WHERE 1=1';
+        const params = [];
+        
+        const { district, category } = req.query;
+        // Filter by district (handle "all" districts)
+        if (district && district !== 'all') {
+            query += ' AND (district = ? OR district = "all")';
+            params.push(district);
+        }
+        
+        // Filter by category
+        if (category) {
+            query += ' AND category = ?';
+            params.push(category);
+        }
+        
+        query += ' ORDER BY posted_date DESC';
+        
+        const [rows] = await db.execute(query, params);
         console.log(`CaltransBizConnect API: Found ${rows.length} opportunities`);
+        
+        // Parse tags from JSON
+        rows.forEach(opp => {
+            try {
+                opp.tags = opp.tags ? JSON.parse(opp.tags) : [];
+            } catch(e) { opp.tags = []; }
+        });
+        
         res.json(rows);
     } catch (error) {
         console.error('CaltransBizConnect API Error fetching opportunities:', error);
@@ -65,44 +91,61 @@ router.get('/:id', async (req, res) => {
 
 // Post new opportunity
 router.post('/', requireRole('prime_contractor'), async (req, res) => {
-    const {
+    let {
         id, title, scopeSummary, district, districtName,
         category, categoryName, subcategory, estimatedValue,
         dueDate, dueTime, submissionMethod, postedBy, status, attachments,
-        duration, requirements, certifications, experience
+        duration, requirements, certifications, experience, description, tags
     } = req.body;
 
-    if (!id || !title || !scopeSummary || !postedBy) {
-        return res.status(400).json({ error: 'Missing required fields: id, title, scopeSummary, and postedBy are mandatory.' });
+    const oppId = id || `OPP-${Date.now()}`;
+    const desc = description || scopeSummary || '';
+    
+    // Determine status based on due date if not explicitly published
+    let calcStatus = status || 'published';
+    if (dueDate && calcStatus !== 'published') {
+        const due = new Date(dueDate);
+        const now = new Date();
+        calcStatus = due < now ? 'closed' : 'open';
+    }
+
+    if (!title || !district || !category || !estimatedValue || !dueDate || !desc) {
+         return res.status(400).json({ error: 'All required fields must be filled' });
     }
 
     try {
+        const uId = postedBy || req.user.id;
         // Validate postedBy user exists
-        const [userRows] = await db.execute('SELECT id FROM users WHERE id = ?', [postedBy]);
+        const [userRows] = await db.execute('SELECT id, business_name, organization_name FROM users WHERE id = ?', [uId]);
         if (userRows.length === 0) {
             return res.status(400).json({ error: 'Invalid postedBy User ID' });
         }
+        
+        const postedByName = userRows[0].business_name || userRows[0].organization_name || 'Prime Contractor';
+        
+        // Clean tags - only include non-empty tags
+        const cleanTags = tags ? tags.filter(tag => tag && tag.trim()) : [];
 
         const sql = `
             INSERT INTO opportunities (
                 id, title, scope_summary, district, district_name, 
                 category, category_name, subcategory, estimated_value, 
                 due_date, due_time, submission_method, status, posted_by, attachments,
-                duration, requirements, certifications, experience
+                duration, requirements, certifications, experience, description, tags, posted_by_name
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         await db.execute(sql, [
-            id, title, scopeSummary, district, districtName,
-            category, categoryName, subcategory || null, estimatedValue || null,
+            oppId, title, desc, district, districtName || district,
+            category, categoryName || category, subcategory || null, estimatedValue || null,
             dueDate || null, dueTime || null, submissionMethod || null,
-            status || 'published', postedBy || null, attachments ? JSON.stringify(attachments) : null,
-            duration || null, requirements || null, certifications || null, experience || null
+            calcStatus, uId, attachments ? JSON.stringify(attachments) : null,
+            duration || null, requirements || null, certifications || null, experience || null,
+            desc, JSON.stringify(cleanTags), postedByName
         ]);
 
-        const actualStatus = status || 'published';
-        res.status(201).json({ id, title, status: actualStatus });
+        res.status(201).json({ id: oppId, success: true, opportunityId: oppId, title, status: calcStatus });
     } catch (error) {
         console.error('Error creating opportunity:', error);
         res.status(500).json({ error: error.message });

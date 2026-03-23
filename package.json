@@ -31,5 +31,8 @@
     "mysql2": "^3.11.5",
     "nodemailer": "^8.0.3",
     "playwright": "^1.58.1"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
   }
 }

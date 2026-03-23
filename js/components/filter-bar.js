@@ -135,70 +135,79 @@ function createOpportunityCard(opp) {
     card.className = 'opportunity-card';
     card.setAttribute('aria-labelledby', `opp-title-${opp.id}`);
 
-    // Robust property access (handle both camelCase and snake_case)
-    const dueDateVal = opp.dueDate || opp.due_date;
-    const dueTimeVal = opp.dueTime || opp.due_time;
-    const districtNameVal = opp.districtName || opp.district_name || ('District ' + opp.district);
-    const categoryNameVal = opp.categoryName || opp.category_name;
-    const estimatedValueVal = opp.estimatedValue || opp.estimated_value;
-    const scopeSummaryVal = opp.scopeSummary || opp.scope_summary;
-    const posterIdVal = opp.posted_by || opp.postedBy;
-    const posterNameVal = opp.poster_name || opp.organization_name || null;
+    // Robust property access
+    const dueDateVal = opp.dueDate || opp.due_date || '';
+    const districtNameVal = opp.districtName || opp.district_name || opp.district || '';
+    const categoryNameVal = opp.categoryName || opp.category_name || opp.category || '';
+    const estimatedValueVal = opp.estimatedValue || opp.estimated_value || 'TBD';
+    const descriptionVal = opp.description || opp.scope_summary || opp.scopeSummary || 'No description provided.';
+    const posterIdVal = opp.posted_by || opp.postedBy || '';
+    const posterNameVal = opp.posted_by_name || opp.poster_name || opp.organization_name || 'Prime Contractor';
+    
+    // Status Logic
+    const getStatusBadgeHtml = (statusStr, dueDateStr) => {
+        let status = statusStr || 'open';
+        if (dueDateStr) {
+            const due = new Date(dueDateStr);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if (due < today) status = 'closed';
+            else if (statusStr === 'published' || !statusStr) status = 'open';
+        }
+        
+        status = status.toLowerCase();
+        let badgeClass = 'status-online';
+        let displayText = 'Online';
+        
+        if (status === 'open') { badgeClass = 'status-open'; displayText = 'Open'; }
+        else if (status === 'closed') { badgeClass = 'status-closed'; displayText = 'Closed'; }
+        
+        return `<span class="status-badge ${badgeClass}">${displayText}</span>`;
+    };
 
-    const dueDate = new Date(dueDateVal);
-    const today = new Date();
-    const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-
-    const dueDateFormatted = isNaN(dueDate.getTime()) ? 'Not specified' : dueDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    const dueDateFormatted = dueDateVal ? new Date(dueDateVal).toLocaleDateString() : 'Not specified';
+    
+    let tagsHtml = '';
+    const rawTags = opp.tags || [];
+    const validTags = rawTags.filter(t => t && t.trim() !== '');
+    if (validTags.length > 0) {
+        tagsHtml = '<div class="opportunity-tags">' + validTags.map(t => `<span class="tag">${t}</span>`).join('') + '</div>';
+    } else if (opp.subcategory || opp.submission_method) {
+        // Fallback for older data
+        const oldTags = [];
+        if (opp.subcategory) oldTags.push(opp.subcategory);
+        if (opp.submission_method) oldTags.push(opp.submission_method);
+        if (oldTags.length > 0) {
+            tagsHtml = '<div class="opportunity-tags">' + oldTags.map(t => `<span class="tag">${t}</span>`).join('') + '</div>';
+        }
+    }
 
     card.innerHTML = `
-    <div class="opportunity-header">
-      <div>
-        <h3 id="opp-title-${opp.id}" class="opportunity-title" data-id="${opp.id}">${opp.title}</h3>
-        <span class="badge badge-primary">${opp.id}</span>
+      <div class="opportunity-header">
+        <h3 id="opp-title-${opp.id}" class="opportunity-title">${opp.title || 'Untitled Opportunity'}</h3>
+        ${getStatusBadgeHtml(opp.status, dueDateVal)}
       </div>
-      <div>
-        ${!isNaN(daysUntilDue) && daysUntilDue <= 7 && daysUntilDue >= 0 ? '<span class="badge badge-warning">Due Soon</span>' : ''}
-        ${!isNaN(daysUntilDue) && daysUntilDue < 0 ? '<span class="badge badge-error">Closed</span>' : ''}
+      <div class="opportunity-id">${opp.id || 'OPP-UNKNOWN'}</div>
+      
+      <div class="opportunity-meta">
+        <div class="meta-item"><span class="meta-label">District:</span> ${districtNameVal}</div>
+        <div class="meta-item"><span class="meta-label">Category:</span> ${categoryNameVal}</div>
+        <div class="meta-item"><span class="meta-label">Estimated Value:</span> ${estimatedValueVal}</div>
+        <div class="meta-item"><span class="meta-label">Due Date:</span> ${dueDateFormatted}</div>
+        <div class="meta-item" style="grid-column: 1 / -1;"><span class="meta-label">Posted by:</span> <a href="prime-contractor-profile.html?id=${posterIdVal}" style="color:var(--color-primary);">${posterNameVal}</a></div>
       </div>
-    </div>
-    
-    <div class="opportunity-meta">
-      <span class="opportunity-meta-item">
-        <strong>District:</strong> ${districtNameVal}
-      </span>
-      <span class="opportunity-meta-item">
-        <strong>Category:</strong> ${categoryNameVal}
-      </span>
-      <span class="opportunity-meta-item">
-        <strong>Estimated Value:</strong> ${estimatedValueVal}
-      </span>
-      <span class="opportunity-meta-item">
-        <strong>Due Date:</strong> ${dueDateFormatted} ${dueTimeVal ? 'at ' + dueTimeVal : ''}
-      </span>
-      ${posterIdVal ? `<span class="opportunity-meta-item">
-        <strong>Posted by:</strong> <a href="prime-contractor-profile.html?id=${posterIdVal}" style="color:var(--color-primary);">${posterNameVal || 'Prime Contractor'}</a>
-      </span>` : ''}
-    </div>
-    
-    <div class="opportunity-description">
-      <p>${scopeSummaryVal}</p>
-    </div>
-    
-    <div class="opportunity-tags">
-      <span class="badge badge-secondary">${opp.subcategory || ''}</span>
-      <span class="badge badge-secondary">${opp.submissionMethod || opp.submission_method || ''}</span>
-    </div>
-    
-    <div class="opportunity-actions">
-      <button class="btn btn-outline btn-small" onclick="saveOpportunity('${opp.id}', this)">Save</button>
-      <a href="opportunity-details.html?id=${opp.id}" class="btn btn-primary btn-small">View Details</a>
-    </div>
-  `;
+      
+      <div class="opportunity-description">
+        ${descriptionVal}
+      </div>
+      
+      ${tagsHtml}
+      
+      <div class="opportunity-actions">
+        <button class="btn btn-outline btn-small" onclick="saveOpportunity('${opp.id}', this)">Save</button>
+        <a href="opportunity-details.html?id=${opp.id}" class="btn btn-primary btn-small">View Details</a>
+      </div>
+    `;
 
     return card;
 }

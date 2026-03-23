@@ -257,7 +257,10 @@ async function initDatabase() {
             `ALTER TABLE users ADD COLUMN IF NOT EXISTS saved_opportunities TEXT`,
             `ALTER TABLE messages ADD COLUMN IF NOT EXISTS sender_business_name VARCHAR(255)`,
             `ALTER TABLE messages ADD COLUMN IF NOT EXISTS receiver_business_name VARCHAR(255)`,
-            `ALTER TABLE messages ADD COLUMN IF NOT EXISTS message_type ENUM('invite', 'application', 'reply') DEFAULT 'reply'`
+            `ALTER TABLE messages ADD COLUMN IF NOT EXISTS message_type ENUM('invite', 'application', 'reply') DEFAULT 'reply'`,
+            `ALTER TABLE opportunities ADD COLUMN IF NOT EXISTS description TEXT`,
+            `ALTER TABLE opportunities ADD COLUMN IF NOT EXISTS tags TEXT`,
+            `ALTER TABLE opportunities ADD COLUMN IF NOT EXISTS posted_by_name VARCHAR(255)`
         ];
         for (const sql of migrations) {
             await db.execute(sql).catch(() => {}); // Ignore if column already exists
