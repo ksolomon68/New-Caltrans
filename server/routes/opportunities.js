@@ -170,14 +170,17 @@ router.post('/:id/approve', async (req, res) => {
 });
 
 // Update opportunity
-router.put('/:id', requireRole('prime_contractor'), async (req, res) => {
+router.put('/:id', requireRole(['prime_contractor', 'admin']), async (req, res) => {
     const { id } = req.params;
     const {
-        title, scopeSummary, district, districtName,
+        title, scopeSummary, description, tags, district, districtName,
         category, categoryName, subcategory, estimatedValue,
         dueDate, dueTime, submissionMethod, status, attachments,
         duration, requirements, certifications, experience
     } = req.body;
+
+    const desc = description || scopeSummary;
+    const cleanTags = tags ? tags.filter(tag => tag && tag.trim()) : [];
 
     try {
         const sql = `
@@ -185,16 +188,16 @@ router.put('/:id', requireRole('prime_contractor'), async (req, res) => {
                 title = ?, scope_summary = ?, district = ?, district_name = ?, 
                 category = ?, category_name = ?, subcategory = ?, estimated_value = ?, 
                 due_date = ?, due_time = ?, submission_method = ?, status = ?, attachments = ?,
-                duration = ?, requirements = ?, certifications = ?, experience = ?
+                duration = ?, requirements = ?, certifications = ?, experience = ?, description = ?, tags = ?
             WHERE id = ?
         `;
 
         const [result] = await db.execute(sql, [
-            title, scopeSummary, district, districtName,
+            title, desc, district, districtName,
             category, categoryName, subcategory || null, estimatedValue || null,
             dueDate || null, dueTime || null, submissionMethod || null,
             status || 'published', attachments ? JSON.stringify(attachments) : null,
-            duration || null, requirements || null, certifications || null, experience || null,
+            duration || null, requirements || null, certifications || null, experience || null, desc, JSON.stringify(cleanTags),
             id
         ]);
 
@@ -205,7 +208,7 @@ router.put('/:id', requireRole('prime_contractor'), async (req, res) => {
 });
 
 // Delete opportunity
-router.delete('/:id', requireRole('prime_contractor'), async (req, res) => {
+router.delete('/:id', requireRole(['prime_contractor', 'admin']), async (req, res) => {
     const { id } = req.params;
 
     try {

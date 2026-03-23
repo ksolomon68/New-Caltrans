@@ -19,8 +19,14 @@ function requireRole(allowedRole) {
             const decoded = jwt.verify(token, JWT_SECRET);
             req.user = decoded; // { id, email, type }
 
-            if (allowedRole !== 'any' && decoded.type !== allowedRole) {
-                return res.status(403).json({ error: `Forbidden: Requires ${allowedRole} role` });
+            if (allowedRole !== 'any') {
+                const roles = Array.isArray(allowedRole) ? allowedRole : [allowedRole];
+                // Treat caltrans_admin as admin in this context if admin is allowed
+                if (roles.includes('admin') && decoded.type === 'caltrans_admin') {
+                    // Allowed
+                } else if (!roles.includes(decoded.type)) {
+                    return res.status(403).json({ error: `Forbidden: Requires ${roles.join(' or ')} role` });
+                }
             }
 
             next();
