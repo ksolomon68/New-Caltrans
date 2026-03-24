@@ -32,21 +32,28 @@ router.post('/', requireRole('any'), async (req, res) => {
         // Fetch receiver's business name
         const [receiverRows] = await db.execute('SELECT business_name, organization_name FROM users WHERE id = ?', [receiverId]);
         if (receiverRows.length === 0) return res.status(404).json({ error: 'Receiver not found' });
-        
+
         const receiverBusinessName = receiverRows[0].business_name || receiverRows[0].organization_name || 'User ' + receiverId;
+
+        // Validate opportunityId — set to null if it doesn't exist in the opportunities table
+        let validOpportunityId = null;
+        if (opportunityId) {
+            const [oppRows] = await db.execute('SELECT id FROM opportunities WHERE id = ?', [opportunityId]);
+            if (oppRows.length > 0) validOpportunityId = opportunityId;
+        }
 
         const sql = `
             INSERT INTO messages (sender_id, receiver_id, sender_business_name, receiver_business_name, opportunity_id, message_type, subject, body)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const [result] = await db.execute(sql, [
-            senderId, 
-            receiverId, 
-            senderBusinessName, 
-            receiverBusinessName, 
-            opportunityId || null, 
+            senderId,
+            receiverId,
+            senderBusinessName,
+            receiverBusinessName,
+            validOpportunityId,
             messageType || 'reply',
-            subject || null, 
+            subject || null,
             body
         ]);
 
