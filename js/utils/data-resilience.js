@@ -6,6 +6,15 @@ const DataService = {
     fetch: async (endpoint, options = {}) => {
         const url = `${window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api'}${endpoint}`;
 
+        // Auto-attach JWT token if present
+        const token = localStorage.getItem('caltrans_token');
+        if (token) {
+            options.headers = options.headers || {};
+            if (!options.headers['Authorization']) {
+                options.headers['Authorization'] = `Bearer ${token}`;
+            }
+        }
+
         try {
             const response = await fetch(url, options);
             if (!response.ok) {

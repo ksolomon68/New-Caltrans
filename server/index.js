@@ -115,10 +115,43 @@ const startServer = async () => {
         console.log('CaltransBizConnect: Initializing database connection and schema...');
         await initDatabase();
 
-        // Serve Static Files
+        // Global development toggle to disable all caching
+        const DISABLE_ALL_CACHE = process.env.DISABLE_ALL_CACHE === 'true';
+
+        // 1. Disable caching for all HTML responses
+        app.use((req, res, next) => {
+            if (DISABLE_ALL_CACHE) {
+                res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+                res.setHeader('Pragma', 'no-cache');
+                res.setHeader('Expires', '0');
+                return next();
+            }
+
+            // Only aggressively prevent caching on HTML or extensionless paths (likely endpoints or SPA routes)
+            if (req.path.endsWith('.html') || req.path === '/' || !req.path.includes('.')) {
+                res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+                res.setHeader('Pragma', 'no-cache');
+                res.setHeader('Expires', '0');
+            }
+            next();
+        });
+
+        // 2. Fix static asset caching
         const publicPath = path.join(__dirname, '../');
         console.log('CaltransBizConnect: Serving static files from:', publicPath);
-        app.use(express.static(publicPath, { etag: false, lastModified: false, setHeaders(res) { res.setHeader('Cache-Control', 'no-cache'); } }));
+        app.use(express.static(publicPath, { 
+            etag: false, 
+            lastModified: false, 
+            setHeaders: (res, filePath) => {
+                if (DISABLE_ALL_CACHE) return;
+
+                // Only safely cache static assets if they are versioned (CSS/JS/Images)
+                if (filePath.endsWith('.css') || filePath.endsWith('.js') || filePath.match(/\.(png|jpg|jpeg|gif|ico|svg)$/)) {
+                    // Cache for 1 week (604800 seconds). Cache-busting handles updates.
+                    res.setHeader('Cache-Control', 'public, max-age=604800');
+                }
+            } 
+        }));
 
         // Routes
         app.use('/api/auth', authLimiter, require('./routes/auth'));

@@ -178,6 +178,7 @@ body.dashboard-v2 {
 .search-bar {
     position: relative;
     width: 400px;
+    max-width: 100%;
 }
 
 .search-bar input {
@@ -590,5 +591,30 @@ body.dashboard-v2 {
 
     .main-content {
         padding: var(--space-xl);
+    }
+}
+
+@media (max-width: 767px) {
+    .action-grid,
+    .summary-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .main-content {
+        padding: var(--space-md) !important;
+    }
+
+    .hero-section {
+        padding: var(--space-lg) var(--space-md) !important;
+    }
+
+    .recommendation-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .rec-value {
+        text-align: left;
     }
 }

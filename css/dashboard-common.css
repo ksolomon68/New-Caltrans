@@ -385,3 +385,75 @@ textarea {
         flex-direction: column;
     }
 }
+
+/* ── Mobile: prevent horizontal overflow ────────────────────────────── */
+@media (max-width: 767px) {
+    /* Clip overflow at the page container level */
+    .dashboard-container {
+        overflow-x: hidden;
+    }
+
+    /* Header: hide portal title to prevent left-side overflow */
+    .header-portal-title {
+        display: none !important;
+    }
+
+    /* Logo: cap width so it doesn't push header content off-screen */
+    .header-top .header-logo img,
+    .header-top img[alt*="logo"],
+    .header-top img[alt*="Caltrans"] {
+        max-width: 120px;
+        height: 28px !important;
+        width: auto;
+    }
+
+    /* Header padding reduction */
+    .header-top {
+        padding: 0 var(--space-md) !important;
+        gap: var(--space-sm) !important;
+    }
+
+    /* Collapse all grids to 1 column */
+    .action-grid,
+    .stats-grid,
+    .summary-grid,
+    [class*="grid"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Forms: stack two-column rows */
+    .form-row {
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+
+    /* Tables: allow horizontal scroll inside their container */
+    .content-card,
+    .enhanced-card,
+    [class*="table-wrap"] {
+        overflow-x: auto;
+    }
+
+    /* Constrain any fixed-width search inputs */
+    input[style*="width: 250px"],
+    input[style*="width:250px"] {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Ensure flex rows in header don't overflow */
+    .header-top > div {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    /* Prevent grid/flex children from blowing out their cells */
+    .action-card,
+    .stat-card,
+    .summary-card,
+    .enhanced-card,
+    .content-card {
+        min-width: 0;
+        word-break: break-word;
+    }
+}

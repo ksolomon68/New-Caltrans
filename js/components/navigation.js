@@ -298,14 +298,23 @@ const Navigation = {
     async fetchNotifications(userId) {
         try {
             const url = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+            const token = localStorage.getItem('caltrans_token');
             const res = await fetch(`${url}/notifications/user/${userId}`, {
-                headers: { 'x-user-id': userId }
+                headers: { 
+                    'x-user-id': userId,
+                    'Authorization': `Bearer ${token}`
+                }
             });
-            if (!res.ok) return;
+            
+            const list = document.getElementById('notification-list');
+            
+            if (!res.ok) {
+                if (list) list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 10px;">No new notifications</div>';
+                return;
+            }
             const notifications = await res.json();
             
             const badge = document.getElementById('notification-badge');
-            const list = document.getElementById('notification-list');
             if (badge) {
                 if (notifications.length > 0) {
                     badge.textContent = notifications.length;
@@ -337,9 +346,13 @@ const Navigation = {
     async markNotificationRead(id, messageId, userId) {
         try {
             const url = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+            const token = localStorage.getItem('caltrans_token');
             await fetch(`${url}/notifications/${id}/read`, {
                 method: 'POST',
-                headers: { 'x-user-id': userId }
+                headers: { 
+                    'x-user-id': userId,
+                    'Authorization': `Bearer ${token}`
+                }
             });
             // Redirect to messages
             window.location.href = `messages.html?id=${messageId || ''}`;

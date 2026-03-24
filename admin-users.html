@@ -13,9 +13,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="BizConnect">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-    <link rel="stylesheet" href="css/design-system.css">
-    <link rel="stylesheet" href="css/dashboard-new.css">
-    <link rel="stylesheet" href="css/dashboard-common.css">
+    <link rel="stylesheet" href="css/design-system.css?v=1774372526353">
+    <link rel="stylesheet" href="css/dashboard-new.css?v=1774372526353">
+    <link rel="stylesheet" href="css/dashboard-common.css?v=1774372526353">
     <style>
         /* Shared Dashboard Styles */
         body.dashboard-v2 {
@@ -133,7 +133,7 @@
             padding-bottom: 1rem;
         }
     </style>
-  <link rel="stylesheet" href="css/accessibility-widget.css">
+  <link rel="stylesheet" href="css/accessibility-widget.css?v=1774372526353">
 </head>
 
 <body class="dashboard-v2">
@@ -156,17 +156,16 @@
             <!-- User Table Section -->
             <section class="content-card">
                 <div
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+                    style="display: flex; flex-wrap: wrap; gap: var(--space-md); justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
                     <h3 style="font-size: 1.5rem; color: var(--color-primary); font-weight: 700;">All Users</h3>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
-                        <div style="position: relative;">
-                            <input type="text" placeholder="Search users..." onkeyup="filterUsers(this.value)"
-                                style="padding: var(--space-sm) var(--space-md); border-radius: var(--border-radius-md); border: 1px solid var(--color-border-light); width: 250px;">
-                        </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+                        <input type="text" placeholder="Search users..." onkeyup="filterUsers(this.value)"
+                            style="padding: var(--space-sm) var(--space-md); border-radius: var(--border-radius-md); border: 1px solid var(--color-border-light); width: 220px; max-width: 100%;">
                         <button class="btn btn-primary" onclick="openAddModal()">+ Add New User</button>
                     </div>
                 </div>
 
+                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
                 <table class="user-table">
                     <thead>
                         <tr>
@@ -186,6 +185,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </div><!-- /overflow-x: auto -->
             </section>
         </main>
     </div>
@@ -245,10 +245,10 @@
         </div>
     </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/utils/data-resilience.js"></script>
-    <script src="js/components/navigation.js"></script>
+    <script src="js/config.js?v=1774372526353"></script>
+    <script src="js/auth.js?v=1774372526353"></script>
+    <script src="js/utils/data-resilience.js?v=1774372526353"></script>
+    <script src="js/components/navigation.js?v=1774372526353"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Strict Admin Check
@@ -478,8 +478,8 @@
             }
         };
     </script>
-  <script src="js/accessibility-widget.js"></script>
-  <script src="js/pwa.js"></script>
+  <script src="js/accessibility-widget.js?v=1774372526353"></script>
+  <script src="js/pwa.js?v=1774372526353"></script>
 </body>
 
 </html>
