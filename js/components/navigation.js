@@ -340,6 +340,10 @@ const Navigation = {
             }
         } catch (e) {
             console.error('Failed to fetch notifications', e);
+            const list = document.getElementById('notification-list');
+            if (list && list.textContent === 'Loading...') {
+                list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 10px;">No new notifications</div>';
+            }
         }
     },
 
