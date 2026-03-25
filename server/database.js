@@ -218,6 +218,39 @@ async function initDatabase() {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         `);
 
+        // Seed default FAQs if the table is empty
+        const [[{ faqCount }]] = await db.execute('SELECT COUNT(*) AS faqCount FROM cms_faqs');
+        if (faqCount === 0) {
+            console.log('CaltransBizConnect DB: Seeding default FAQs...');
+            const defaultFaqs = [
+                ['General Questions', 0, 'Do I need to be Small Business certified to use the platform?', '<p>No, you don\'t need Small Business certification to create an account and browse opportunities. However, some opportunities may require Small Business certification. Check the requirements for each opportunity listing.</p><p><strong>How do I get Small Business certified?</strong> Visit our <a href="eligibility.html">Eligibility page</a> to learn about the Small Business certification process, requirements, and how to apply.</p>'],
+                ['General Questions', 1, 'What is a capability statement?', '<p>A capability statement is a one-page document that showcases your business qualifications, past performance, and capabilities. It\'s like a resume for your business.</p><p>You can download our template from the <a href="resources.html">Resources page</a>. Capability statements must be uploaded as PDF files with a maximum size of 10MB.</p>'],
+                ['General Questions', 2, 'How do I apply for an opportunity?', '<p>Each opportunity listing includes contact information for the posting agency. You\'ll need to contact them directly using the information provided and follow their specific application process.</p>'],
+                ['General Questions', 3, 'Can I select multiple work categories?', '<p>Yes, you can select all work categories that apply to your business capabilities. This helps agencies find you when searching for small businesses in those categories.</p>'],
+                ['For Small Businesses', 0, 'How often are new opportunities posted?', '<p>Opportunities are posted regularly as agencies have new projects. We recommend checking the platform frequently or enabling email notifications for new opportunities in your selected categories.</p>'],
+                ['For Small Businesses', 1, 'How long does it take for an opportunity to be posted?', '<p>Opportunities that meet our quality standards are typically posted within 1–2 business days after submission for review.</p>'],
+                ['For Small Businesses', 2, 'Can I edit an opportunity after it\'s posted?', '<p>Yes, you can edit your posted opportunities through your agency dashboard. Updates will be reflected immediately on the platform.</p>'],
+                ['For Small Businesses', 3, 'How do I search for qualified small businesses?', '<p>Use the small business search feature in your dashboard to filter by work category, district, and certification status. You can review small business profiles and capability statements to find qualified partners.</p>'],
+                ['For Agencies', 0, 'Who can post opportunities?', '<p>Caltrans districts, other government agencies, and agencies working on Caltrans projects can post opportunities on the platform.</p>'],
+                ['For Agencies', 1, 'What information is required to post an opportunity?', '<p>You\'ll need to provide project title, description, location (district), work category, timeline, budget range, requirements, and contact information. All fields are required to ensure small businesses receive complete information.</p>'],
+                ['For Agencies', 2, 'How long does it take for an opportunity to be posted?', '<p>Opportunities that meet our quality standards are typically posted within 1–2 business days after submission for review.</p>'],
+                ['For Agencies', 3, 'Can I edit an opportunity after it\'s posted?', '<p>Yes, you can edit your posted opportunities through your agency dashboard. Updates will be reflected immediately on the platform.</p>'],
+                ['For Agencies', 4, 'How do I search for qualified small businesses?', '<p>Use the small business search feature in your dashboard to filter by work category, district, and certification status. You can review small business profiles and capability statements to find qualified partners.</p>'],
+                ['For Agencies', 5, 'What are the quality standards for opportunity postings?', '<p>All postings must include complete project information, clear requirements, realistic timelines, and accurate contact details. This ensures small businesses can make informed decisions about applying.</p>'],
+                ['Technical Questions', 0, 'What browsers are supported?', '<p>CaltransBizConnect works best on the latest versions of Chrome, Firefox, Safari, and Edge. We recommend keeping your browser updated for the best experience.</p>'],
+                ['Technical Questions', 1, 'Is the platform mobile-friendly?', '<p>Yes, CaltransBizConnect is fully responsive and works on smartphones, tablets, and desktop computers.</p>'],
+                ['Technical Questions', 2, 'Is my information secure?', '<p>Yes, we use industry-standard security measures to protect your data. Your personal information is never shared without your consent.</p>'],
+                ['Technical Questions', 3, 'I forgot my password. How do I reset it?', '<p>Click the "Forgot Password" link on the login page and follow the instructions to reset your password via email.</p>'],
+            ];
+            for (const [category, sort_order, question, answer] of defaultFaqs) {
+                await db.execute(
+                    `INSERT INTO cms_faqs (category, sort_order, question, answer, status) VALUES (?, ?, ?, ?, 'active')`,
+                    [category, sort_order, question, answer]
+                );
+            }
+            console.log(`CaltransBizConnect DB: Seeded ${defaultFaqs.length} default FAQs.`);
+        }
+
         // Terminlogy Migrations for existing live databases
         console.log('CaltransBizConnect DB: Running terminology data migrations...');
         try {
