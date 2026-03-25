@@ -177,12 +177,16 @@ router.put('/global', requireAdmin, (req, res) => {
     if (!req.body || typeof req.body !== 'object') {
         return res.status(400).json({ error: 'JSON body required' });
     }
-    const current = readJson(GLOBAL_FILE) || {};
-    // Deep-merge one level: allow partial updates to sub-objects
-    const updated = mergeDeep(current, req.body);
-    updated.updatedAt = new Date().toISOString();
-    writeJson(GLOBAL_FILE, updated);
-    res.json({ success: true, data: updated });
+    try {
+        const current = readJson(GLOBAL_FILE) || {};
+        const updated = mergeDeep(current, req.body);
+        updated.updatedAt = new Date().toISOString();
+        writeJson(GLOBAL_FILE, updated);
+        res.json({ success: true, data: updated });
+    } catch (err) {
+        console.error('CMS: Failed to write global.json:', err.message);
+        res.status(500).json({ error: `Failed to save: ${err.message}` });
+    }
 });
 
 // ─── PAGE CONTENT ─────────────────────────────────────────────────────────────
@@ -229,13 +233,17 @@ router.put('/pages/:slug', requireAdmin, (req, res) => {
     if (!req.body || typeof req.body !== 'object') {
         return res.status(400).json({ error: 'JSON body required' });
     }
-
-    const filePath = path.join(PAGES_DIR, `${slug}.json`);
-    const current  = readJson(filePath) || {};
-    const updated  = mergeDeep(current, req.body);
-    updated.updatedAt = new Date().toISOString();
-    writeJson(filePath, updated);
-    res.json({ success: true, data: updated });
+    try {
+        const filePath = path.join(PAGES_DIR, `${slug}.json`);
+        const current  = readJson(filePath) || {};
+        const updated  = mergeDeep(current, req.body);
+        updated.updatedAt = new Date().toISOString();
+        writeJson(filePath, updated);
+        res.json({ success: true, data: updated });
+    } catch (err) {
+        console.error(`CMS: Failed to write page ${slug}:`, err.message);
+        res.status(500).json({ error: `Failed to save: ${err.message}` });
+    }
 });
 
 /** POST /api/cms/pages — create a new custom page (admin only) */
