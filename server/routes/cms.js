@@ -81,6 +81,18 @@ const upload = multer({
  *
  * Body: { email: string, password: string }
  */
+// Helper: get active CMS password (file override takes precedence over env var)
+const CMS_AUTH_FILE = path.join(ROOT_DIR, 'content', 'cms-auth.json');
+function getCmsPassword() {
+    try {
+        if (fs.existsSync(CMS_AUTH_FILE)) {
+            const data = JSON.parse(fs.readFileSync(CMS_AUTH_FILE, 'utf8'));
+            if (data && data.password) return data.password;
+        }
+    } catch (e) {}
+    return process.env.CMS_ADMIN_PASSWORD || null;
+}
+
 router.post('/login', (req, res) => {
     const { email, password } = req.body || {};
 
@@ -88,7 +100,7 @@ router.post('/login', (req, res) => {
         return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const requiredPassword = process.env.CMS_ADMIN_PASSWORD;
+    const requiredPassword = getCmsPassword();
 
     if (!requiredPassword) {
         return res.status(500).json({ error: 'CMS_ADMIN_PASSWORD is not configured on the server' });
@@ -105,6 +117,33 @@ router.post('/login', (req, res) => {
     );
 
     res.json({ success: true, token, email, message: 'CMS login successful' });
+});
+
+/** POST /api/cms/change-password — change the CMS admin password (admin only) */
+router.post('/change-password', requireAdmin, (req, res) => {
+    const { currentPassword, newPassword } = req.body || {};
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: 'currentPassword and newPassword are required' });
+    }
+    if (newPassword.length < 8) {
+        return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    }
+
+    const activePassword = getCmsPassword();
+    if (currentPassword !== activePassword) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    try {
+        const dir = path.dirname(CMS_AUTH_FILE);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(CMS_AUTH_FILE, JSON.stringify({ password: newPassword, updatedAt: new Date().toISOString() }, null, 2), 'utf8');
+        res.json({ success: true, message: 'Password updated successfully' });
+    } catch (err) {
+        console.error('CMS: Failed to save new password:', err.message);
+        res.status(500).json({ error: `Failed to save password: ${err.message}` });
+    }
 });
 
 // ─── Admin auth middleware ────────────────────────────────────────────────────

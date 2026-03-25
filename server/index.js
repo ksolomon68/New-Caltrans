@@ -87,14 +87,19 @@ const startServer = async () => {
             
             if (process.env.MAINTENANCE_MODE === 'true' && !hasBypassCookie && !isAllowedIP) {
                 // Always allow static assets needed for the maintenance page
-                if (req.path.startsWith('/css/maintenance.css') || 
-                    req.path.startsWith('/images/') || 
+                if (req.path.startsWith('/css/maintenance.css') ||
+                    req.path.startsWith('/images/') ||
                     req.path.startsWith('/assets/') ||
                     req.path.startsWith('/js/maintenance-animations.js')) {
                     return next();
                 }
-                
-                // Revert APIs to 503 JSON
+
+                // Always allow CMS admin routes (they require their own JWT auth)
+                if (req.path.startsWith('/api/cms/')) {
+                    return next();
+                }
+
+                // Return 503 JSON for all other API routes
                 if (req.path.startsWith('/api/')) {
                     return res.status(503).json({ error: 'Service Unavailable', message: 'Platform upgrade in progress.' });
                 }

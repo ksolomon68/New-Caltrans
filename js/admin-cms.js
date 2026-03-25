@@ -119,6 +119,10 @@ async function showShell() {
           <span class="cms-header-user" aria-label="Logged in as ${escHtml(currentAdmin.email)}">
             ${escHtml(currentAdmin.email)}
           </span>
+          <button class="cms-btn cms-btn-sm" id="change-password-btn"
+                  style="background:rgba(255,255,255,.15);color:#fff;border-color:transparent">
+            Change Password
+          </button>
           <button class="cms-btn cms-btn-sm" id="logout-btn"
                   style="background:rgba(255,255,255,.15);color:#fff;border-color:transparent">
             Log out
@@ -169,6 +173,7 @@ async function showShell() {
 
     // Wire up events
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    document.getElementById('change-password-btn').addEventListener('click', showChangePasswordModal);
 
     document.querySelectorAll('[data-tab]').forEach(link => {
         link.addEventListener('click', e => {
@@ -193,6 +198,71 @@ function handleLogout() {
     sessionStorage.removeItem('cms_admin');
     currentAdmin = null;
     showLoginScreen();
+}
+
+function showChangePasswordModal() {
+    const existing = document.getElementById('cms-change-pw-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'cms-change-pw-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+        <div style="background:#fff;border-radius:8px;padding:2rem;width:360px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+            <h2 style="margin:0 0 1.5rem;font-size:1.2rem;">Change CMS Password</h2>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:.25rem;">Current Password</label>
+                <input type="password" id="cp-current" class="cms-input" style="width:100%;box-sizing:border-box;" autocomplete="current-password">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:.25rem;">New Password</label>
+                <input type="password" id="cp-new" class="cms-input" style="width:100%;box-sizing:border-box;" autocomplete="new-password">
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:.25rem;">Confirm New Password</label>
+                <input type="password" id="cp-confirm" class="cms-input" style="width:100%;box-sizing:border-box;" autocomplete="new-password">
+            </div>
+            <div id="cp-error" style="display:none;color:#c62828;font-size:.85rem;margin-bottom:1rem;"></div>
+            <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+                <button id="cp-cancel" class="cms-btn" style="background:#f5f5f5;color:#333;border-color:#ddd;">Cancel</button>
+                <button id="cp-submit" class="cms-btn cms-btn-primary">Update Password</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('cp-cancel').onclick = () => modal.remove();
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+    document.getElementById('cp-submit').onclick = async () => {
+        const current = document.getElementById('cp-current').value;
+        const newPw = document.getElementById('cp-new').value;
+        const confirm = document.getElementById('cp-confirm').value;
+        const errorEl = document.getElementById('cp-error');
+        errorEl.style.display = 'none';
+
+        if (!current || !newPw || !confirm) {
+            errorEl.textContent = 'All fields are required.'; errorEl.style.display = 'block'; return;
+        }
+        if (newPw.length < 8) {
+            errorEl.textContent = 'New password must be at least 8 characters.'; errorEl.style.display = 'block'; return;
+        }
+        if (newPw !== confirm) {
+            errorEl.textContent = 'New passwords do not match.'; errorEl.style.display = 'block'; return;
+        }
+
+        const btn = document.getElementById('cp-submit');
+        btn.disabled = true; btn.textContent = 'Saving…';
+
+        try {
+            await apiFetch('POST', '/cms/change-password', { currentPassword: current, newPassword: newPw });
+            modal.remove();
+            showToast('Password updated successfully.', 'success');
+        } catch (err) {
+            errorEl.textContent = err.message; errorEl.style.display = 'block';
+            btn.disabled = false; btn.textContent = 'Update Password';
+        }
+    };
 }
 
 // ── Tab Navigation ─────────────────────────────────────────────────────────
@@ -1667,9 +1737,14 @@ async function apiFetch(method, path, body) {
         },
         ...(body ? { body: JSON.stringify(body) } : {})
     };
-    const res  = await fetch(`${API}${path}`, opts);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    const res = await fetch(`${API}${path}`, opts);
+    let data;
+    try {
+        data = await res.json();
+    } catch (e) {
+        throw new Error(`Server returned HTTP ${res.status} (non-JSON response)`);
+    }
+    if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`);
     return data;
 }
 
