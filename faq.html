@@ -412,11 +412,6 @@
                 groups[faq.category].push(faq);
             });
 
-            if (order.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:var(--color-text-secondary);padding:var(--space-2xl) 0;">No FAQs available at this time.</p>';
-                return;
-            }
-
             let html = '';
             order.forEach(category => {
                 const safeCat = category.replace(/[^a-z0-9]/gi, '-').toLowerCase();
@@ -459,7 +454,7 @@
                 const res = await fetch(`${apiBase}/cms/faqs/export`);
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const faqs = await res.json();
-                renderFaqs(faqs);
+                renderFaqs(faqs && faqs.length > 0 ? faqs : getFallbackFaqs());
             } catch (err) {
                 console.warn('Could not load FAQs from CMS, falling back to static content.', err);
                 renderFaqs(getFallbackFaqs());
