@@ -4,7 +4,7 @@
   "updatedAt": "2026-03-17T00:00:00.000Z",
   "meta": {
     "title": "CaltransBizConnect - Connecting Businesses with Opportunities",
-    "description": "CaltransBizConnect connects Small Businesses with contracting opportunities and Prime Contractors with qualified partners. Your central hub for Caltrans business development."
+    "description": "CaltransBizConnect connects Small Businesses with contracting opportunities and Agencies with qualified partners. Your central hub for Caltrans business development."
   },
   "header": {
     "backgroundImage": "",
@@ -31,16 +31,16 @@
           "image": "images/small-business-pathway.jpg",
           "imageAlt": "Construction professionals reviewing plans on site",
           "title": "For Small Businesses",
-          "description": "Find contracting opportunities, upload your capability statement, and connect with Prime Contractors seeking your expertise.",
+          "description": "Find contracting opportunities, upload your capability statement, and connect with Agencies seeking your expertise.",
           "srText": "Learn more about small business services"
         },
         "primeContractorCard": {
-          "href": "for-prime-contractors.html",
+          "href": "for-agencies.html",
           "image": "images/prime-contractor-pathway.jpg",
           "imageAlt": "Construction professional reviewing blueprints",
-          "title": "For Prime Contractors",
+          "title": "For Agencies",
           "description": "Post structured opportunities, find qualified Small Businesses, and manage your contracting needs efficiently.",
-          "srText": "Learn more about prime contractor services"
+          "srText": "Learn more about agency services"
         }
       }
     },
@@ -68,7 +68,7 @@
             "id": "partnership-connections",
             "href": "opportunities.html",
             "title": "Partnership Connections",
-            "description": "Connect with prime contractors and explore upcoming subcontracting opportunities across all Caltrans districts.",
+            "description": "Connect with agencies and explore upcoming subcontracting opportunities across all Caltrans districts.",
             "linkText": "Explore Roles"
           },
           {

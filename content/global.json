@@ -14,7 +14,7 @@
     "items": [
       { "label": "Home",        "href": "index.html",           "active": true  },
       { "label": "For Small Businesses", "href": "for-small businesses.html",     "active": true  },
-      { "label": "For Prime Contractors","href": "for-prime contractors.html",    "active": true  },
+      { "label": "For Agencies","href": "for-agencies.html",    "active": true  },
       { "label": "Opportunities","href": "opportunities.html",  "active": true  },
       { "label": "How It Works","href": "how-it-works.html",    "active": true  },
       { "label": "Resources",   "href": "resources.html",       "active": true  },
@@ -35,10 +35,10 @@
         ]
       },
       {
-        "heading": "For Prime Contractors",
+        "heading": "For Agencies",
         "links": [
-          { "label": "Getting Started",  "href": "for-prime contractors.html"    },
-          { "label": "Create Account",   "href": "register-prime-contractor.html" },
+          { "label": "Getting Started",  "href": "for-agencies.html"    },
+          { "label": "Create Account",   "href": "register-agency.html" },
           { "label": "Post Opportunity", "href": "opportunities.html"   }
         ]
       },

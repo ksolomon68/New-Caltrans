@@ -4,7 +4,7 @@
   "updatedAt": "2026-03-17T00:00:00.000Z",
   "meta": {
     "title": "Resources - CaltransBizConnect",
-    "description": "Access templates, guides, and resources for Small Businesses and prime contractors using CaltransBizConnect."
+    "description": "Access templates, guides, and resources for Small Businesses and agencies using CaltransBizConnect."
   },
   "header": {
     "backgroundImage": "",
@@ -29,7 +29,7 @@
           {
             "id": "capability-guide",
             "title": "Capability Statement Guide",
-            "body": "Step-by-step guide to building a compelling capability statement that gets noticed by prime contractors.",
+            "body": "Step-by-step guide to building a compelling capability statement that gets noticed by agencies.",
             "buttonLabel": "View Guide",
             "buttonHref": "for-small-businesses.html#get-started"
           },
@@ -54,14 +54,14 @@
       "id": "prime-contractor-resources",
       "type": "card-grid",
       "fields": {
-        "heading": "For Prime Contractors",
+        "heading": "For Agencies",
         "cards": [
           {
             "id": "posting-guidelines",
             "title": "Opportunity Posting Guidelines",
             "body": "Best practices for creating clear, complete opportunity postings that attract qualified small businesses.",
             "buttonLabel": "View Guidelines",
-            "buttonHref": "for-prime-contractors.html#posting-requirements"
+            "buttonHref": "for-agencies.html#posting-requirements"
           },
           {
             "id": "small-business-checklist",
