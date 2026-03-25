@@ -148,12 +148,19 @@ const startServer = async () => {
             etag: false, 
             lastModified: false, 
             setHeaders: (res, filePath) => {
-                if (DISABLE_ALL_CACHE) return;
+                if (DISABLE_ALL_CACHE) {
+                    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+                    res.setHeader('Pragma', 'no-cache');
+                    res.setHeader('Expires', '0');
+                    return;
+                }
 
                 // Only safely cache static assets if they are versioned (CSS/JS/Images)
                 if (filePath.endsWith('.css') || filePath.endsWith('.js') || filePath.match(/\.(png|jpg|jpeg|gif|ico|svg)$/)) {
-                    // Cache for 1 week (604800 seconds). Cache-busting handles updates.
-                    res.setHeader('Cache-Control', 'public, max-age=604800');
+                    // For now, let's keep it at "no-cache" which means "revalidate every time"
+                    // but allows the browser to re-use if ETag matches (though we disabled ETag above).
+                    // This is the safest way to ensure "clear cache" works instantly without breaking CDN/caching later.
+                    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
                 }
             } 
         }));
