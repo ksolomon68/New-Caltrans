@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Prime Contractor Dashboard - CaltransBizConnect</title>
+    <title>Agency Dashboard - CaltransBizConnect</title>
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#005A8C">
@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/dashboard-new.css?v=1774372526353">
     <link rel="stylesheet" href="css/dashboard-common.css?v=1774372526353">
     <style>
-        /* Enhanced prime contractor dashboard styling */
+        /* Enhanced agency dashboard styling */
         body.dashboard-v2 {
             background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
             min-height: 100vh;
@@ -239,7 +239,7 @@
             <!-- Hero Section -->
             <section class="hero-section">
                 <div class="hero-content">
-                    <h1 class="page-title">🏢 Prime Contractor Dashboard</h1>
+                    <h1 class="page-title">🏢 Agency Dashboard</h1>
                     <p>Manage opportunities, track small business engagement, and monitor performance.</p>
                 </div>
             </section>
@@ -301,7 +301,7 @@
                                 opportunities</div>
                         </a>
 
-                        <a href="prime-contractor-analytics.html" class="action-card">
+                        <a href="agency-analytics.html" class="action-card">
                             <div class="action-icon">📈</div>
                             <div class="action-title">View Analytics</div>
                             <div class="action-description">Monitor engagement metrics and performance analytics</div>
@@ -319,9 +319,9 @@
                             <div class="action-description">Search for a qualified small business and send a direct invitation to apply to one of your open opportunities</div>
                         </a>
 
-                        <a href="prime-contractor-settings.html" class="action-card">
+                        <a href="agency-settings.html" class="action-card">
                             <div class="action-icon">⚙️</div>
-                            <div class="action-title">Prime Contractor Settings</div>
+                            <div class="action-title">Agency Settings</div>
                             <div class="action-description">Update organization profile and preferences</div>
                         </a>
 
@@ -345,10 +345,10 @@
     <script src="js/utils/data-resilience.js?v=1774372526353"></script>
     <script src="js/components/navigation.js?v=1774372526353"></script>
     <script>
-        // Initialize Prime Contractor dashboard
+        // Initialize Agency dashboard
         document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(() => {
-                Navigation.init('prime_contractor');
+                Navigation.init('agency');
                 initDashboardData();
             }, 50);
         });
@@ -359,7 +359,7 @@
 
             try {
                 // Set organization name in welcome section
-                const orgName = user.organization_name || user.business_name || user.contact_name || 'Prime Contractor Partner';
+                const orgName = user.organization_name || user.business_name || user.contact_name || 'Agency Partner';
                 const welcomeEl = document.querySelector('.page-title');
                 if (welcomeEl) {
                     welcomeEl.textContent = `Welcome, ${orgName}`;
@@ -372,7 +372,7 @@
                     DataService.fetch(`/applications?primeContractorId=${user.id}`).catch(() => [])
                 ]);
 
-                // Filter opps to this prime contractor's own postings
+                // Filter opps to this agency's own postings
                 const myOpps = Array.isArray(opps)
                     ? opps.filter(o => String(o.posted_by) === String(user.id) || String(o.postedBy) === String(user.id))
                     : [];

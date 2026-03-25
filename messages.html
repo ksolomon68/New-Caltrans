@@ -154,7 +154,7 @@
                     <div class="empty-state">
                         <div style="font-size: 3rem;">📥</div>
                         <h3>Select a message to read</h3>
-                        <p>Communicate directly with prime contractors and small businesses</p>
+                        <p>Communicate directly with agencies and small businesses</p>
                     </div>
                 </div>
             </div>
@@ -271,7 +271,7 @@
             let usersOptions = '<option value="">Select a Business</option>';
             try {
                 // Determine opposite role for direct messaging
-                const targetRole = currentUser.type === 'prime_contractor' ? 'small_business' : 'prime_contractor';
+                const targetRole = currentUser.type === 'agency' ? 'small_business' : 'agency';
                 const res = await fetch(`${APP_CONFIG.API_URL}/users?type=${targetRole}`, { headers: getHeaders() });
                 const users = await res.json();
                 usersOptions += users.map(u => `<option value="${u.id}" ${u.id == recipientId ? 'selected' : ''}>${u.business_name || u.organization_name}</option>`).join('');

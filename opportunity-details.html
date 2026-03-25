@@ -167,8 +167,8 @@
                     <div class="action-bar" style="flex-wrap: wrap;">
                         <button id="saveBtn" class="btn btn-outline" onclick="toggleSave()" style="display:none;">Save Opportunity</button>
                         <button id="applyBtn" class="btn btn-primary" onclick="applyForOpportunity()" style="display:none;">Apply for This Opportunity</button>
-                        <button id="viewPrimeContractorBtn" class="btn btn-outline" onclick="viewPrimeContractorProfile()" style="display:none;">View Prime Contractor Profile</button>
-                        <button id="contactPrimeContractorBtn" class="btn btn-secondary" onclick="contactPrimeContractor()" style="display:none;">Contact Prime Contractor</button>
+                        <button id="viewPrimeContractorBtn" class="btn btn-outline" onclick="viewPrimeContractorProfile()" style="display:none;">View Agency Profile</button>
+                        <button id="contactPrimeContractorBtn" class="btn btn-secondary" onclick="contactPrimeContractor()" style="display:none;">Contact Agency</button>
                         <button id="inviteBtn" class="btn btn-secondary" style="display:none;" onclick="showInviteModal()">Invite Small Business to Apply</button>
                     </div>
 
@@ -283,8 +283,8 @@
 
                 renderDetails(currentOpportunity);
                 
-                // If Prime Contractor views their own opportunity, load recommendations
-                if (user && user.type === 'prime_contractor' && String(currentOpportunity.posted_by) === String(user.id)) {
+                // If Agency views their own opportunity, load recommendations
+                if (user && user.type === 'agency' && String(currentOpportunity.posted_by) === String(user.id)) {
                     loadRecommendedSBs(currentOpportunity.id);
                 }
             } catch (error) {
@@ -358,7 +358,7 @@
                     const applyBtn = document.getElementById('applyBtn');
                     if(applyBtn) applyBtn.style.display = 'inline-flex';
                 }
-            } else if (user && user.type === 'prime_contractor') {
+            } else if (user && user.type === 'agency') {
                 // Prime contractors can invite businesses
                 document.getElementById('inviteBtn').style.display = 'inline-flex';
             }
@@ -432,7 +432,7 @@
                 // Redirect to messages with recipient and context
                 window.location.href = `messages.html?recipient=${primeContractorId}&ref_type=opportunity&ref_id=${currentOpportunity.id}&ref_title=${encodeURIComponent(currentOpportunity.title)}`;
             } else {
-                alert('Prime Contractor contact information is not available for this opportunity.');
+                alert('Agency contact information is not available for this opportunity.');
             }
         }
 
@@ -445,9 +445,9 @@
             if (!currentOpportunity) return;
             const primeContractorId = currentOpportunity.posted_by || currentOpportunity.postedBy;
             if (primeContractorId) {
-                window.location.href = `prime-contractor-profile.html?id=${primeContractorId}`;
+                window.location.href = `agency-profile.html?id=${primeContractorId}`;
             } else {
-                alert('Prime Contractor information not available.');
+                alert('Agency information not available.');
             }
         }
 

@@ -223,7 +223,7 @@ async function initDatabase() {
         try {
             // Update user types
             await db.execute("UPDATE users SET type = 'small_business' WHERE type = 'vendor' OR type = 'small business'");
-            await db.execute("UPDATE users SET type = 'prime_contractor' WHERE type = 'agency' OR type = 'prime contractor'");
+            await db.execute("UPDATE users SET type = 'agency' WHERE type = 'prime_contractor' OR type = 'prime contractor'");
             
             // Rename legacy columns
             const [appCols] = await db.execute("SHOW COLUMNS FROM applications LIKE 'vendor_id'");

@@ -17,7 +17,7 @@ async function runFix() {
             const [info] = await db.execute(`
                 INSERT INTO users (email, password_hash, type, organization_name, status)
                 VALUES (?, ?, ?, ?, ?)
-            `, [testAgentEmail, hash, 'prime_contractor', 'Test Prime Contractor Dept', 'active']);
+            `, [testAgentEmail, hash, 'agency', 'Test Agency Dept', 'active']);
 
             agent = { id: info.insertId };
             console.log(`Created test agent with ID: ${agent.id}`);

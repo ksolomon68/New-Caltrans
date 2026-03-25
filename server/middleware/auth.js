@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'caltrans-fallback-secret-change-in
 
 /**
  * Middleware to require authentication via JWT bearer token.
- * allowedRole: 'small_business' | 'prime_contractor' | 'admin' | 'caltrans_admin' | 'any'
+ * allowedRole: 'small_business' | 'agency' | 'admin' | 'caltrans_admin' | 'any'
  */
 function requireRole(allowedRole) {
     return (req, res, next) => {

@@ -72,8 +72,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get opportunities by prime contractor ID
-router.get('/prime-contractor/:id', async (req, res) => {
+// Get opportunities by agency ID
+router.get('/agency/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const [rows] = await db.execute('SELECT * FROM opportunities WHERE posted_by = ? ORDER BY posted_date DESC', [id]);
@@ -83,7 +83,7 @@ router.get('/prime-contractor/:id', async (req, res) => {
     }
 });
 
-// Get prime contractor's opportunities with application status for a specific small business
+// Get agency's opportunities with application status for a specific small business
 router.get('/prime/:primeId/for-sb/:smallBusinessId', async (req, res) => {
     const { primeId, smallBusinessId } = req.params;
     try {
@@ -106,7 +106,7 @@ router.get('/prime/:primeId/for-sb/:smallBusinessId', async (req, res) => {
 // Get single opportunity by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    if (id === 'prime_contractor' || id === 'saved' || id === 'save' || id === 'unsave') return res.status(404).json({ error: 'Not found' });
+    if (id === 'agency' || id === 'saved' || id === 'save' || id === 'unsave') return res.status(404).json({ error: 'Not found' });
 
     try {
         const [rows] = await db.execute('SELECT * FROM opportunities WHERE id = ?', [id]);
@@ -125,7 +125,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Post new opportunity
-router.post('/', requireRole('prime_contractor'), async (req, res) => {
+router.post('/', requireRole('agency'), async (req, res) => {
     let {
         id, title, scopeSummary, district, districtName,
         category, categoryName, subcategory, estimatedValue,
@@ -156,7 +156,7 @@ router.post('/', requireRole('prime_contractor'), async (req, res) => {
             return res.status(400).json({ error: 'Invalid postedBy User ID' });
         }
         
-        const postedByName = userRows[0].business_name || userRows[0].organization_name || 'Prime Contractor';
+        const postedByName = userRows[0].business_name || userRows[0].organization_name || 'Agency';
         
         // Clean tags and NAICS
         const cleanTags = tags ? tags.filter(tag => tag && tag.trim()) : [];
@@ -256,7 +256,7 @@ async function notifyApplicantsOfStatusChange(opportunityId, opportunityTitle, n
 }
 
 // Update opportunity
-router.put('/:id', requireRole(['prime_contractor', 'admin']), async (req, res) => {
+router.put('/:id', requireRole(['agency', 'admin']), async (req, res) => {
     const { id } = req.params;
     const {
         title, scopeSummary, description, tags, district, districtName,
@@ -276,7 +276,7 @@ router.put('/:id', requireRole(['prime_contractor', 'admin']), async (req, res) 
         const oldStatus = existing[0].status;
         const oppTitle = title || existing[0].title;
         const senderId = existing[0].posted_by || req.user.id;
-        const senderName = existing[0].posted_by_name || req.user.organization_name || 'Prime Contractor';
+        const senderName = existing[0].posted_by_name || req.user.organization_name || 'Agency';
 
         const sql = `
             UPDATE opportunities SET
@@ -309,7 +309,7 @@ router.put('/:id', requireRole(['prime_contractor', 'admin']), async (req, res) 
 });
 
 // Delete opportunity
-router.delete('/:id', requireRole(['prime_contractor', 'admin']), async (req, res) => {
+router.delete('/:id', requireRole(['agency', 'admin']), async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -393,11 +393,11 @@ router.delete('/unsave/:smallBusinessId/:opportunityId', requireRole('small_busi
 });
 
 // Invite Small Business to Apply
-router.post('/:id/invite', requireRole('prime_contractor'), async (req, res) => {
+router.post('/:id/invite', requireRole('agency'), async (req, res) => {
     const { id: opportunityId } = req.params;
     const { smallBusinessId, note } = req.body;
     const senderId = req.user.id;
-    const senderBusinessName = req.user.business_name || req.user.organization_name || 'Prime Contractor';
+    const senderBusinessName = req.user.business_name || req.user.organization_name || 'Agency';
 
     if (!smallBusinessId) {
         return res.status(400).json({ error: 'Small Business ID is required' });
@@ -450,7 +450,7 @@ router.post('/:id/invite', requireRole('prime_contractor'), async (req, res) => 
 });
 
 // Get recommended Small Businesses for a specific opportunity
-router.get('/:id/recommended-sbs', requireRole(['prime_contractor', 'admin']), async (req, res) => {
+router.get('/:id/recommended-sbs', requireRole(['agency', 'admin']), async (req, res) => {
     const { id } = req.params;
     
     try {

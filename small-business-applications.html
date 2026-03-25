@@ -103,7 +103,7 @@
                     <div class="form-group" style="margin-bottom: var(--space-xl); background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md); border: 1px dashed var(--color-border-dark);">
                         <label style="display: flex; align-items: flex-start; gap: var(--space-md); cursor: pointer;">
                             <input type="checkbox" required aria-required="true" name="terms" id="termsCheckbox" style="margin-top: 4px; transform: scale(1.2);">
-                            <span style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">I certify that the information provided is accurate, and I agree to the terms of service. I understand that this proposal will be shared directly with the Prime Contractor.</span>
+                            <span style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">I certify that the information provided is accurate, and I agree to the terms of service. I understand that this proposal will be shared directly with the Agency.</span>
                         </label>
                     </div>
 
@@ -256,7 +256,7 @@
                 const st = STATUS_LABELS[app.status] || { label: app.status || 'Pending', cls: 'badge-secondary' };
                 const title = app.project_title || app.opportunity_title || 'Untitled Opportunity';
                 const district = app.district_name || (app.district_id ? `District ${app.district_id}` : '');
-                const prime = app.prime_contractor_name || '';
+                const prime = app.agency_name || '';
                 const date = app.applied_date || app.applied_at;
                 const isPending = (app.status || 'pending') === 'pending';
 

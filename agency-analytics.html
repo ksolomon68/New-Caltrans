@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Prime Contractor Analytics - CaltransBizConnect</title>
+    <title>Agency Analytics - CaltransBizConnect</title>
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#005A8C">
@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/dashboard-new.css?v=1774372526353">
     <link rel="stylesheet" href="css/dashboard-common.css?v=1774372526353">
     <style>
-        /* Enhanced prime contractor analytics styling */
+        /* Enhanced agency analytics styling */
         body.dashboard-v2 {
             background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
             min-height: 100vh;
@@ -287,7 +287,7 @@
             <!-- Hero Section -->
             <section class="hero-section">
                 <div class="hero-content">
-                    <h1 class="page-title">📈 Prime Contractor Analytics</h1>
+                    <h1 class="page-title">📈 Agency Analytics</h1>
                     <p>Monitor platform effectiveness, track opportunity engagement, and optimize outreach strategies across all Caltrans districts.</p>
                 </div>
             </section>
@@ -380,7 +380,7 @@
                 <div class="enhanced-card">
                     <div class="card-header">
                         <h3 class="card-title">⚙️ Quick Actions</h3>
-                        <div class="card-subtitle">Manage your prime contractor dashboard and access key administrative functions
+                        <div class="card-subtitle">Manage your agency dashboard and access key administrative functions
                         </div>
                     </div>
                     <div class="metric-grid">
@@ -408,7 +408,7 @@
                         <div class="metric-item">
                             <span class="metric-icon">⚙️</span>
                             <div class="metric-action">
-                                <a href="prime-contractor-settings.html" class="metric-value">Settings</a>
+                                <a href="agency-settings.html" class="metric-value">Settings</a>
                                 <div class="metric-label">Profile & Preferences</div>
                             </div>
                         </div>
@@ -424,11 +424,11 @@
     <script src="js/utils/data-resilience.js?v=1774372526353"></script>
     <script src="js/components/navigation.js?v=1774372526353"></script>
     <script>
-        // Initialize Prime Contractor Analytics dashboard with enhanced design
+        // Initialize Agency Analytics dashboard with enhanced design
         document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(() => {
                 const _navUser = JSON.parse(localStorage.getItem('caltrans_user'));
-                Navigation.init(_navUser ? _navUser.type : 'prime_contractor');
+                Navigation.init(_navUser ? _navUser.type : 'agency');
                 initAnalyticsData();
             }, 50);
         });

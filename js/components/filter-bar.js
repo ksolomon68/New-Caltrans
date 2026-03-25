@@ -149,7 +149,7 @@ function createOpportunityCard(opp) {
     const estimatedValueVal = opp.estimatedValue || opp.estimated_value || 'TBD';
     const descriptionVal = opp.description || opp.scope_summary || opp.scopeSummary || 'No description provided.';
     const posterIdVal = opp.posted_by || opp.postedBy || '';
-    const posterNameVal = opp.posted_by_name || opp.poster_name || opp.organization_name || 'Prime Contractor';
+    const posterNameVal = opp.posted_by_name || opp.poster_name || opp.organization_name || 'Agency';
     
     // Status Logic
     const getStatusBadgeHtml = (statusStr, dueDateStr) => {
@@ -206,7 +206,7 @@ function createOpportunityCard(opp) {
         <div class="meta-item"><span class="meta-label">Category:</span> ${categoryNameVal}</div>
         <div class="meta-item"><span class="meta-label">Estimated Value:</span> ${estimatedValueVal}</div>
         <div class="meta-item"><span class="meta-label">Due Date:</span> ${dueDateFormatted}</div>
-        <div class="meta-item" style="grid-column: 1 / -1;"><span class="meta-label">Posted by:</span> <a href="prime-contractor-profile.html?id=${posterIdVal}" style="color:var(--color-primary);">${posterNameVal}</a></div>
+        <div class="meta-item" style="grid-column: 1 / -1;"><span class="meta-label">Posted by:</span> <a href="agency-profile.html?id=${posterIdVal}" style="color:var(--color-primary);">${posterNameVal}</a></div>
       </div>
       
       <div class="opportunity-description">

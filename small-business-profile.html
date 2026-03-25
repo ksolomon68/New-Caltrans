@@ -244,7 +244,7 @@
                     <p id="heroSubtitle">Manage your business identities and certifications.</p>
                 </div>
                 <div id="viewModeBadge" class="view-mode-badge"
-                    style="display: none; position: absolute; top: var(--space-md); right: var(--space-md);">Prime Contractor View
+                    style="display: none; position: absolute; top: var(--space-md); right: var(--space-md);">Agency View
                     Mode</div>
             </section>
 
@@ -366,7 +366,7 @@
                                 </div>
                             </div>
 
-                            <!-- Prime Contractor Contact Actions -->
+                            <!-- Agency Contact Actions -->
                             <div id="primeContractorActions" class="contact-card-actions" style="display: none;">
                                 <button type="button" class="btn btn-primary" id="btnMessage">Send Message</button>
                                 <button type="button" class="btn btn-outline" id="btnEmail">Direct Email</button>
@@ -421,7 +421,7 @@
                             <!-- Edit Mode Upload -->
                             <div class="edit-only">
                                 <p class="text-muted mb-md">Upload a professional PDF of your Capability Statement. This
-                                    will be visible to Prime Contractors.</p>
+                                    will be visible to Agencies.</p>
                                 <div
                                     style="border: 2px dashed var(--color-bg-tertiary); padding: var(--space-xl); border-radius: var(--border-radius-lg); text-align: center;">
                                     <input type="file" id="csFileInput" accept=".pdf" style="display: none;">
@@ -553,14 +553,14 @@
             const targetId = params.get('id');
 
             // Mode Logic
-            // 1. Prime Contractor viewing a small business (targetId is present and currentUser is prime contractor)
+            // 1. Agency viewing a small business (targetId is present and currentUser is agency)
             // 2. Small Business viewing another small business (targetId present and != currentUser.id)
             if (targetId && targetId != user.id) {
                 isViewMode = true;
-            } else if (user.type === 'prime_contractor' && !targetId) {
-                // Prime Contractor should not be on this page without an ID
+            } else if (user.type === 'agency' && !targetId) {
+                // Agency should not be on this page without an ID
                 alert('Redirecting to dashboard...');
-                window.location.href = 'dashboard-prime-contractor.html';
+                window.location.href = 'dashboard-agency.html';
                 return;
             }
 
@@ -724,7 +724,7 @@
             };
 
             const currentUser = Auth.getUser();
-            if (currentUser && currentUser.type === 'prime_contractor') {
+            if (currentUser && currentUser.type === 'agency') {
                 document.getElementById('primeContractorActions').style.display = 'flex';
                 document.getElementById('btnInviteSB').style.display = 'inline-flex';
                 window.targetSmallBusinessId = data.id; // Store for the modal to use

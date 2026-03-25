@@ -54,7 +54,7 @@ const DataService = {
             '/admin/users': [
                 { id: 1, name: 'BuildIT Small Business', email: 'contact@buildit.com', role: 'small_business', status: 'active' },
                 { id: 2, name: 'Sacramento Paving', email: 'office@sacpaving.com', role: 'small_business', status: 'active' },
-                { id: 3, name: 'District 4 Office', email: 'd4@dot.ca.gov', role: 'prime_contractor', status: 'active' }
+                { id: 3, name: 'District 4 Office', email: 'd4@dot.ca.gov', role: 'agency', status: 'active' }
             ],
             '/small-businesses': [
                 { id: 1, business_name: 'Vertex Construction', districts: ['04'], services: ['Highway Construction', 'Bridge Engineering'] },

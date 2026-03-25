@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/dashboard-new.css?v=1774372526353">
     <link rel="stylesheet" href="css/dashboard-common.css?v=1774372526353">
     <style>
-        /* Enhanced Dashboard Styling matching Prime Contractor */
+        /* Enhanced Dashboard Styling matching Agency */
         body.dashboard-v2 {
             background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
             min-height: 100vh;
@@ -325,7 +325,7 @@
                         <a href="admin-users.html" class="action-card">
                             <div class="action-icon">👥</div>
                             <div class="action-title">User Management</div>
-                            <div class="action-description">View, verify, and manage small business and prime contractor accounts</div>
+                            <div class="action-description">View, verify, and manage small business and agency accounts</div>
                         </a>
 
                         <a href="manage-opportunities.html" class="action-card">
@@ -334,7 +334,7 @@
                             <div class="action-description">Review and approve posted contracting opportunities</div>
                         </a>
 
-                        <a href="prime-contractor-settings.html" class="action-card">
+                        <a href="agency-settings.html" class="action-card">
                             <div class="action-icon">⚙️</div>
                             <div class="action-title">System Settings</div>
                             <div class="action-description">Configure platform-wide preferences and defaults</div>
@@ -444,7 +444,7 @@
                 // Recent registrations (last 5 users)
                 if (Array.isArray(users)) {
                     users.slice(0, 5).forEach(u => {
-                        const label = u.type === 'small_business' ? 'Small Business' : 'Prime Contractor';
+                        const label = u.type === 'small_business' ? 'Small Business' : 'Agency';
                         const name = u.business_name || u.organization_name || u.contact_name || u.email || 'User';
                         events.push({ icon: '👤', name, detail: `New ${label} registered`, date: u.created_at });
                     });

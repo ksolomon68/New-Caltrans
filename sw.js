@@ -22,7 +22,7 @@ const PRECACHE_ASSETS = [
   '/faq.html',
   '/contact.html',
   '/for-small-businesses.html',
-  '/for-prime-contractors.html',
+  '/for-agencies.html',
   '/offline.html',
   '/manifest.json',
   '/css/design-system.css',

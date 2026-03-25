@@ -69,7 +69,7 @@
             }
 
             // prevent authorized users from seeing the wrong nav momentarily 
-            // by not hardcoding 'prime_contractor' here.
+            // by not hardcoding 'agency' here.
             setTimeout(() => {
                 Navigation.init(user.type); // Init based on actual role
                 loadOpportunities();
@@ -93,8 +93,8 @@
                     // Admin sees all opportunities (or a specific admin endpoint)
                     endpoint = '/opportunities'; // Assuming this returns all
                 } else {
-                    // Prime Contractors see only their own
-                    endpoint = `/opportunities/prime-contractor/${user.id}`;
+                    // Agencies see only their own
+                    endpoint = `/opportunities/agency/${user.id}`;
                 }
 
                 // Use DataService for resilient fetching
@@ -104,11 +104,11 @@
                 if (!opportunities) {
                     if (user.type === 'admin') {
                         opportunities = [
-                            { id: '101', title: 'Road Repair 2026', status: 'pending', district: '4', category: 'Construction', created_at: '2025-02-01', prime_contractor_name: 'City of Sacramento' },
-                            { id: '102', title: 'Bridge Maintenance', status: 'published', district: '3', category: 'Maintenance', created_at: '2025-01-20', prime_contractor_name: 'Caltrans District 3' }
+                            { id: '101', title: 'Road Repair 2026', status: 'pending', district: '4', category: 'Construction', created_at: '2025-02-01', agency_name: 'City of Sacramento' },
+                            { id: '102', title: 'Bridge Maintenance', status: 'published', district: '3', category: 'Maintenance', created_at: '2025-01-20', agency_name: 'Caltrans District 3' }
                         ];
                     } else {
-                        // Prime Contractor Fallback
+                        // Agency Fallback
                         opportunities = [];
                     }
                 }
@@ -137,7 +137,7 @@
 
             let html = '';
             opportunities.forEach(opp => {
-                // Admin Actions vs Prime Contractor Actions
+                // Admin Actions vs Agency Actions
                 let actionButtons = '';
 
                 if (isAdmin) {
@@ -170,7 +170,7 @@
                     `;
                 }
 
-                const primeContractorBadge = isAdmin && opp.prime_contractor_name ? `<span class="badge badge-info">${opp.prime_contractor_name}</span>` : '';
+                const primeContractorBadge = isAdmin && opp.agency_name ? `<span class="badge badge-info">${opp.agency_name}</span>` : '';
 
                 html += `
                     <div class="enhanced-card" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--color-primary);">
@@ -205,7 +205,7 @@
 
             listEl.innerHTML = html;
 
-            // Pre-load application counts for prime contractor
+            // Pre-load application counts for agency
             if (!isAdmin) {
                 opportunities.forEach(opp => {
                     DataService.fetch(`/applications/opportunity/${opp.id}`)

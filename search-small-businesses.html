@@ -299,7 +299,7 @@
                 <div style="flex:1;font-weight:500;color:var(--color-text-primary);">
                     <strong>Invite Mode</strong> — Browse the directory and click <strong>Invite to Apply</strong> on any small business to send them a direct invitation to one of your open opportunities.
                 </div>
-                <a href="dashboard-prime-contractor.html" style="background:none;border:none;cursor:pointer;color:var(--color-primary);font-size:0.85rem;font-weight:600;text-decoration:underline;">← Back to Dashboard</a>
+                <a href="dashboard-agency.html" style="background:none;border:none;cursor:pointer;color:var(--color-primary);font-size:0.85rem;font-weight:600;text-decoration:underline;">← Back to Dashboard</a>
             </div>
 
             <!-- Invite Modal -->
@@ -537,11 +537,11 @@
             const user = JSON.parse(localStorage.getItem('caltrans_user'));
             const userRole = user ? user.type : 'staff';
 
-            // Check for ?invite=true — normalize type so 'agency' (legacy DB value) also works
-            const _typeMap = { vendor: 'small_business', agency: 'prime_contractor', caltrans_admin: 'staff' };
+            // Check for ?invite=true — normalize type so 'prime_contractor' (legacy DB value) also works
+            const _typeMap = { vendor: 'small_business', prime_contractor: 'agency', caltrans_admin: 'staff' };
             const normalizedType = user ? (_typeMap[user.type] || user.type) : '';
             const params = new URLSearchParams(window.location.search);
-            if (params.get('invite') === 'true' && user && normalizedType === 'prime_contractor') {
+            if (params.get('invite') === 'true' && user && normalizedType === 'agency') {
                 window._inviteMode = true;
                 document.getElementById('inviteBanner').style.display = 'flex';
                 document.getElementById('pageTitle').textContent = 'Invite a Small Business to Apply';

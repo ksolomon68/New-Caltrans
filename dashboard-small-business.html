@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="css/dashboard-new.css?v=1774372526353">
     <link rel="stylesheet" href="css/dashboard-common.css?v=1774372526353">
     <style>
-        /* Enhanced Dashboard Styling matching Prime Contractor */
+        /* Enhanced Dashboard Styling matching Agency */
         .hero-section {
             background: linear-gradient(135deg, var(--brand-blue) 0%, var(--color-primary-light) 100%);
             color: white;
@@ -351,7 +351,7 @@
                 const notifText = document.getElementById('notificationText');
                 let message = '';
                 if (underReview > 0) {
-                    message = `Welcome back, ${name}! You have <strong>${underReview} application${underReview > 1 ? 's' : ''} under review</strong> — a Prime Contractor is evaluating your submission.`;
+                    message = `Welcome back, ${name}! You have <strong>${underReview} application${underReview > 1 ? 's' : ''} under review</strong> — a Agency is evaluating your submission.`;
                 } else if (awardedApps > 0) {
                     message = `Congratulations, ${name}! 🎉 You've been <strong>awarded ${awardedApps} contract${awardedApps > 1 ? 's' : ''}</strong>. Check your applications for details.`;
                 } else if (pendingApps > 0) {

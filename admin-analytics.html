@@ -275,10 +275,10 @@
             const total = users.length || 1;
             const counts = {
                 'Small Business': users.filter(u => u.type === 'small_business').length,
-                'Prime Contractor': users.filter(u => u.type === 'prime_contractor').length,
+                'Agency': users.filter(u => u.type === 'agency').length,
                 'Admin': users.filter(u => u.type === 'admin' || u.type === 'caltrans_admin').length
             };
-            const icons = { 'Small Business': '🏢', 'Prime Contractor': '🏗️', 'Admin': '🛡️' };
+            const icons = { 'Small Business': '🏢', 'Agency': '🏗️', 'Admin': '🛡️' };
 
             const html = Object.entries(counts).map(([label, count]) => {
                 const pct = Math.round((count / total) * 100);
@@ -330,8 +330,8 @@
                 return;
             }
 
-            const typeLabel = { small_business: 'Small Business', prime_contractor: 'Prime Contractor', admin: 'Admin', caltrans_admin: 'Staff Admin' };
-            const typeBadge = { small_business: 'background:#e0f2fe;color:#0369a1;', prime_contractor: 'background:#fef3c7;color:#92400e;', admin: 'background:#f3e8ff;color:#7e22ce;', caltrans_admin: 'background:#dcfce7;color:#166534;' };
+            const typeLabel = { small_business: 'Small Business', agency: 'Agency', admin: 'Admin', caltrans_admin: 'Staff Admin' };
+            const typeBadge = { small_business: 'background:#e0f2fe;color:#0369a1;', agency: 'background:#fef3c7;color:#92400e;', admin: 'background:#f3e8ff;color:#7e22ce;', caltrans_admin: 'background:#dcfce7;color:#166534;' };
 
             document.getElementById('recentUsers').innerHTML = `
                 <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">

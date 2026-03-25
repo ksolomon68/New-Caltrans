@@ -21,7 +21,7 @@ function isStorageAvailable() {
 // Simulated user database (in production, this would be server-side)
 const users = {
     "small businesses": [],
-    "prime contractors": []
+    "agencies": []
 };
 
 const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
@@ -184,13 +184,13 @@ async function registerSmallBusiness(formData) {
     }
 }
 
-// Register prime contractor
+// Register agency
 async function registerPrimeContractor(formData) {
     try {
         const response = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...formData, type: 'prime_contractor' })
+            body: JSON.stringify({ ...formData, type: 'agency' })
         });
 
         const data = await safeParseJson(response);
@@ -201,7 +201,7 @@ async function registerPrimeContractor(formData) {
 
         const user = data.user || data;
         localStorage.setItem('caltrans_user', JSON.stringify(user));
-        console.log('CaltransBizConnect: Prime Contractor registered:', user.organizationName || user.email);
+        console.log('CaltransBizConnect: Agency registered:', user.organizationName || user.email);
         return user;
     } catch (error) {
         // Mock fallback if API is unreachable
@@ -210,7 +210,7 @@ async function registerPrimeContractor(formData) {
             const mockUser = {
                 id: 'a-' + Date.now(),
                 ...formData,
-                type: 'prime_contractor',
+                type: 'agency',
                 password: null
             };
             localStorage.setItem('caltrans_user', JSON.stringify(mockUser));
@@ -226,8 +226,8 @@ function redirectToDashboard(user) {
         window.location.href = 'dashboard-admin.html';
     } else if (user.type === 'small_business') {
         window.location.href = 'dashboard-small-business.html';
-    } else if (user.type === 'prime_contractor') {
-        window.location.href = 'dashboard-prime-contractor.html';
+    } else if (user.type === 'agency') {
+        window.location.href = 'dashboard-agency.html';
     }
 }
 
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Prime Contractor registration form handler
+    // Agency registration form handler
     const primeContractorRegForm = document.getElementById('agencyRegistrationForm');
 
     if (primeContractorRegForm) {
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function () {
             registerPrimeContractor(formData)
                 .then(user => {
                     alert('Account created successfully! Redirecting...');
-                    window.location.href = 'dashboard-prime-contractor.html';
+                    window.location.href = 'dashboard-agency.html';
                 })
                 .catch(error => {
                     showErrorMessage(error.message, primeContractorRegForm.parentElement);
@@ -395,7 +395,7 @@ function syncNavHeader() {
     if (user && loginBtn) {
         const li = loginBtn.parentElement;
         let dashboardUrl = 'dashboard-small-business.html';
-        if (user.type === 'prime_contractor') dashboardUrl = 'dashboard-prime-contractor.html';
+        if (user.type === 'agency') dashboardUrl = 'dashboard-agency.html';
         if (user.type === 'admin') dashboardUrl = 'dashboard-admin.html';
 
         li.innerHTML = `

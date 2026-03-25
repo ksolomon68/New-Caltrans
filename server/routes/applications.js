@@ -9,7 +9,7 @@ router.get('/:id', async (req, res) => {
     try {
         const [rows] = await db.execute(`
             SELECT a.*, o.title as opportunity_title, o.category, o.district as district_id, o.category_name as project_type,
-                   u.organization_name as prime_contractor_name, v.business_name as business_name, v.email as small_business_email
+                   u.organization_name as agency_name, v.business_name as business_name, v.email as small_business_email
             FROM applications a
             JOIN opportunities o ON a.opportunity_id = o.id
             JOIN users u ON o.posted_by = u.id
@@ -25,13 +25,13 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Get applications (filtered by small business or prime contractor)
+// Get applications (filtered by small business or agency)
 router.get('/', async (req, res) => {
     const { smallBusinessId, primeContractorId } = req.query;
 
     try {
         let query = `
-            SELECT a.*, o.title as project_title, o.district_name, u.organization_name as prime_contractor_name, v.business_name as business_name
+            SELECT a.*, o.title as project_title, o.district_name, u.organization_name as agency_name, v.business_name as business_name
             FROM applications a
             JOIN opportunities o ON a.opportunity_id = o.id
             JOIN users u ON o.posted_by = u.id
@@ -69,14 +69,14 @@ router.post('/', requireRole('small_business'), async (req, res) => {
     }
 
     try {
-        // Find prime contractor ID and Opportunity details
+        // Find agency ID and Opportunity details
         const [oppRows] = await db.execute('SELECT title, posted_by FROM opportunities WHERE id = ?', [opportunityId]);
         if (oppRows.length === 0) return res.status(404).json({ error: 'Opportunity not found' });
         const opp = oppRows[0];
 
         // Fetch Prime's business name
         const [primeRows] = await db.execute('SELECT organization_name, business_name FROM users WHERE id = ?', [opp.posted_by]);
-        const receiverBusinessName = primeRows[0]?.organization_name || primeRows[0]?.business_name || 'Prime Contractor';
+        const receiverBusinessName = primeRows[0]?.organization_name || primeRows[0]?.business_name || 'Agency';
 
         const senderBusinessName = req.user.business_name || req.user.contact_name;
 
@@ -87,7 +87,7 @@ router.post('/', requireRole('small_business'), async (req, res) => {
 
         await db.execute(sql, [opportunityId, smallBusinessId, opp.posted_by, notes || null]);
 
-        // Create message for Prime Contractor
+        // Create message for Agency
         const body = `We have submitted an application for the opportunity: ${opp.title}.\n\nAdditional Notes: ${notes || 'None provided.'}`;
         
         const [msgResult] = await db.execute(`
@@ -95,7 +95,7 @@ router.post('/', requireRole('small_business'), async (req, res) => {
             VALUES (?, ?, ?, ?, ?, 'application', ?, ?)
         `, [smallBusinessId, opp.posted_by, senderBusinessName, receiverBusinessName, opportunityId, `New Application: ${opp.title}`, body]);
 
-        // Create notification for Prime Contractor
+        // Create notification for Agency
         await db.execute(`
             INSERT INTO notifications (user_id, message_id)
             VALUES (?, ?)
@@ -111,7 +111,7 @@ router.post('/', requireRole('small_business'), async (req, res) => {
     }
 });
 
-// Get applications for a specific opportunity (Prime Contractor view)
+// Get applications for a specific opportunity (Agency view)
 router.get('/opportunity/:opportunityId', async (req, res) => {
     const { opportunityId } = req.params;
     try {
@@ -144,7 +144,7 @@ router.get('/small-business/:smallBusinessId', async (req, res) => {
     const { smallBusinessId } = req.params;
     try {
         const [rows] = await db.execute(`
-            SELECT a.*, o.title as project_title, o.district_name, u.organization_name as prime_contractor_name
+            SELECT a.*, o.title as project_title, o.district_name, u.organization_name as agency_name
             FROM applications a
             JOIN opportunities o ON a.opportunity_id = o.id
             JOIN users u ON o.posted_by = u.id
@@ -158,7 +158,7 @@ router.get('/small-business/:smallBusinessId', async (req, res) => {
     }
 });
 
-// Update application status (Prime Contractor: approve/decline; Admin: any status)
+// Update application status (Agency: approve/decline; Admin: any status)
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;

@@ -133,12 +133,12 @@
             const opportunityId = params.get('id');
             const user = Auth.getUser();
 
-            if (!opportunityId || !user || user.type !== 'prime_contractor') {
+            if (!opportunityId || !user || user.type !== 'agency') {
                 location.href = 'manage-opportunities.html';
                 return;
             }
 
-            Navigation.init('prime_contractor');
+            Navigation.init('agency');
             loadAppliedSmallBusinesses(opportunityId);
         });
 

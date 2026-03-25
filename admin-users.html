@@ -149,7 +149,7 @@
             <section class="hero-section">
                 <div class="hero-content">
                     <h1 class="page-title">👥 User Management</h1>
-                    <p>View and verify registered small businesses and prime contractors.</p>
+                    <p>View and verify registered small businesses and agencies.</p>
                 </div>
             </section>
 
@@ -221,7 +221,7 @@
                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Account Type</label>
                     <select id="modalUserType" class="form-input" style="width: 100%;">
                         <option value="small_business">Small Business</option>
-                        <option value="prime_contractor">Prime Contractor</option>
+                        <option value="agency">Agency</option>
                         <option value="admin">Administrator</option>
                     </select>
                 </div>
@@ -282,7 +282,7 @@
                 if (!currentUsers.length) {
                     currentUsers = [
                         { id: 1, business_name: 'Acme Construction', email: 'contact@acme.com', type: 'small_business', status: 'verified', created_at: '2025-01-15' },
-                        { id: 2, organization_name: 'City of Sacramento', email: 'planning@city.gov', type: 'prime_contractor', status: 'active', created_at: '2025-02-01' }
+                        { id: 2, organization_name: 'City of Sacramento', email: 'planning@city.gov', type: 'agency', status: 'active', created_at: '2025-02-01' }
                     ];
                 }
                 renderUsers(currentUsers);
@@ -305,7 +305,7 @@
 
                 const typeBadge = u.type === 'small_business'
                     ? '<span class="badge badge-secondary">Small Business</span>'
-                    : (u.type === 'prime_contractor' ? '<span class="badge badge-primary">Prime Contractor</span>'
+                    : (u.type === 'agency' ? '<span class="badge badge-primary">Agency</span>'
                         : '<span class="badge badge-outline">Admin</span>');
 
                 let statusColor = 'var(--color-success)';
@@ -393,7 +393,7 @@
                 type: document.getElementById('modalUserType').value,
                 status: document.getElementById('modalUserStatus').value,
                 business_name: document.getElementById('modalUserType').value === 'small_business' ? document.getElementById('modalUserName').value : null,
-                organization_name: document.getElementById('modalUserType').value === 'prime_contractor' ? document.getElementById('modalUserName').value : null
+                organization_name: document.getElementById('modalUserType').value === 'agency' ? document.getElementById('modalUserName').value : null
             };
 
             const password = document.getElementById('modalUserPassword').value;

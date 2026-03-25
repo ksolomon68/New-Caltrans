@@ -851,7 +851,7 @@ async function renderGlobalSettings(container) {
           <div class="cms-panel-header"><h3 class="cms-panel-title">District Look-Ahead Dropdown</h3></div>
           <div class="cms-panel-body">
             <div class="cms-alert cms-alert-info cms-mb">
-              Edit district labels used in search filters and the prime contractor settings dropdown.
+              Edit district labels used in search filters and the agency settings dropdown.
             </div>
             <div id="district-list">
               ${(globalData.districtLookahead || []).map((d, i) => `
@@ -1454,7 +1454,7 @@ async function saveFAQOrder() {
 /** Open add/edit modal */
 function openFAQModal(faq) {
     const isEdit  = !!faq;
-    const catOpts = [...new Set([...faqCategories, ...faqData.map(f => f.category), 'General', 'Small Businesses', 'Prime Contractors', 'Registration', 'Applications', 'Technical Support'])]
+    const catOpts = [...new Set([...faqCategories, ...faqData.map(f => f.category), 'General', 'Small Businesses', 'Agencies', 'Registration', 'Applications', 'Technical Support'])]
         .sort()
         .map(c => `<option value="${escHtml(c)}" ${faq && faq.category === c ? 'selected' : ''}>${escHtml(c)}</option>`)
         .join('');

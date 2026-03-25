@@ -15,7 +15,7 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
     try {
         // Get stats
         const [[smallBusinessCount]] = await db.execute("SELECT COUNT(*) as count FROM users WHERE type = 'small_business'");
-        const [[primeContractorCount]] = await db.execute("SELECT COUNT(*) as count FROM users WHERE type = 'prime_contractor'");
+        const [[primeContractorCount]] = await db.execute("SELECT COUNT(*) as count FROM users WHERE type = 'agency'");
         const [[pendingCount]] = await db.execute("SELECT COUNT(*) as count FROM opportunities WHERE status = 'pending'");
 
         // Get pending opportunities
