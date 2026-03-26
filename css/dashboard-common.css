@@ -80,13 +80,18 @@ textarea {
 
 /* Touch Targets for Mobile */
 .nav-item,
-.btn,
 .action-card,
 .header-actions button {
     min-height: 44px;
     min-width: 44px;
     display: flex;
     align-items: center;
+}
+
+/* .btn touch target — do NOT set display:flex here; design-system.css owns .btn display */
+.btn {
+    min-height: 44px;
+    min-width: 44px;
 }
 
 /* Navigation Active State */
