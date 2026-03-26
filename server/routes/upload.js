@@ -5,7 +5,9 @@ const fs = require('fs');
 const router = express.Router();
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../../uploads');
+// UPLOADS_DIR env var lets production point to a path outside the git repo
+// so files survive redeployments (e.g. /home/u579331817/uploads)
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, '../../uploads');
 console.log('CaltransBizConnect Upload: uploads dir =', uploadsDir);
 if (!fs.existsSync(uploadsDir)) {
     console.log('CaltransBizConnect Upload: Creating uploads directory...');

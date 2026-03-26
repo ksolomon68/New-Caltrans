@@ -107,7 +107,7 @@ router.get('/:id/capability-statement', async (req, res) => {
         }
 
         // Robust path: extract filename only, join with known uploads dir
-        const uploadsDir = path.join(__dirname, '../../uploads');
+        const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, '../../uploads');
         const filename = path.basename(csPath);
         const filePath = path.join(uploadsDir, filename);
 
@@ -142,7 +142,7 @@ router.delete('/:id/capability-statement', async (req, res) => {
 
         // Delete the file from disk if it exists
         if (csPath && csPath.startsWith('/uploads/')) {
-            const uploadsDir = path.join(__dirname, '../../uploads');
+            const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, '../../uploads');
             const filePath = path.join(uploadsDir, path.basename(csPath));
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
