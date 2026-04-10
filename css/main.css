@@ -1040,7 +1040,18 @@ body {
     padding-top: var(--space-lg);
     text-align: center;
     font-size: var(--font-size-sm);
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.footer-bottom a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.footer-bottom a:hover {
+    color: var(--color-secondary);
+    text-decoration: underline;
 }
 
 /* ============================================
