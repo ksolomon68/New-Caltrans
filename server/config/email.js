@@ -3,6 +3,10 @@
 const nodemailer = require('nodemailer');
 
 // ── Transporter ──────────────────────────────────────────────────────────────
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.warn('[Email] WARNING: EMAIL_USER or EMAIL_PASSWORD not set — outbound email will fail. Add them to .env.');
+}
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
