@@ -1573,7 +1573,7 @@ async function saveFAQOrder() {
 /** Open add/edit modal */
 function openFAQModal(faq) {
     const isEdit  = !!faq;
-    const catOpts = [...new Set([...faqCategories, ...faqData.map(f => f.category), 'General', 'Small Businesses', 'Prime Contractors', 'Registration', 'Applications', 'Technical Support'])]
+    const catOpts = [...new Set(faqData.map(f => f.category))]
         .sort()
         .map(c => `<option value="${escHtml(c)}" ${faq && faq.category === c ? 'selected' : ''}>${escHtml(c)}</option>`)
         .join('');
