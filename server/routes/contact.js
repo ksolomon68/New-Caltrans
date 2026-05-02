@@ -21,22 +21,32 @@ router.post('/submit', async (req, res) => {
 
     const msgSubject = subject ? subject.trim() : 'General Inquiry';
 
+    // HTML-encode user-supplied values before embedding in email body
+    function escHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }
+
     try {
         // Notify admin
         await sendEmail({
             to: ADMIN_EMAIL,
-            subject: `CaltransBizConnect Contact Form: ${msgSubject}`,
+            subject: `CaltransBizConnect Contact Form: ${escHtml(msgSubject)}`,
             html: `
                 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
                     <h2 style="color:#003D5B;border-bottom:3px solid #FDB714;padding-bottom:12px;">New Contact Form Submission</h2>
                     <table style="width:100%;border-collapse:collapse;margin-top:16px;">
-                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;width:120px;">Name:</td><td style="padding:8px 0;">${name}</td></tr>
-                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;">Email:</td><td style="padding:8px 0;"><a href="mailto:${email}" style="color:#046B99;">${email}</a></td></tr>
-                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;">Subject:</td><td style="padding:8px 0;">${msgSubject}</td></tr>
+                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;width:120px;">Name:</td><td style="padding:8px 0;">${escHtml(name)}</td></tr>
+                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;">Email:</td><td style="padding:8px 0;"><a href="mailto:${escHtml(email)}" style="color:#046B99;">${escHtml(email)}</a></td></tr>
+                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;">Subject:</td><td style="padding:8px 0;">${escHtml(msgSubject)}</td></tr>
                     </table>
                     <div style="margin-top:16px;padding:16px;background:#f5f5f5;border-radius:4px;">
                         <p style="font-weight:bold;color:#003D5B;margin:0 0 8px;">Message:</p>
-                        <p style="margin:0;white-space:pre-wrap;">${message}</p>
+                        <p style="margin:0;white-space:pre-wrap;">${escHtml(message)}</p>
                     </div>
                     <p style="margin-top:24px;font-size:12px;color:#666;">Sent via CaltransBizConnect contact form at ${new Date().toISOString()}</p>
                 </div>

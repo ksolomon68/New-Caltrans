@@ -82,16 +82,18 @@ const upload = multer({
  *
  * Body: { email: string, password: string }
  */
-// Helper: get active CMS password (file override takes precedence over env var)
+// Helper: get active CMS password info from file (bcrypt hash) or env var (plain)
 const CMS_AUTH_FILE = path.join(ROOT_DIR, 'content', 'cms-auth.json');
-function getCmsPassword() {
+function getCmsPasswordInfo() {
     try {
         if (fs.existsSync(CMS_AUTH_FILE)) {
             const data = JSON.parse(fs.readFileSync(CMS_AUTH_FILE, 'utf8'));
-            if (data && data.password) return data.password;
+            if (data && data.passwordHash) return { hash: data.passwordHash, isHashed: true };
+            if (data && data.password) return { hash: data.password, isHashed: false }; // legacy plain
         }
     } catch (e) {}
-    return process.env.CMS_ADMIN_PASSWORD || null;
+    const plain = process.env.CMS_ADMIN_PASSWORD || null;
+    return plain ? { hash: plain, isHashed: false } : null;
 }
 
 router.post('/login', async (req, res) => {
@@ -123,11 +125,14 @@ router.post('/login', async (req, res) => {
         }
 
         // Fallback: static CMS password (env var or cms-auth.json override)
-        const requiredPassword = getCmsPassword();
-        if (!requiredPassword) {
+        const pwdInfo = getCmsPasswordInfo();
+        if (!pwdInfo) {
             return res.status(500).json({ error: 'CMS_ADMIN_PASSWORD is not configured on the server' });
         }
-        if (password !== requiredPassword) {
+        const passwordMatch = pwdInfo.isHashed
+            ? await bcrypt.compare(password, pwdInfo.hash)
+            : password === pwdInfo.hash;
+        if (!passwordMatch) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
@@ -170,18 +175,22 @@ router.post('/change-password', requireAdmin, async (req, res) => {
             return res.json({ success: true, message: 'Password updated successfully' });
         }
 
-        // Fallback: update static CMS password file
-        const activePassword = getCmsPassword();
-        if (currentPassword !== activePassword) {
+        // Fallback: update static CMS password file (store bcrypt hash, never plaintext)
+        const pwdInfo = getCmsPasswordInfo();
+        const currentMatch = pwdInfo
+            ? (pwdInfo.isHashed ? await bcrypt.compare(currentPassword, pwdInfo.hash) : currentPassword === pwdInfo.hash)
+            : false;
+        if (!currentMatch) {
             return res.status(401).json({ error: 'Current password is incorrect' });
         }
+        const newHash = await bcrypt.hash(newPassword, 12);
         const dir = path.dirname(CMS_AUTH_FILE);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(CMS_AUTH_FILE, JSON.stringify({ password: newPassword, updatedAt: new Date().toISOString() }, null, 2), 'utf8');
+        fs.writeFileSync(CMS_AUTH_FILE, JSON.stringify({ passwordHash: newHash, updatedAt: new Date().toISOString() }, null, 2), 'utf8');
         res.json({ success: true, message: 'Password updated successfully' });
     } catch (err) {
         console.error('CMS: Failed to change password:', err.message);
-        res.status(500).json({ error: `Failed to change password: ${err.message}` });
+        res.status(500).json({ error: 'Failed to change password. Please try again.' });
     }
 });
 

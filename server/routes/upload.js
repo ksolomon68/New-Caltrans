@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // Ensure uploads directory exists
@@ -34,8 +35,7 @@ const storage = multer.diskStorage({
 const ALLOWED_MIMETYPES = [
     'application/pdf',
     'application/x-pdf',
-    'application/acrobat',
-    'application/octet-stream' // some browsers send this for PDF
+    'application/acrobat'
 ];
 
 const upload = multer({
@@ -51,8 +51,8 @@ const upload = multer({
     }
 });
 
-// POST /api/upload-cs
-router.post('/', (req, res) => {
+// POST /api/upload-cs — authenticated users only (small_business uploading their own capability statement)
+router.post('/', requireRole('small_business'), (req, res) => {
     upload.single('file')(req, res, (err) => {
         if (err) {
             console.error('CaltransBizConnect Upload: Multer error -', err);

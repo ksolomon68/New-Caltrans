@@ -26,7 +26,21 @@ const startServer = async () => {
     try {
         // Security Headers
         app.use(helmet({
-            contentSecurityPolicy: false, // disabled to allow inline scripts in HTML pages
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc:     ["'self'"],
+                    scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+                    styleSrc:       ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+                    fontSrc:        ["'self'", 'https://fonts.gstatic.com'],
+                    imgSrc:         ["'self'", 'data:', 'blob:'],
+                    connectSrc:     ["'self'"],
+                    frameSrc:       ["'none'"],
+                    objectSrc:      ["'none'"],
+                    baseUri:        ["'self'"],
+                    formAction:     ["'self'"],
+                    upgradeInsecureRequests: isLive ? [] : null
+                }
+            },
             hsts: isLive ? {
                 maxAge: 31536000,          // 1 year
                 includeSubDomains: true,
@@ -77,13 +91,32 @@ const startServer = async () => {
             message: { error: 'Too many requests, please try again later.' }
         });
 
+        // Stricter limiter for password reset to prevent email abuse
+        const resetLimiter = rateLimit({
+            windowMs: 60 * 60 * 1000, // 1 hour
+            max: 5,
+            standardHeaders: true,
+            legacyHeaders: false,
+            message: { error: 'Too many password reset requests. Please try again in an hour.' }
+        });
+
         app.use(express.json({ limit: '1mb' }));
 
         // Maintenance Mode Middleware
+        const { JWT_SECRET: MAINT_JWT_SECRET } = require('./middleware/auth');
+        const jwt = require('jsonwebtoken');
         app.use((req, res, next) => {
-            // Check bypass mechanisms (localhost only — no query param bypass)
-            const hasBypassCookie = req.headers.cookie && req.headers.cookie.includes('admin_bypass=true');
+            // Bypass: localhost IP, or a valid signed admin JWT in the Authorization header
             const isAllowedIP = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip);
+            let hasBypassCookie = false;
+            try {
+                const raw = req.headers.cookie || '';
+                const match = raw.match(/admin_bypass=([^;]+)/);
+                if (match) {
+                    const payload = jwt.verify(match[1], MAINT_JWT_SECRET);
+                    hasBypassCookie = payload && (payload.type === 'admin' || payload.type === 'caltrans_admin');
+                }
+            } catch (_) { /* invalid token — no bypass */ }
             
             if (process.env.MAINTENANCE_MODE === 'true' && !hasBypassCookie && !isAllowedIP) {
                 // Always allow static assets needed for the maintenance page
@@ -168,6 +201,7 @@ const startServer = async () => {
         // Routes
         app.use('/api/auth', authLimiter, require('./routes/auth'));
         app.use('/api/cms/login', authLimiter);
+        app.use('/api/password-reset', resetLimiter);
         app.use('/api/opportunities', require('./routes/opportunities'));
         app.use('/api/users', require('./routes/users'));
         app.use('/api/messages', require('./routes/messages'));

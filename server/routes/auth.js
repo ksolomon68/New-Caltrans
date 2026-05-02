@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { db } = require('../database');
-const { JWT_SECRET } = require('../middleware/auth');
+const { JWT_SECRET, requireRole } = require('../middleware/auth');
 const { sendEmail, getWelcomeEmail } = require('../config/email');
 const router = express.Router();
 
@@ -27,10 +27,10 @@ router.post('/register', async (req, res) => {
         });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
         return res.status(400).json({
             success: false,
-            message: 'Password must be at least 6 characters'
+            message: 'Password must be at least 8 characters'
         });
     }
 
@@ -93,8 +93,7 @@ router.post('/register', async (req, res) => {
         }
         res.status(500).json({
             success: false,
-            message: 'Server error during registration',
-            error: error.message
+            message: 'Server error during registration'
         });
     }
 });
@@ -145,15 +144,17 @@ router.post('/login', async (req, res) => {
         console.error(`CaltransBizConnect Auth Error during login for ${email}:`, error);
         res.status(500).json({
             success: false,
-            message: 'Server error during login',
-            error: error.message
+            message: 'Server error during login'
         });
     }
 });
 
-// Update user profile
-router.put('/:id', async (req, res) => {
+// Update user profile — requires auth; users may only update their own record
+router.put('/:id', requireRole('any'), async (req, res) => {
     const { id } = req.params;
+    if (String(req.user.id) !== String(id) && req.user.type !== 'admin' && req.user.type !== 'caltrans_admin') {
+        return res.status(403).json({ error: 'Forbidden: You may only update your own profile' });
+    }
     const profileData = req.body;
 
     try {
@@ -211,7 +212,7 @@ router.put('/:id', async (req, res) => {
         res.json(userWithoutPassword);
     } catch (error) {
         console.error('Profile update error:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to update profile' });
     }
 });
 

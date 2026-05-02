@@ -1,5 +1,6 @@
 const express = require('express');
 const { db } = require('../database');
+const { requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // Get public users list (filtered by type, district, category)
@@ -54,7 +55,7 @@ router.get('/', async (req, res) => {
 
         res.json(processedUsers);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to fetch users' });
     }
 });
 
@@ -93,13 +94,16 @@ router.get('/:id', async (req, res) => {
         res.json(user);
     } catch (error) {
         console.error(`Error fetching user profile for ID ${id}:`, error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to fetch user' });
     }
 });
 
-// Update user profile
-router.put('/:id', async (req, res) => {
+// Update user profile — requires auth; users may only update their own record
+router.put('/:id', requireRole('any'), async (req, res) => {
     const { id } = req.params;
+    if (String(req.user.id) !== String(id) && req.user.type !== 'admin' && req.user.type !== 'caltrans_admin') {
+        return res.status(403).json({ error: 'Forbidden: You may only update your own profile' });
+    }
     const {
         business_name, organization_name, contact_name, phone,
         website, address, city, state, zip, description,
@@ -171,7 +175,7 @@ router.put('/:id', async (req, res) => {
         res.json(updatedRows[0]);
     } catch (error) {
         console.error('Update user error:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to update profile' });
     }
 });
 

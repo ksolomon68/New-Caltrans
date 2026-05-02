@@ -1,6 +1,6 @@
 const express = require('express');
 const { db } = require('../database');
-const { requireRole } = require('../middleware/auth');
+const { requireRole, requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
 // Get all opportunities
@@ -189,7 +189,7 @@ router.post('/', requireRole('agency'), async (req, res) => {
 });
 
 // Approve opportunity (Admin only)
-router.post('/:id/approve', async (req, res) => {
+router.post('/:id/approve', requireAdmin, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -327,9 +327,13 @@ router.delete('/:id', requireRole(['agency', 'admin']), async (req, res) => {
 
 // --- Saved Opportunities Endpoints ---
 
-// Get saved opportunities for a small business
-router.get('/saved/:smallBusinessId', async (req, res) => {
+// Get saved opportunities — caller must be the business whose saved list is requested
+router.get('/saved/:smallBusinessId', requireRole(['small_business', 'admin', 'caltrans_admin']), async (req, res) => {
     const { smallBusinessId } = req.params;
+    const isAdmin = req.user.type === 'admin' || req.user.type === 'caltrans_admin';
+    if (!isAdmin && String(req.user.id) !== String(smallBusinessId)) {
+        return res.status(403).json({ error: 'Forbidden: You may only view your own saved opportunities' });
+    }
     try {
         const [rows] = await db.execute(`
             SELECT o.* FROM opportunities o
@@ -343,44 +347,52 @@ router.get('/saved/:smallBusinessId', async (req, res) => {
     }
 });
 
-// Save an opportunity
+// Save an opportunity — smallBusinessId must match the authenticated user
 router.post('/save', requireRole('small_business'), async (req, res) => {
     const { smallBusinessId, opportunityId } = req.body;
     if (!smallBusinessId || !opportunityId) {
         return res.status(400).json({ error: 'Small Business ID and Opportunity ID are required' });
     }
+    if (String(req.user.id) !== String(smallBusinessId)) {
+        return res.status(403).json({ error: 'Forbidden: You may only save opportunities for your own account' });
+    }
     try {
-        const sql = `
-            INSERT IGNORE INTO saved_opportunities (small_business_id, opportunity_id)
-            VALUES (?, ?)
-        `;
-        await db.execute(sql, [smallBusinessId, opportunityId]);
+        await db.execute(
+            'INSERT IGNORE INTO saved_opportunities (small_business_id, opportunity_id) VALUES (?, ?)',
+            [smallBusinessId, opportunityId]
+        );
         res.status(201).json({ message: 'Opportunity saved successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to save opportunity' });
     }
 });
 
-// Unsave an opportunity
+// Unsave an opportunity — smallBusinessId must match the authenticated user
 router.post('/unsave', requireRole('small_business'), async (req, res) => {
     const { smallBusinessId, opportunityId } = req.body;
     if (!smallBusinessId || !opportunityId) {
         return res.status(400).json({ error: 'Small Business ID and Opportunity ID are required' });
     }
+    if (String(req.user.id) !== String(smallBusinessId)) {
+        return res.status(403).json({ error: 'Forbidden: You may only unsave opportunities for your own account' });
+    }
     try {
-        const [result] = await db.execute(`
-            DELETE FROM saved_opportunities 
-            WHERE small_business_id = ? AND opportunity_id = ?
-        `, [smallBusinessId, opportunityId]);
+        await db.execute(
+            'DELETE FROM saved_opportunities WHERE small_business_id = ? AND opportunity_id = ?',
+            [smallBusinessId, opportunityId]
+        );
         res.status(200).json({ message: 'Opportunity unsaved successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to unsave opportunity' });
     }
 });
 
-// Unsave an opportunity (DELETE method)
+// Unsave an opportunity (DELETE method) — path param must match authenticated user
 router.delete('/unsave/:smallBusinessId/:opportunityId', requireRole('small_business'), async (req, res) => {
     const { smallBusinessId, opportunityId } = req.params;
+    if (String(req.user.id) !== String(smallBusinessId)) {
+        return res.status(403).json({ error: 'Forbidden: You may only remove your own saved opportunities' });
+    }
     try {
         const [result] = await db.execute('DELETE FROM saved_opportunities WHERE small_business_id = ? AND opportunity_id = ?', [smallBusinessId, opportunityId]);
         if (result.affectedRows === 0) {
@@ -388,7 +400,7 @@ router.delete('/unsave/:smallBusinessId/:opportunityId', requireRole('small_busi
         }
         res.json({ message: 'Opportunity removed from saved list' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to remove saved opportunity' });
     }
 });
 
