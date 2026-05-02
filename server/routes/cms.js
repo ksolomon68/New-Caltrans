@@ -269,6 +269,12 @@ router.put('/global', requireAdmin, (req, res) => {
 
 // ─── PAGE CONTENT ─────────────────────────────────────────────────────────────
 
+// Nav order — pages appear in this sequence in the CMS page list
+const NAV_ORDER = [
+    'index', 'for-small-businesses', 'for-prime-contractors',
+    'opportunities', 'how-it-works', 'resources', 'faq', 'contact'
+];
+
 /** GET /api/cms/pages — list all pages (public) */
 router.get('/pages', (_req, res) => {
     const files = fs.existsSync(PAGES_DIR)
@@ -284,6 +290,16 @@ router.get('/pages', (_req, res) => {
             updatedAt: data?.updatedAt          || null,
             isSystem:  data?.isSystem           || false
         };
+    });
+
+    pages.sort((a, b) => {
+        const ai = NAV_ORDER.indexOf(a.slug);
+        const bi = NAV_ORDER.indexOf(b.slug);
+        // Known nav pages first in order; unknown pages alphabetically at end
+        if (ai === -1 && bi === -1) return a.slug.localeCompare(b.slug);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
     });
 
     res.json(pages);
