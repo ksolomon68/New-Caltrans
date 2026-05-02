@@ -281,7 +281,7 @@ router.put('/global', requireAdmin, (req, res) => {
 // Nav order — pages appear in this sequence in the CMS page list
 const NAV_ORDER = [
     'index', 'for-small-businesses', 'for-prime-contractors',
-    'opportunities', 'how-it-works', 'resources', 'faq', 'contact'
+    'opportunities', 'how-it-works', 'resources', 'faq', 'support-services', 'eligibility', 'contact'
 ];
 
 /** GET /api/cms/pages — list all pages (public) */

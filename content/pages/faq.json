@@ -1,0 +1,18 @@
+{
+  "slug": "faq",
+  "isSystem": true,
+  "updatedAt": "2026-05-02T00:00:00.000Z",
+  "meta": {
+    "title": "FAQs | Frequently Asked Questions | CaltransBizConnect",
+    "description": "Frequently asked questions about CaltransBizConnect, eligibility, and the application process."
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero-section",
+      "fields": {
+        "title": "Frequently Asked Questions"
+      }
+    }
+  ]
+}

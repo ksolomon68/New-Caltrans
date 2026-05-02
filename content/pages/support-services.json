@@ -1,0 +1,18 @@
+{
+  "slug": "support-services",
+  "isSystem": true,
+  "updatedAt": "2026-05-02T00:00:00.000Z",
+  "meta": {
+    "title": "Support Services | Free Training & Assistance | CaltransBizConnect",
+    "description": "Access free training, assistance, and support services to help you navigate Caltrans contracting."
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero-section",
+      "fields": {
+        "title": "Support Services"
+      }
+    }
+  ]
+}

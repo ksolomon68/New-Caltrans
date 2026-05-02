@@ -1,0 +1,18 @@
+{
+  "slug": "how-it-works",
+  "isSystem": true,
+  "updatedAt": "2026-05-02T00:00:00.000Z",
+  "meta": {
+    "title": "How It Works | Business-Contractor Matching | CaltransBizConnect",
+    "description": "Learn how CaltransBizConnect matches small businesses with prime contractors for California transportation projects."
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero-section",
+      "fields": {
+        "title": "How CaltransBizConnect Works"
+      }
+    }
+  ]
+}

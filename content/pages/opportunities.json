@@ -1,0 +1,18 @@
+{
+  "slug": "opportunities",
+  "isSystem": true,
+  "updatedAt": "2026-05-02T00:00:00.000Z",
+  "meta": {
+    "title": "Current Opportunities | California Transportation Contracts | CaltransBizConnect",
+    "description": "Browse and search for current Caltrans contracting opportunities."
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero-section",
+      "fields": {
+        "title": "Current Opportunities"
+      }
+    }
+  ]
+}

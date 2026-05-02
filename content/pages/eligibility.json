@@ -1,0 +1,19 @@
+{
+  "slug": "eligibility",
+  "isSystem": true,
+  "updatedAt": "2026-05-02T00:00:00.000Z",
+  "meta": {
+    "title": "Certification Eligibility | California Requirements | CaltransBizConnect",
+    "description": "Complete guide to small business certification eligibility requirements for Caltrans contracts in California."
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero-section",
+      "fields": {
+        "title": "Small Business Eligibility",
+        "subtitle": "Learn about Small Business certification requirements and benefits"
+      }
+    }
+  ]
+}
