@@ -116,16 +116,19 @@
                 </div>
                 <div class="card-body">
                     <form id="contactForm" novalidate>
+                        <div hidden data-form-alert class="alert alert-success" role="alert">Thanks for filling out the form!</div>
+                        <div hidden data-form-alert-danger class="alert alert-danger" role="alert">Oops — something went wrong. Please try again.</div>
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
                             <div class="form-group">
                                 <label for="firstName" class="required">First Name</label>
-                                <input type="text" id="firstName" name="firstName" required autocomplete="given-name">
+                                <input type="text" id="firstName" name="nameFirst" data-form-field="nameFirst" required autocomplete="given-name">
                                 <span class="form-error" role="alert"></span>
                             </div>
 
                             <div class="form-group">
                                 <label for="lastName" class="required">Last Name</label>
-                                <input type="text" id="lastName" name="lastName" required autocomplete="family-name">
+                                <input type="text" id="lastName" name="nameLast" data-form-field="nameLast" required autocomplete="family-name">
                                 <span class="form-error" role="alert"></span>
                             </div>
                         </div>
@@ -133,36 +136,36 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
                             <div class="form-group">
                                 <label for="email" class="required">Email Address</label>
-                                <input type="email" id="email" name="email" required>
+                                <input type="email" id="email" name="email" data-form-field="email" required autocomplete="email">
                                 <span class="form-error" role="alert"></span>
                             </div>
 
                             <div class="form-group">
                                 <label for="phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" autocomplete="tel" autocomplete="tel">
+                                <input type="tel" id="phone" name="phone" data-form-field="phone" autocomplete="tel">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="userType" class="required">I am a:</label>
-                            <select id="userType" name="userType" required>
+                            <select id="userType" name="select" data-form-field="select" required>
                                 <option value="">Select one</option>
-                                <option value="small_business">Small Business</option>
-                                <option value="agency">Prime Contractor</option>
-                                <option value="other">Other</option>
+                                <option value="Small Business">Small Business</option>
+                                <option value="Prime Contractor">Prime Contractor</option>
+                                <option value="Other">Other</option>
                             </select>
                             <span class="form-error" role="alert"></span>
                         </div>
 
                         <div class="form-group">
                             <label for="subject" class="required">Subject</label>
-                            <input type="text" id="subject" name="subject" required>
+                            <input type="text" id="subject" name="subject" data-form-field="subject" required>
                             <span class="form-error" role="alert"></span>
                         </div>
 
                         <div class="form-group">
                             <label for="message" class="required">Message</label>
-                            <textarea id="message" name="message" required rows="6"></textarea>
+                            <textarea id="message" name="message" data-form-field="message" required rows="6"></textarea>
                             <span class="form-error" role="alert"></span>
                         </div>
 
@@ -269,51 +272,62 @@
   <script src="js/main.js?v=1774549569000"></script>
   <script src="js/accessibility-widget.js?v=1774549569000"></script>
   <script>
-    const contactForm = document.getElementById('contactForm');
-    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    (function () {
+      const form = document.getElementById('contactForm');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const alertSuccess = form.querySelector('[data-form-alert]');
+      const alertDanger = form.querySelector('[data-form-alert-danger]');
 
-    contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      // Clear previous errors
-      contactForm.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        form.querySelectorAll('.form-error').forEach(function (el) { el.textContent = ''; });
+        alertSuccess.hidden = true;
+        alertDanger.hidden = true;
 
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName = document.getElementById('lastName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const subject = document.getElementById('subject').value.trim();
-      const message = document.getElementById('message').value.trim();
+        var nameFirst = document.getElementById('firstName').value.trim();
+        var nameLast  = document.getElementById('lastName').value.trim();
+        var email     = document.getElementById('email').value.trim();
+        var userType  = document.getElementById('userType').value;
+        var subject   = document.getElementById('subject').value.trim();
+        var message   = document.getElementById('message').value.trim();
 
-      let valid = true;
-      if (!firstName) { document.getElementById('firstName').nextElementSibling.textContent = 'First name is required.'; valid = false; }
-      if (!lastName) { document.getElementById('lastName').nextElementSibling.textContent = 'Last name is required.'; valid = false; }
-      if (!email) { document.getElementById('email').nextElementSibling.textContent = 'Email address is required.'; valid = false; }
-      if (!subject) { document.getElementById('subject').nextElementSibling.textContent = 'Subject is required.'; valid = false; }
-      if (!message) { document.getElementById('message').nextElementSibling.textContent = 'Message is required.'; valid = false; }
-      if (!valid) return;
+        var valid = true;
+        if (!nameFirst) { document.getElementById('firstName').nextElementSibling.textContent = 'First name is required.'; valid = false; }
+        if (!nameLast)  { document.getElementById('lastName').nextElementSibling.textContent  = 'Last name is required.';  valid = false; }
+        if (!email)     { document.getElementById('email').nextElementSibling.textContent     = 'Email address is required.'; valid = false; }
+        if (!subject)   { document.getElementById('subject').nextElementSibling.textContent   = 'Subject is required.'; valid = false; }
+        if (!message)   { document.getElementById('message').nextElementSibling.textContent   = 'Message is required.'; valid = false; }
+        if (!valid) return;
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
 
-      try {
-        const res = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: firstName + ' ' + lastName, email, subject, message })
-        });
-        const data = await res.json();
-        if (data.success) {
-          contactForm.innerHTML = '<div style="padding:var(--space-lg);background:#e8f5e9;border:1px solid #4caf50;border-radius:var(--border-radius-md);color:#1b5e20;" role="alert"><strong>Message sent!</strong> Thank you for reaching out. We\'ll get back to you as soon as we can.</div>';
-        } else {
+        var fullSubject = subject + (userType ? ' [' + userType + ']' : '');
+
+        try {
+          var res  = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: nameFirst + ' ' + nameLast, email: email, subject: fullSubject, message: message })
+          });
+          var data = await res.json();
+          if (data.success) {
+            alertSuccess.hidden = false;
+            form.querySelectorAll('input,select,textarea,button').forEach(function (el) { el.disabled = true; });
+          } else {
+            alertDanger.hidden = false;
+            alertDanger.textContent = data.message || 'An error occurred. Please try again.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+          }
+        } catch {
+          alertDanger.hidden = false;
+          alertDanger.innerHTML = 'Unable to send. Email us directly at <a href="mailto:smallbusinesses@dot.ca.gov">smallbusinesses@dot.ca.gov</a>';
           submitBtn.disabled = false;
           submitBtn.textContent = 'Send Message';
-          document.getElementById('message').nextElementSibling.textContent = data.message || 'An error occurred. Please try again.';
         }
-      } catch {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
-        document.getElementById('message').nextElementSibling.innerHTML = 'Unable to send. Please email us directly at <a href="mailto:smallbusinesses@dot.ca.gov">smallbusinesses@dot.ca.gov</a>';
-      }
-    });
+      });
+    }());
   </script>
 
   <!-- Organization Schema -->

@@ -64,9 +64,12 @@
       <div class="card">
         <div class="card-body">
           <form id="issueForm" novalidate>
+            <div hidden data-form-alert class="alert alert-success" role="alert">Your issue report has been submitted. Thank you!</div>
+            <div hidden data-form-alert-danger class="alert alert-danger" role="alert">Oops — something went wrong. Please try again.</div>
+
             <div class="form-group">
               <label for="issueType" class="required">Issue Type</label>
-              <select id="issueType" name="issueType" required>
+              <select id="issueType" name="issueType" data-form-field="issueType" required>
                 <option value="">Select issue type</option>
                 <option value="broken-link">Broken Link</option>
                 <option value="display-problem">Display Problem</option>
@@ -80,7 +83,7 @@
 
             <div class="form-group">
               <label for="pageUrl" class="required">Page URL</label>
-              <input type="url" id="pageUrl" name="pageUrl" required aria-describedby="pageUrl-help">
+              <input type="url" id="pageUrl" name="pageUrl" data-form-field="pageUrl" required aria-describedby="pageUrl-help">
               <span id="pageUrl-help" class="form-help">The web address where you encountered the
                 issue</span>
               <span class="form-error" role="alert"></span>
@@ -88,7 +91,7 @@
 
             <div class="form-group">
               <label for="description" class="required">Description</label>
-              <textarea id="description" name="description" required rows="6"
+              <textarea id="description" name="description" data-form-field="description" required rows="6"
                 aria-describedby="description-help"></textarea>
               <span id="description-help" class="form-help">Please describe the issue in detail, including
                 what you expected to happen and what actually happened</span>
@@ -97,21 +100,21 @@
 
             <div class="form-group">
               <label for="screenshot">Screenshot (Optional)</label>
-              <input type="file" id="screenshot" name="screenshot" accept="image/*" aria-describedby="screenshot-help">
+              <input type="file" id="screenshot" name="screenshot" data-form-field="screenshot" accept="image/*" aria-describedby="screenshot-help">
               <span id="screenshot-help" class="form-help">Upload a screenshot to help us understand the
                 issue</span>
             </div>
 
             <div class="form-group">
               <label for="browser">Browser and Device Information</label>
-              <input type="text" id="browser" name="browser" aria-describedby="browser-help">
+              <input type="text" id="browser" name="browser" data-form-field="browser" aria-describedby="browser-help">
               <span id="browser-help" class="form-help">Example: Chrome on Windows 11, Safari on iPhone
                 14</span>
             </div>
 
             <div class="form-group">
               <label for="contactEmail">Your Email (Optional)</label>
-              <input type="email" id="contactEmail" name="contactEmail" aria-describedby="contactEmail-help">
+              <input type="email" id="contactEmail" name="email" data-form-field="email" aria-describedby="contactEmail-help" autocomplete="email">
               <span id="contactEmail-help" class="form-help">Provide your email if you would like us to
                 follow up with you</span>
             </div>
@@ -217,83 +220,92 @@
   <script src="js/main.js?v=1774549569000"></script>
   <script src="js/accessibility-widget.js?v=1774549569000"></script>
   <script>
-    // Auto-populate page URL
-    const referrer = document.referrer;
-    if (referrer) {
-      document.getElementById('pageUrl').value = referrer;
-    }
-
-    // Auto-detect browser info
+    // Auto-populate page URL and browser info
+    var referrer = document.referrer;
+    if (referrer) { document.getElementById('pageUrl').value = referrer; }
     document.getElementById('browser').value = navigator.userAgent;
 
-    const issueForm = document.getElementById('issueForm');
-    const submitBtn = issueForm.querySelector('button[type="submit"]');
+    (function () {
+      var form      = document.getElementById('issueForm');
+      var submitBtn = form.querySelector('button[type="submit"]');
+      var alertSuccess = form.querySelector('[data-form-alert]');
+      var alertDanger  = form.querySelector('[data-form-alert-danger]');
 
-    issueForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      issueForm.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        form.querySelectorAll('.form-error').forEach(function (el) { el.textContent = ''; });
+        alertSuccess.hidden = true;
+        alertDanger.hidden  = true;
 
-      const issueType = document.getElementById('issueType').value;
-      const pageUrl = document.getElementById('pageUrl').value.trim();
-      const description = document.getElementById('description').value.trim();
-      const browser = document.getElementById('browser').value.trim();
-      const contactEmail = document.getElementById('contactEmail').value.trim();
+        var issueType    = document.getElementById('issueType').value;
+        var pageUrl      = document.getElementById('pageUrl').value.trim();
+        var description  = document.getElementById('description').value.trim();
+        var browser      = document.getElementById('browser').value.trim();
+        var contactEmail = document.getElementById('contactEmail').value.trim();
 
-      let valid = true;
-      if (!issueType) { document.getElementById('issueType').nextElementSibling.textContent = 'Please select an issue type.'; valid = false; }
-      if (!pageUrl) { document.getElementById('pageUrl').nextElementSibling.textContent = 'Page URL is required.'; valid = false; }
-      if (!description) { document.getElementById('description').nextElementSibling.textContent = 'Description is required.'; valid = false; }
-      if (!valid) return;
+        var valid = true;
+        if (!issueType)   { document.getElementById('issueType').nextElementSibling.textContent   = 'Please select an issue type.'; valid = false; }
+        if (!pageUrl)     { document.getElementById('pageUrl').nextElementSibling.textContent     = 'Page URL is required.'; valid = false; }
+        if (!description) { document.getElementById('description').nextElementSibling.textContent = 'Description is required.'; valid = false; }
+        if (!valid) return;
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
+        submitBtn.disabled    = true;
+        submitBtn.textContent = 'Submitting…';
 
-      const messageBody = [
-        'Issue Type: ' + issueType,
-        'Page URL: ' + pageUrl,
-        '',
-        'Description:',
-        description,
-        '',
-        'Browser/Device: ' + (browser || 'Not provided'),
-        'Contact Email: ' + (contactEmail || 'Not provided')
-      ].join('\n');
+        var messageBody = [
+          'Issue Type: ' + issueType,
+          'Page URL: ' + pageUrl,
+          '',
+          'Description:',
+          description,
+          '',
+          'Browser/Device: ' + (browser || 'Not provided'),
+          'Contact Email: ' + (contactEmail || 'Not provided')
+        ].join('\n');
 
-      try {
-        const res = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'Site Issue Report',
-            email: contactEmail || 'noreply@caltransbizconnect.org',
-            subject: 'Site Issue Report: ' + issueType,
-            message: messageBody
-          })
-        });
-        const data = await res.json();
-        if (data.success) {
-          var refNum = 'BC-' + Date.now().toString(36).toUpperCase();
-          var isSevere = ['login-issue', 'upload-issue'].includes(issueType);
-          var severeNote = isSevere
-            ? '<p style="margin-top:var(--space-md);padding:var(--space-md);background:#fff3cd;border:1px solid #ffc107;border-radius:4px;color:#6d4c00;"><strong>For urgent login or account access issues:</strong> Call <a href="tel:9163241700" style="color:#6d4c00;">(916) 324-1700</a> or email <a href="mailto:smallbusinesses@dot.ca.gov" style="color:#6d4c00;">smallbusinesses@dot.ca.gov</a> directly during business hours (M–F, 8:00 AM – 5:00 PM PST).</p>'
-            : '';
-          issueForm.innerHTML = '<div style="padding:var(--space-lg);background:#e8f5e9;border:1px solid #4caf50;border-radius:var(--border-radius-md);color:#1b5e20;" role="alert">'
-            + '<strong>Issue submitted successfully.</strong>'
-            + '<p style="margin-top:var(--space-sm);margin-bottom:0;">Reference number: <strong>' + refNum + '</strong></p>'
-            + '<p style="margin-top:var(--space-xs);margin-bottom:0;">Our team will review this and follow up as soon as possible' + (contactEmail ? ' to <strong>' + contactEmail + '</strong>' : '') + '. Save your reference number in case you need to follow up.</p>'
-            + severeNote
-            + '</div>';
-        } else {
-          submitBtn.disabled = false;
+        try {
+          var res  = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name:    'Site Issue Report',
+              email:   contactEmail || 'noreply@caltransbizconnect.org',
+              subject: 'Site Issue Report: ' + issueType,
+              message: messageBody
+            })
+          });
+          var data = await res.json();
+          if (data.success) {
+            var refNum    = 'BC-' + Date.now().toString(36).toUpperCase();
+            var isSevere  = ['login-issue', 'upload-issue'].includes(issueType);
+            var severeNote = isSevere
+              ? '<p style="margin-top:1rem;padding:1rem;background:#fff3cd;border:1px solid #ffc107;border-radius:4px;color:#6d4c00;">'
+                + '<strong>For urgent login or account access issues:</strong> Call '
+                + '<a href="tel:9163241700" style="color:#6d4c00;">(916) 324-1700</a> or email '
+                + '<a href="mailto:smallbusinesses@dot.ca.gov" style="color:#6d4c00;">smallbusinesses@dot.ca.gov</a>'
+                + ' during business hours (M–F, 8:00 AM – 5:00 PM PST).</p>'
+              : '';
+            alertSuccess.hidden = false;
+            alertSuccess.innerHTML = '<strong>Issue submitted successfully.</strong>'
+              + '<p style="margin-top:.5rem;margin-bottom:0;">Reference number: <strong>' + refNum + '</strong></p>'
+              + '<p style="margin-top:.25rem;margin-bottom:0;">Our team will review this and follow up as soon as possible'
+              + (contactEmail ? ' to <strong>' + contactEmail + '</strong>' : '') + '.</p>'
+              + severeNote;
+            form.querySelectorAll('input,select,textarea,button').forEach(function (el) { el.disabled = true; });
+          } else {
+            alertDanger.hidden = false;
+            alertDanger.textContent = data.message || 'An error occurred. Please try again.';
+            submitBtn.disabled    = false;
+            submitBtn.textContent = 'Submit Issue Report';
+          }
+        } catch {
+          alertDanger.hidden = false;
+          alertDanger.textContent = 'Unable to submit. Please email us directly at smallbusinesses@dot.ca.gov';
+          submitBtn.disabled    = false;
           submitBtn.textContent = 'Submit Issue Report';
-          document.getElementById('description').nextElementSibling.textContent = data.message || 'An error occurred. Please try again.';
         }
-      } catch {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Issue Report';
-        document.getElementById('description').nextElementSibling.textContent = 'Unable to submit. Please email us directly at smallbusinesses@dot.ca.gov';
-      }
-    });
+      });
+    }());
   </script>
   <script src="js/pwa.js?v=1774549569000"></script>
 </body>

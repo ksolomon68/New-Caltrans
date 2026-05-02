@@ -665,13 +665,31 @@ function renderListItem(fieldKey, item, index, listType, schema) {
         </div>`;
     }
 
-    const preview = typeof item === 'object' ? (item.title || item.question || item.label || `Item ${index + 1}`) : String(item);
-    const bodyHtml = typeof item === 'object'
-        ? Object.entries(item).filter(([k]) => k !== 'id').map(([k, v]) => {
+    const itemObj  = (typeof item === 'object' && item !== null) ? item : {};
+    const preview  = itemObj.title || itemObj.question || itemObj.label || itemObj.heading || `Item ${index + 1}`;
+    const subFields = getSubFieldSchema(schema, listType);
+
+    let bodyHtml;
+    if (subFields) {
+        bodyHtml = subFields.map(f => {
+            const val  = itemObj[f.key];
+            const fKey = `${fieldKey}[${index}].${f.key}`;
+            switch (f.inputType) {
+                case 'text':     return fieldInput(fKey, f.label, val || '', 'text',     f.maxLength, f.required, f.note || '');
+                case 'textarea': return fieldInput(fKey, f.label, val || '', 'textarea', f.maxLength, f.required, f.note || '');
+                case 'url':      return fieldInput(fKey, f.label, val || '', 'url',      null,         f.required, f.note || '');
+                case 'checkbox': return fieldCheckbox(fKey, f.label, !!val);
+                case 'media':    return mediaField(fKey, f.label, val || '', f.aspectRatio || '', f.note || '');
+                default:         return fieldInput(fKey, f.label, String(val || ''), 'text', f.maxLength, f.required, '');
+            }
+        }).join('');
+    } else {
+        // Fallback for unknown list types: generic key-value rendering
+        bodyHtml = Object.entries(itemObj).filter(([k]) => k !== 'id').map(([k, v]) => {
             const isLong = typeof v === 'string' && v.length > 80;
             return fieldInput(`${fieldKey}[${index}].${k}`, k, String(v || ''), isLong ? 'textarea' : 'text', 300);
-          }).join('')
-        : '';
+        }).join('');
+    }
 
     return `
     <div class="cms-list-item" id="${id}">
@@ -701,13 +719,14 @@ function wireListEditors(container, section) {
     container.querySelectorAll('[data-remove-list-item]').forEach(btn => {
         btn.addEventListener('click', e => {
             e.stopPropagation();
-            const fieldKey = btn.getAttribute('data-remove-list-item');
-            const index    = parseInt(btn.getAttribute('data-remove-index'), 10);
-            const parts    = parseFieldKey(fieldKey);
-            let target     = getDeepRef(section.fields, parts);
+            const fieldKey  = btn.getAttribute('data-remove-list-item');
+            const index     = parseInt(btn.getAttribute('data-remove-index'), 10);
+            const fieldPath = stripSectionPrefix(fieldKey, section.id);
+            const parts     = parseFieldKey(fieldPath);
+            const target    = getDeepRef(section.fields, parts);
             if (Array.isArray(target)) {
                 target.splice(index, 1);
-                openSectionEditor(section.id); // re-render
+                openSectionEditor(section.id);
             }
         });
     });
@@ -715,23 +734,24 @@ function wireListEditors(container, section) {
     // Add item
     container.querySelectorAll('[data-add-to]').forEach(btn => {
         btn.addEventListener('click', () => {
-            const fieldKey = btn.getAttribute('data-add-to');
-            const listType = btn.getAttribute('data-list-type');
-            const parts    = parseFieldKey(fieldKey);
-            let arr        = getDeepRef(section.fields, parts);
+            const fieldKey  = btn.getAttribute('data-add-to');
+            const listType  = btn.getAttribute('data-list-type');
+            const fieldPath = stripSectionPrefix(fieldKey, section.id);
+            const parts     = parseFieldKey(fieldPath);
+            let arr         = getDeepRef(section.fields, parts);
             if (!Array.isArray(arr)) {
                 setDeepRef(section.fields, parts, []);
                 arr = getDeepRef(section.fields, parts);
             }
             arr.push(newListItem(listType));
-            openSectionEditor(section.id); // re-render
+            openSectionEditor(section.id);
         });
     });
 }
 
 function newListItem(listType) {
     switch (listType) {
-        case 'card-list':     return { id: `card-${Date.now()}`, title: 'New Card',  body: '' };
+        case 'card-list':     return { id: `card-${Date.now()}`, title: 'New Card', body: '', image: '', imageAlt: '', buttonLabel: '', buttonHref: '', external: false };
         case 'steps-list':    return { label: 'New Step', detail: '' };
         case 'tile-list':     return { id: `tile-${Date.now()}`, title: 'New Tile', description: '', href: '', linkText: 'Learn More' };
         case 'accordion-list':return { question: 'New Question', answer: '' };
@@ -798,14 +818,21 @@ function collectFieldValues() {
         setFieldValue(rawKey, value);
     });
 
-    // List item inputs: data-list-item-field + data-list-index
+    // String-list item inputs: data-list-item-field + data-list-index
+    // fieldKey format is "sectionId.fieldName" — must resolve through sections, not activePage directly.
     panel.querySelectorAll('[data-list-item-field]').forEach(input => {
-        const fieldKey = input.getAttribute('data-list-item-field');
-        const index    = parseInt(input.getAttribute('data-list-index'), 10);
-        const parts    = parseFieldKey(fieldKey);
-        let arr = getDeepRef(activePage, parts);
+        const fieldKey  = input.getAttribute('data-list-item-field');
+        const index     = parseInt(input.getAttribute('data-list-index'), 10);
+        const dotIdx    = fieldKey.indexOf('.');
+        if (dotIdx === -1) return;
+        const sectionId = fieldKey.slice(0, dotIdx);
+        const fieldPath = fieldKey.slice(dotIdx + 1);
+        const section   = activePage.sections?.find(s => s.id === sectionId);
+        if (!section) return;
+        const parts     = parseFieldKey(fieldPath);
+        const arr       = getDeepRef(section.fields, parts);
         if (!Array.isArray(arr)) return;
-        arr[index] = input.value;
+        arr[index]      = input.value;
     });
 }
 
@@ -1892,4 +1919,37 @@ function setDeepRef(obj, parts, value) {
 function setNestedValue(target, rawKey, value) {
     const parts = parseFieldKey(rawKey);
     setDeepRef(target, parts, value);
+}
+
+/**
+ * Map a list inputType to the correct sub-field schema array on the component schema.
+ * e.g. 'tile-list' → schema.tileFields
+ * @param {object|null} schema  Component-level schema object
+ * @param {string}      listType
+ * @returns {Array|null}
+ */
+function getSubFieldSchema(schema, listType) {
+    if (!schema) return null;
+    const map = {
+        'card-list':      schema.cardFields,
+        'tile-list':      schema.tileFields,
+        'steps-list':     schema.stepFields,
+        'cta-list':       schema.columnFields,
+        'accordion-list': schema.itemFields,
+    };
+    return map[listType] || null;
+}
+
+/**
+ * Strip a leading "sectionId." prefix from a fieldKey so it can be used
+ * directly against section.fields.
+ * "value-tiles.tiles" → "tiles"
+ * "how-we-help.cards[0].title" → "cards[0].title"
+ * @param {string} fieldKey
+ * @param {string} sectionId
+ * @returns {string}
+ */
+function stripSectionPrefix(fieldKey, sectionId) {
+    const prefix = sectionId + '.';
+    return fieldKey.startsWith(prefix) ? fieldKey.slice(prefix.length) : fieldKey;
 }

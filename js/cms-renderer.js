@@ -45,6 +45,7 @@
             ]);
 
             if (pageData)   hydratePage(pageData, globalData);
+            if (pageData)   hydrateListSections(pageData);
             if (globalData) hydrateGlobal(globalData);
 
         } catch (err) {
@@ -292,6 +293,114 @@
                 navLink.className = 'btn btn-secondary btn-small';
             }
         });
+    }
+
+    // ── Dynamic list-section rendering ───────────────────────────────────────
+    /**
+     * Find every [data-cms-list] container on the page and replace its
+     * children with items from CMS data. This enables admin-added cards,
+     * tiles, and CTA columns to appear on the live site.
+     *
+     * Attribute contract on the container element:
+     *   data-cms-list="sectionId.fieldKey"   e.g. "value-tiles.tiles"
+     *   data-cms-list-type="tile|cta-column|card|step"
+     *
+     * @param {object} pageData
+     */
+    function hydrateListSections(pageData) {
+        var sectionMap = {};
+        if (Array.isArray(pageData.sections)) {
+            pageData.sections.forEach(function (s) { sectionMap[s.id] = s.fields || {}; });
+        }
+
+        document.querySelectorAll('[data-cms-list]').forEach(function (container) {
+            var fieldPath = container.getAttribute('data-cms-list');   // e.g. "value-tiles.tiles"
+            var listType  = container.getAttribute('data-cms-list-type') || '';
+            var dotIdx    = fieldPath.indexOf('.');
+            if (dotIdx === -1) return;
+            var sectionId  = fieldPath.slice(0, dotIdx);
+            var fieldParts = fieldPath.slice(dotIdx + 1).split('.');
+            var fields     = sectionMap[sectionId];
+            if (!fields) return;
+            var items = getNestedValue(fields, fieldParts);
+            if (!Array.isArray(items) || items.length === 0) return;
+
+            container.innerHTML = items.map(function (item, i) {
+                return renderDynamicItem(item, listType, i);
+            }).join('');
+        });
+    }
+
+    function renderDynamicItem(item, listType, index) {
+        if (!item || typeof item !== 'object') return '';
+        switch (listType) {
+            case 'tile':       return renderTileItem(item, index);
+            case 'cta-column': return renderCtaColumnItem(item);
+            case 'card':       return renderCardItem(item);
+            default:           return '';
+        }
+    }
+
+    function renderTileItem(tile, index) {
+        var href     = safeAttr(tile.href || '#');
+        var title    = safeText(tile.title || '');
+        var desc     = safeText(tile.description || '');
+        var linkText = safeText(tile.linkText || 'Learn More');
+        var delay    = (index * 100) + 'ms';
+        return '<a href="' + href + '" class="action-tile reveal-slide-up" data-delay="' + delay + '">' +
+               '<h3 class="action-tile-title">' + title + '</h3>' +
+               '<p class="action-tile-description">' + desc + '</p>' +
+               '<span class="action-tile-link">' + linkText +
+               ' <span aria-hidden="true">→</span></span>' +
+               '</a>';
+    }
+
+    function renderCtaColumnItem(col) {
+        var href    = safeAttr(col.buttonHref || '#');
+        var label   = safeText(col.buttonLabel || 'Learn More');
+        var heading = col.heading
+            ? '<h3 class="mb-xs" style="color:white;font-size:var(--font-size-md);">' + safeText(col.heading) + '</h3>'
+            : '';
+        var text = col.text
+            ? '<p class="mb-sm" style="opacity:0.9;font-size:0.9rem;">' + safeText(col.text) + '</p>'
+            : '';
+        return '<div>' + heading + text +
+               '<a href="' + href + '" class="btn btn-secondary">' + label + '</a></div>';
+    }
+
+    function renderCardItem(card) {
+        var title   = safeText(card.title || '');
+        var body    = safeText(card.body  || '');
+        var imgHtml = card.image
+            ? '<img src="' + safeAttr(card.image) + '" alt="' + safeAttr(card.imageAlt || '') +
+              '" class="card-image" loading="lazy" style="width:100%;border-radius:4px;margin-bottom:.75rem">'
+            : '';
+        var btnHtml = (card.buttonLabel && card.buttonHref)
+            ? '<a href="' + safeAttr(card.buttonHref) + '" class="btn btn-outline btn-small"' +
+              (card.external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' +
+              safeText(card.buttonLabel) + '</a>'
+            : '';
+        return '<div class="feature-card" style="background:#fff;padding:1.5rem;border-radius:8px;' +
+               'box-shadow:0 2px 8px rgba(0,0,0,.08)">' +
+               imgHtml +
+               '<h3 style="font-size:1.05rem;margin-bottom:.5rem;color:var(--color-primary)">' + title + '</h3>' +
+               '<p style="color:var(--color-text-secondary);font-size:.9rem;margin-bottom:.75rem">' + body + '</p>' +
+               btnHtml + '</div>';
+    }
+
+    // Safe-escaping helpers for renderer-generated HTML
+    function safeText(str) {
+        var d = document.createElement('div');
+        d.textContent = String(str || '');
+        return d.innerHTML;
+    }
+
+    function safeAttr(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
 
     // ── Fetch helper ─────────────────────────────────────────────────────────
