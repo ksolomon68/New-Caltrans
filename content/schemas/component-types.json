@@ -36,7 +36,7 @@
       "description": "A heading and rich text body paragraph.",
       "fields": [
         { "key": "heading", "label": "Heading", "inputType": "text",     "required": true,  "maxLength": 120 },
-        { "key": "body",    "label": "Body",    "inputType": "textarea", "required": true,  "maxLength": 2000 }
+        { "key": "body",    "label": "Body",    "inputType": "textarea", "required": true,  "maxLength": 5000 }
       ]
     },
     {
