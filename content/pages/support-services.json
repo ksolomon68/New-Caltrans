@@ -9,9 +9,82 @@
   "sections": [
     {
       "id": "hero",
-      "type": "hero-section",
+      "type": "hero-inner",
       "fields": {
-        "title": "Support Services"
+        "title": "Support Services",
+        "subtitle": "Training, technical assistance, and business development programs to help you succeed"
+      }
+    },
+    {
+      "id": "districtHub",
+      "type": "text-block",
+      "fields": {
+        "heading": "Find Support in Your District",
+        "body": "<p class=\"mb-lg\">Caltrans operates across 12 districts in California. Each district has a <strong>District Small Business Liaison (DSBL)</strong> who can connect you with local training, resources, and support services specific to your area.</p>\n\n<div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-xl);\">\n    <div style=\"background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);\">\n        <h3 style=\"font-size: var(--font-size-base); margin-bottom: var(--space-xs);\">Locate Your District</h3>\n        <p style=\"font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);\">Use the Caltrans district map to identify your Caltrans district by county or zip code.</p>\n        <a href=\"https://dot.ca.gov/caltrans-near-me/district-map\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn btn-primary btn-small\">View District Map <span class=\"sr-only\">(opens in new window)</span>&nearrow;</a>\n    </div>\n    <div style=\"background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);\">\n        <h3 style=\"font-size: var(--font-size-base); margin-bottom: var(--space-xs);\">Contact Your DSBL</h3>\n        <p style=\"font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);\">Reach the District Small Business Liaison for your area through the Caltrans Civil Rights office.</p>\n        <a href=\"https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn btn-primary btn-small\">DSBL Directory <span class=\"sr-only\">(opens in new window)</span>&nearrow;</a>\n    </div>\n    <div style=\"background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);\">\n        <h3 style=\"font-size: var(--font-size-base); margin-bottom: var(--space-xs);\">Local Training &amp; Events</h3>\n        <p style=\"font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);\">View the Caltrans Small Business Events Calendar for workshops and training in your region.</p>\n        <a href=\"https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn btn-primary btn-small\">Events Calendar <span class=\"sr-only\">(opens in new window)</span>&nearrow;</a>\n    </div>\n</div>\n\n<div class=\"alert alert-info\" style=\"margin-bottom: 0;\">\n    <strong>Tip:</strong> When you contact your DSBL, let them know your business type, NAICS code, and the types of Caltrans work you are interested in. They can point you toward district-specific opportunities and upcoming training relevant to your area.\n</div>"
+      }
+    },
+    {
+      "id": "overview",
+      "type": "text-block",
+      "fields": {
+        "heading": "Small Business Enterprise Supportive Services",
+        "body": "<p>The Small Business Enterprise Supportive Services Program (Small Business/BDP) provides comprehensive support to help small businesses compete for and successfully complete Caltrans contracts. Our services are designed to strengthen your business capabilities and increase your competitiveness.</p>"
+      }
+    },
+    {
+      "id": "techAssist",
+      "type": "text-block",
+      "fields": {
+        "heading": "Technical Assistance",
+        "body": "<p class=\"mb-md\">Get expert guidance on various aspects of contracting and business operations:</p>\n<ul>\n    <li><strong>Estimating & Bidding:</strong> Learn how to accurately estimate project costs and prepare competitive bids</li>\n    <li><strong>Contract Management:</strong> Understand contract requirements, compliance, and best practices</li>\n    <li><strong>Project Planning:</strong> Develop effective project schedules and resource allocation strategies</li>\n    <li><strong>Quality Control:</strong> Implement quality assurance processes and documentation</li>\n    <li><strong>Safety Programs:</strong> Develop and maintain comprehensive safety programs</li>\n</ul>\n<a href=\"contact.html\" class=\"btn btn-primary mt-md\">Request Assistance</a>"
+      }
+    },
+    {
+      "id": "training",
+      "type": "text-block",
+      "fields": {
+        "heading": "Training Programs",
+        "body": "<p class=\"mb-md\">Participate in workshops and training sessions covering:</p>\n<ul>\n    <li><strong>Business Fundamentals:</strong> Accounting, financial management, and business planning</li>\n    <li><strong>Marketing & Networking:</strong> How to market your services and build relationships</li>\n    <li><strong>Proposal Writing:</strong> Creating compelling proposals that win contracts</li>\n    <li><strong>Technology & Innovation:</strong> Leveraging technology to improve efficiency</li>\n    <li><strong>Compliance & Regulations:</strong> Understanding regulatory requirements</li>\n</ul>\n<a href=\"index.html#events\" class=\"btn btn-primary mt-md\">View Upcoming Training</a>"
+      }
+    },
+    {
+      "id": "bizDev",
+      "type": "text-block",
+      "fields": {
+        "heading": "Business Development",
+        "body": "<p class=\"mb-md\">Grow your business with our development services:</p>\n<ul>\n    <li><strong>One-on-One Consulting:</strong> Personalized business counseling and strategic planning</li>\n    <li><strong>Capability Statement Review:</strong> Professional review and feedback on your capability statement</li>\n    <li><strong>Bonding Assistance:</strong> Guidance on obtaining bonding and insurance</li>\n    <li><strong>Financial Planning:</strong> Cash flow management and financial forecasting</li>\n    <li><strong>Growth Strategy:</strong> Planning for business expansion and diversification</li>\n</ul>\n<a href=\"contact.html\" class=\"btn btn-primary mt-md\">Schedule Consultation</a>"
+      }
+    },
+    {
+      "id": "networking",
+      "type": "text-block",
+      "fields": {
+        "heading": "Networking Opportunities",
+        "body": "<p class=\"mb-md\">Connect with prime contractors, agencies, and other small businesses:</p>\n<ul>\n    <li><strong>Matchmaking Events:</strong> Meet Prime Contractors looking for subcontractors</li>\n    <li><strong>Industry Forums:</strong> Participate in discussions about industry trends and opportunities</li>\n    <li><strong>Small Business Fairs:</strong> Showcase your capabilities to potential clients</li>\n    <li><strong>Peer Networks:</strong> Connect with other small business owners for support and collaboration</li>\n</ul>\n<a href=\"index.html#events\" class=\"btn btn-primary mt-md\">View Events</a>"
+      }
+    },
+    {
+      "id": "certSupport",
+      "type": "text-block",
+      "fields": {
+        "heading": "Certification Support",
+        "body": "<p class=\"mb-md\">Get help with the Small Business certification process:</p>\n<ul>\n    <li><strong>Eligibility Assessment:</strong> Determine if your business qualifies for Small Business certification</li>\n    <li><strong>Application Assistance:</strong> Help completing the certification application</li>\n    <li><strong>Document Preparation:</strong> Guidance on gathering and organizing required documents</li>\n    <li><strong>Renewal Support:</strong> Assistance with certification renewal process</li>\n</ul>\n<a href=\"eligibility.html\" class=\"btn btn-primary mt-md\">Learn About Certification</a>"
+      }
+    },
+    {
+      "id": "accessServices",
+      "type": "text-block",
+      "fields": {
+        "heading": "How to Access Support Services",
+        "body": "<div style=\"display: grid; gap: var(--space-lg);\">\n    <div style=\"display: grid; grid-template-columns: 60px 1fr; gap: var(--space-md); align-items: start;\">\n        <div style=\"width: 40px; height: 40px; background-color: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: var(--font-weight-bold);\">1</div>\n        <div>\n            <h3 class=\"mb-xs\">Contact Us</h3>\n            <p>Reach out to our support services team via phone, email, or the contact form.</p>\n        </div>\n    </div>\n    <div style=\"display: grid; grid-template-columns: 60px 1fr; gap: var(--space-md); align-items: start;\">\n        <div style=\"width: 40px; height: 40px; background-color: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: var(--font-weight-bold);\">2</div>\n        <div>\n            <h3 class=\"mb-xs\">Initial Assessment</h3>\n            <p>We'll discuss your needs and recommend appropriate services and resources.</p>\n        </div>\n    </div>\n    <div style=\"display: grid; grid-template-columns: 60px 1fr; gap: var(--space-md); align-items: start;\">\n        <div style=\"width: 40px; height: 40px; background-color: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: var(--font-weight-bold);\">3</div>\n        <div>\n            <h3 class=\"mb-xs\">Customized Support Plan</h3>\n            <p>Receive a tailored plan addressing your specific business needs and goals.</p>\n        </div>\n    </div>\n    <div style=\"display: grid; grid-template-columns: 60px 1fr; gap: var(--space-md); align-items: start;\">\n        <div style=\"width: 40px; height: 40px; background-color: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: var(--font-weight-bold);\">4</div>\n        <div>\n            <h3 class=\"mb-xs\">Ongoing Support</h3>\n            <p>Access continuous support as your business grows and evolves.</p>\n        </div>\n    </div>\n</div>"
+      }
+    },
+    {
+      "id": "contactCta",
+      "type": "text-block",
+      "fields": {
+        "heading": "Ready to Get Started?",
+        "body": "<p class=\"mb-lg\">Contact our support services team today to learn how we can help your business succeed.</p>\n<div style=\"display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;\">\n    <a href=\"contact.html\" class=\"btn btn-primary\">Contact Support Services</a>\n    <a href=\"index.html#events\" class=\"btn btn-outline\">View Upcoming Events</a>\n</div>"
       }
     }
   ]

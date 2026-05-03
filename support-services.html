@@ -70,29 +70,31 @@
             <!-- District Hub -->
             <div class="card mb-2xl" style="border-left: 4px solid var(--color-secondary);">
                 <div class="card-body">
-                    <h2 class="mb-md">Find Support in Your District</h2>
-                    <p class="mb-lg">Caltrans operates across 12 districts in California. Each district has a <strong>District Small Business Liaison (DSBL)</strong> who can connect you with local training, resources, and support services specific to your area.</p>
+                    <h2 class="mb-md" data-cms-field="districtHub.heading">Find Support in Your District</h2>
+                    <div data-cms-field="districtHub.body" data-cms-type="html">
+                        <p class="mb-lg">Caltrans operates across 12 districts in California. Each district has a <strong>District Small Business Liaison (DSBL)</strong> who can connect you with local training, resources, and support services specific to your area.</p>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-xl);">
-                        <div style="background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);">
-                            <h3 style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Locate Your District</h3>
-                            <p style="font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);">Use the Caltrans district map to identify your Caltrans district by county or zip code.</p>
-                            <a href="https://dot.ca.gov/caltrans-near-me/district-map" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-small">View District Map <span class="sr-only">(opens in new window)</span>&nearrow;</a>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-xl);">
+                            <div style="background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);">
+                                <h3 style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Locate Your District</h3>
+                                <p style="font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);">Use the Caltrans district map to identify your Caltrans district by county or zip code.</p>
+                                <a href="https://dot.ca.gov/caltrans-near-me/district-map" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-small">View District Map <span class="sr-only">(opens in new window)</span>&nearrow;</a>
+                            </div>
+                            <div style="background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);">
+                                <h3 style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Contact Your DSBL</h3>
+                                <p style="font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);">Reach the District Small Business Liaison for your area through the Caltrans Civil Rights office.</p>
+                                <a href="https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-small">DSBL Directory <span class="sr-only">(opens in new window)</span>&nearrow;</a>
+                            </div>
+                            <div style="background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);">
+                                <h3 style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Local Training &amp; Events</h3>
+                                <p style="font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);">View the Caltrans Small Business Events Calendar for workshops and training in your region.</p>
+                                <a href="https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-small">Events Calendar <span class="sr-only">(opens in new window)</span>&nearrow;</a>
+                            </div>
                         </div>
-                        <div style="background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);">
-                            <h3 style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Contact Your DSBL</h3>
-                            <p style="font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);">Reach the District Small Business Liaison for your area through the Caltrans Civil Rights office.</p>
-                            <a href="https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-small">DSBL Directory <span class="sr-only">(opens in new window)</span>&nearrow;</a>
-                        </div>
-                        <div style="background: var(--color-bg-secondary); padding: var(--space-md); border-radius: var(--border-radius-md);">
-                            <h3 style="font-size: var(--font-size-base); margin-bottom: var(--space-xs);">Local Training &amp; Events</h3>
-                            <p style="font-size: 0.9rem; margin-bottom: var(--space-sm); color: var(--color-text-secondary);">View the Caltrans Small Business Events Calendar for workshops and training in your region.</p>
-                            <a href="https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-small">Events Calendar <span class="sr-only">(opens in new window)</span>&nearrow;</a>
-                        </div>
-                    </div>
 
-                    <div class="alert alert-info" style="margin-bottom: 0;">
-                        <strong>Tip:</strong> When you contact your DSBL, let them know your business type, NAICS code, and the types of Caltrans work you are interested in. They can point you toward district-specific opportunities and upcoming training relevant to your area.
+                        <div class="alert alert-info" style="margin-bottom: 0;">
+                            <strong>Tip:</strong> When you contact your DSBL, let them know your business type, NAICS code, and the types of Caltrans work you are interested in. They can point you toward district-specific opportunities and upcoming training relevant to your area.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,10 +102,12 @@
             <!-- Overview -->
             <div class="card mb-2xl">
                 <div class="card-body">
-                    <h2 class="mb-md">Small Business Enterprise Supportive Services</h2>
-                    <p>The Small Business Enterprise Supportive Services Program (Small Business/BDP) provides comprehensive support
-                        to help small businesses compete for and successfully complete Caltrans contracts. Our services
-                        are designed to strengthen your business capabilities and increase your competitiveness.</p>
+                    <h2 class="mb-md" data-cms-field="overview.heading">Small Business Enterprise Supportive Services</h2>
+                    <div data-cms-field="overview.body" data-cms-type="html">
+                        <p>The Small Business Enterprise Supportive Services Program (Small Business/BDP) provides comprehensive support
+                            to help small businesses compete for and successfully complete Caltrans contracts. Our services
+                            are designed to strengthen your business capabilities and increase your competitiveness.</p>
+                    </div>
                 </div>
             </div>
 
@@ -112,9 +116,9 @@
                 <!-- Technical Assistance -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Technical Assistance</h2>
+                        <h2 class="card-title" data-cms-field="techAssist.heading">Technical Assistance</h2>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" data-cms-field="techAssist.body" data-cms-type="html">
                         <p class="mb-md">Get expert guidance on various aspects of contracting and business operations:
                         </p>
                         <ul>
@@ -136,9 +140,9 @@
                 <!-- Training Programs -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Training Programs</h2>
+                        <h2 class="card-title" data-cms-field="training.heading">Training Programs</h2>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" data-cms-field="training.body" data-cms-type="html">
                         <p class="mb-md">Participate in workshops and training sessions covering:</p>
                         <ul>
                             <li><strong>Business Fundamentals:</strong> Accounting, financial management, and business
@@ -157,9 +161,9 @@
                 <!-- Business Development -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Business Development</h2>
+                        <h2 class="card-title" data-cms-field="bizDev.heading">Business Development</h2>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" data-cms-field="bizDev.body" data-cms-type="html">
                         <p class="mb-md">Grow your business with our development services:</p>
                         <ul>
                             <li><strong>One-on-One Consulting:</strong> Personalized business counseling and strategic
@@ -178,9 +182,9 @@
                 <!-- Networking Opportunities -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Networking Opportunities</h2>
+                        <h2 class="card-title" data-cms-field="networking.heading">Networking Opportunities</h2>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" data-cms-field="networking.body" data-cms-type="html">
                         <p class="mb-md">Connect with prime contractors, agencies, and other small businesses:</p>
                         <ul>
                             <li><strong>Matchmaking Events:</strong> Meet Prime Contractors looking for subcontractors
@@ -198,9 +202,9 @@
                 <!-- Certification Support -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Certification Support</h2>
+                        <h2 class="card-title" data-cms-field="certSupport.heading">Certification Support</h2>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" data-cms-field="certSupport.body" data-cms-type="html">
                         <p class="mb-md">Get help with the Small Business certification process:</p>
                         <ul>
                             <li><strong>Eligibility Assessment:</strong> Determine if your business qualifies for Small Business
@@ -219,9 +223,9 @@
             <!-- How to Access Services -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">How to Access Support Services</h2>
+                    <h2 class="card-title" data-cms-field="accessServices.heading">How to Access Support Services</h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body" data-cms-field="accessServices.body" data-cms-type="html">
                     <div style="display: grid; gap: var(--space-lg);">
                         <div
                             style="display: grid; grid-template-columns: 60px 1fr; gap: var(--space-md); align-items: start;">
@@ -273,12 +277,14 @@
             <!-- Contact CTA -->
             <div class="mt-2xl"
                 style="background-color: var(--color-bg-secondary); padding: var(--space-2xl); border-radius: var(--border-radius-lg); text-align: center;">
-                <h2 class="mb-md">Ready to Get Started?</h2>
-                <p class="mb-lg">Contact our support services team today to learn how we can help your business succeed.
-                </p>
-                <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
-                    <a href="contact.html" class="btn btn-primary">Contact Support Services</a>
-                    <a href="index.html#events" class="btn btn-outline">View Upcoming Events</a>
+                <h2 class="mb-md" data-cms-field="contactCta.heading">Ready to Get Started?</h2>
+                <div data-cms-field="contactCta.body" data-cms-type="html">
+                    <p class="mb-lg">Contact our support services team today to learn how we can help your business succeed.
+                    </p>
+                    <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+                        <a href="contact.html" class="btn btn-primary">Contact Support Services</a>
+                        <a href="index.html#events" class="btn btn-outline">View Upcoming Events</a>
+                    </div>
                 </div>
             </div>
         </section>
