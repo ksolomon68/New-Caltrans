@@ -125,7 +125,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Post new opportunity
-router.post('/', requireRole('agency'), async (req, res) => {
+router.post('/', requireRole(['agency', 'admin', 'caltrans_admin']), async (req, res) => {
     let {
         id, title, scopeSummary, district, districtName,
         category, categoryName, subcategory, estimatedValue,
@@ -138,7 +138,9 @@ router.post('/', requireRole('agency'), async (req, res) => {
     
     // Determine status based on due date if not explicitly published
     let calcStatus = status || 'published';
-    if (dueDate && calcStatus !== 'published') {
+    if (req.user && req.user.type === 'agency') {
+        calcStatus = 'pending';
+    } else if (dueDate && calcStatus !== 'published') {
         const due = new Date(dueDate);
         const now = new Date();
         calcStatus = due < now ? 'closed' : 'open';
@@ -180,6 +182,10 @@ router.post('/', requireRole('agency'), async (req, res) => {
             duration || null, requirements || null, certifications || null, experience || null,
             desc, JSON.stringify(cleanTags), JSON.stringify(cleanNaics), postedByName
         ]);
+
+        if (calcStatus === 'pending') {
+            await notifyAdminsOfPendingOpportunity(oppId, title, postedByName);
+        }
 
         res.status(201).json({ id: oppId, success: true, opportunityId: oppId, title, status: calcStatus });
     } catch (error) {
@@ -252,6 +258,32 @@ async function notifyApplicantsOfStatusChange(opportunityId, opportunityTitle, n
         console.log(`CaltransBizConnect: Notified ${applicants.length} applicants of status change to "${newStatus}" for ${opportunityId}`);
     } catch (err) {
         console.error('CaltransBizConnect: Failed to notify applicants:', err.message);
+    }
+}
+
+// Helper: notify admins of a pending opportunity
+async function notifyAdminsOfPendingOpportunity(opportunityId, opportunityTitle, postedByName) {
+    try {
+        const [admins] = await db.execute(`SELECT id FROM users WHERE type IN ('admin', 'caltrans_admin')`);
+        if (admins.length === 0) return;
+
+        const subject = `Pending Approval: ${opportunityTitle}`;
+        const body = `A new opportunity "${opportunityTitle}" has been submitted by ${postedByName} and is pending review. Please visit the admin dashboard to review and approve this opportunity.`;
+
+        for (const admin of admins) {
+            const [msgResult] = await db.execute(
+                `INSERT INTO messages (sender_id, receiver_id, sender_business_name, receiver_business_name, opportunity_id, message_type, subject, body)
+                 VALUES (?, ?, ?, ?, ?, 'system', ?, ?)`,
+                [1, admin.id, 'System', 'Admin', opportunityId, subject, body]
+            );
+            await db.execute(
+                `INSERT INTO notifications (user_id, message_id) VALUES (?, ?)`,
+                [admin.id, msgResult.insertId]
+            );
+        }
+        console.log(`CaltransBizConnect: Notified admins of pending opportunity ${opportunityId}`);
+    } catch (err) {
+        console.error('CaltransBizConnect: Failed to notify admins:', err.message);
     }
 }
 

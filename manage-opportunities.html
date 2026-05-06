@@ -44,7 +44,10 @@
 
             <!-- Opportunities Management Section -->
             <section class="content-card">
-                <h3>Active Opportunities</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+                    <h3>Active Opportunities</h3>
+                    <a href="post-opportunity.html" class="btn btn-primary">Post New Opportunity</a>
+                </div>
                 <div id="opportunitiesList">
                     <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
                         Loading opportunities...
@@ -129,7 +132,6 @@
                 listEl.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
                         <p>${isAdmin ? 'No opportunities found in the system.' : 'You have no active opportunities.'}</p>
-                        ${!isAdmin ? '<a href="post-opportunity.html" class="btn btn-primary">Post New Opportunity</a>' : ''}
                     </div>
                 `;
                 return;

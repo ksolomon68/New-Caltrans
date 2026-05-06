@@ -165,7 +165,12 @@ router.put('/users/:id', requireAdmin, async (req, res) => {
     const data = req.body;
 
     try {
-        const allowedFields = ['business_name', 'organization_name', 'contact_name', 'phone', 'ein', 'status', 'type'];
+        const allowedFields = [
+            'business_name', 'organization_name', 'contact_name', 'phone', 'ein', 
+            'status', 'type', 'business_description', 'address', 'city', 'state', 
+            'zip', 'years_in_business', 'certification_number', 'certifications',
+            'districts', 'categories'
+        ];
         const updates = [];
         const params = [];
 

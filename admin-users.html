@@ -206,6 +206,34 @@
                         style="width: 100%;">
                 </div>
                 <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Contact Name</label>
+                    <input type="text" id="modalContactName" class="form-input" placeholder="Enter contact name" style="width: 100%;">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Phone</label>
+                        <input type="text" id="modalPhone" class="form-input" placeholder="Enter phone" style="width: 100%;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">EIN / Tax ID</label>
+                        <input type="text" id="modalEIN" class="form-input" placeholder="Enter EIN" style="width: 100%;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Business Description</label>
+                    <textarea id="modalBusinessDescription" class="form-input" placeholder="Enter description" style="width: 100%; min-height: 80px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="flex: 2;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Address</label>
+                        <input type="text" id="modalAddress" class="form-input" placeholder="Enter address" style="width: 100%;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">City</label>
+                        <input type="text" id="modalCity" class="form-input" placeholder="Enter city" style="width: 100%;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Email Address</label>
                     <input type="email" id="modalUserEmail" class="form-input" placeholder="example@dot.ca.gov"
                         style="width: 100%;">
@@ -347,6 +375,12 @@
             selectedUserId = null;
             document.querySelector('.modal-title').textContent = 'Add New User';
             document.getElementById('modalUserName').value = '';
+            document.getElementById('modalContactName').value = '';
+            document.getElementById('modalPhone').value = '';
+            document.getElementById('modalEIN').value = '';
+            document.getElementById('modalBusinessDescription').value = '';
+            document.getElementById('modalAddress').value = '';
+            document.getElementById('modalCity').value = '';
             document.getElementById('modalUserEmail').value = '';
             document.getElementById('modalUserPassword').value = '';
             document.getElementById('passwordGroup').style.display = 'block';
@@ -364,6 +398,12 @@
 
             document.querySelector('.modal-title').textContent = 'Edit User';
             document.getElementById('modalUserName').value = u.business_name || u.organization_name || '';
+            document.getElementById('modalContactName').value = u.contact_name || '';
+            document.getElementById('modalPhone').value = u.phone || '';
+            document.getElementById('modalEIN').value = u.ein || '';
+            document.getElementById('modalBusinessDescription').value = u.business_description || '';
+            document.getElementById('modalAddress').value = u.address || '';
+            document.getElementById('modalCity').value = u.city || '';
             document.getElementById('modalUserEmail').value = u.email;
             document.getElementById('modalUserPassword').value = '';
             document.getElementById('passwordGroup').style.display = 'block'; // Keep it for password reset
@@ -391,6 +431,12 @@
                 email: document.getElementById('modalUserEmail').value,
                 type: document.getElementById('modalUserType').value,
                 status: document.getElementById('modalUserStatus').value,
+                contact_name: document.getElementById('modalContactName').value,
+                phone: document.getElementById('modalPhone').value,
+                ein: document.getElementById('modalEIN').value,
+                business_description: document.getElementById('modalBusinessDescription').value,
+                address: document.getElementById('modalAddress').value,
+                city: document.getElementById('modalCity').value,
                 business_name: document.getElementById('modalUserType').value === 'small_business' ? document.getElementById('modalUserName').value : null,
                 organization_name: document.getElementById('modalUserType').value === 'agency' ? document.getElementById('modalUserName').value : null
             };

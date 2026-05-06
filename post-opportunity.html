@@ -295,7 +295,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             setTimeout(() => {
-                Navigation.init('agency');
+                const user = Auth.getUser();
+                if (!user || (user.type !== 'agency' && user.type !== 'admin' && user.type !== 'caltrans_admin')) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                Navigation.init(user.type);
                 initializeForm();
             }, 50);
         });

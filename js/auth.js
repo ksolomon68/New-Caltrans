@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = {
                 businessName: document.getElementById('businessName').value,
                 legalStructure: document.getElementById('legalStructure').value,
-                ein: document.getElementById('ein').value,
+                ein: document.getElementById('ein') ? document.getElementById('ein').value : null,
                 businessAddress: document.getElementById('businessAddress').value,
                 city: document.getElementById('city').value,
                 zipCode: document.getElementById('zipCode').value,
