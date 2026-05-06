@@ -115,6 +115,9 @@
             border-radius: var(--border-radius-lg);
             width: 100%;
             max-width: 500px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
             box-shadow: var(--shadow-xl);
             transform: translateY(20px);
             transition: transform 0.2s ease;
@@ -124,13 +127,29 @@
             transform: translateY(0);
         }
 
+        .modal-body {
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
         .modal-header {
+            flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--color-border-light);
             padding-bottom: 1rem;
+        }
+
+        .modal-footer {
+            flex-shrink: 0;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border-light);
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
         }
     </style>
   <link rel="stylesheet" href="css/accessibility-widget.css?v=1774549569000">
@@ -261,12 +280,12 @@
                         <option value="suspended">Suspended</option>
                     </select>
                 </div>
-                <div style="display: flex; gap: 1rem; justify-content: space-between;">
-                    <button class="btn btn-outline-error" id="btnDeleteUser" onclick="deleteUser()"
-                        style="display: none;">Delete User</button>
-                    <div style="display: flex; gap: 1rem; margin-left: auto;">
-                        <button class="btn btn-primary" id="btnSaveUser" onclick="saveUser()">Save Changes</button>
-                    </div>
+            </div> <!-- End modal-body -->
+            <div class="modal-footer">
+                <button class="btn btn-outline-error" id="btnDeleteUser" onclick="deleteUser()"
+                    style="display: none;">Delete User</button>
+                <div style="display: flex; gap: 1rem; margin-left: auto;">
+                    <button class="btn btn-primary" id="btnSaveUser" onclick="saveUser()">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -343,9 +362,14 @@
 
                 const isActive = status === 'active' || status === 'verified';
                 const isSuspended = status === 'suspended';
+                
+                const profileLink = u.type === 'small_business' ? `small-business-profile.html?id=${u.id}` : 
+                                   (u.type === 'agency' ? `prime-contractor-profile.html?id=${u.id}` : '#');
+                const displayNameHtml = profileLink !== '#' ? `<a href="${profileLink}" style="color: var(--color-primary); text-decoration: underline;">${displayName}</a>` : displayName;
+
                 row.innerHTML = `
                     <td>
-                        <div style="font-weight: 600; color: var(--color-primary);">${displayName}</div>
+                        <div style="font-weight: 600;">${displayNameHtml}</div>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">${u.email}</div>
                     </td>
                     <td>${typeBadge}</td>

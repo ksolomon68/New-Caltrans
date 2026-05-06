@@ -190,10 +190,12 @@ const startServer = async () => {
 
                 // Only safely cache static assets if they are versioned (CSS/JS/Images)
                 if (filePath.endsWith('.css') || filePath.endsWith('.js') || filePath.match(/\.(png|jpg|jpeg|gif|ico|svg)$/)) {
-                    // For now, let's keep it at "no-cache" which means "revalidate every time"
-                    // but allows the browser to re-use if ETag matches (though we disabled ETag above).
-                    // This is the safest way to ensure "clear cache" works instantly without breaking CDN/caching later.
                     res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+                } else if (filePath.endsWith('.html')) {
+                    // Forcefully prevent caching on all HTML files
+                    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+                    res.setHeader('Pragma', 'no-cache');
+                    res.setHeader('Expires', '0');
                 }
             } 
         }));
