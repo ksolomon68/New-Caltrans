@@ -369,7 +369,10 @@ async function renderPageEditor(container, slug) {
               </span>
             </h2>
           </div>
-          <button class="cms-btn cms-btn-secondary" id="save-page-btn">💾 Save All Changes</button>
+          <div class="cms-flex cms-gap">
+            <button class="cms-btn cms-btn-outline" id="preview-page-btn" title="Preview unsaved changes in a new tab">👁️ Preview Page</button>
+            <button class="cms-btn cms-btn-secondary" id="save-page-btn">💾 Save All Changes</button>
+          </div>
         </div>
 
         <!-- Meta & Header -->
@@ -417,6 +420,14 @@ async function renderPageEditor(container, slug) {
         document.getElementById('back-to-pages').addEventListener('click', () => navigateTab('pages'));
         document.getElementById('save-page-btn').addEventListener('click', savePageChanges);
         document.getElementById('add-section-btn').addEventListener('click', () => navigateTab('builder', slug));
+
+        document.getElementById('preview-page-btn').addEventListener('click', () => {
+            // Save current in-memory state to localStorage for preview
+            localStorage.setItem('cms_preview_' + activeSlug, JSON.stringify(activePage));
+            // Open the page in a new tab with the preview query parameter
+            const url = `/${activeSlug === 'index' ? 'index' : activeSlug}.html?preview=true`;
+            window.open(url, '_blank');
+        });
 
         container.querySelectorAll('[data-section-edit]').forEach(btn => {
             btn.addEventListener('click', () => openSectionEditor(btn.getAttribute('data-section-edit')));

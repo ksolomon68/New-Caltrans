@@ -39,8 +39,25 @@
         if (!slug) return; // Page not opted into CMS
 
         try {
+            // Check for preview mode
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPreview = urlParams.get('preview') === 'true';
+            
+            let pageDataPromise;
+            if (isPreview) {
+                const previewData = localStorage.getItem('cms_preview_' + slug);
+                if (previewData) {
+                    pageDataPromise = Promise.resolve(JSON.parse(previewData));
+                    showPreviewBanner();
+                } else {
+                    pageDataPromise = fetchJson(`${API}/cms/pages/${slug}`);
+                }
+            } else {
+                pageDataPromise = fetchJson(`${API}/cms/pages/${slug}`);
+            }
+
             const [pageData, globalData] = await Promise.all([
-                fetchJson(`${API}/cms/pages/${slug}`),
+                pageDataPromise,
                 fetchJson(`${API}/cms/global`)
             ]);
 
@@ -52,6 +69,13 @@
             console.warn('[CMS Renderer] Failed to load CMS content:', err.message);
         }
     });
+
+    function showPreviewBanner() {
+        const banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#003D5B;color:#fff;padding:10px 20px;border-radius:30px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:99999;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;';
+        banner.innerHTML = '<span>👁️ CMS Preview Mode (Unsaved Changes)</span> <button style="background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:12px;" onclick="this.parentElement.remove()">Dismiss</button>';
+        document.body.appendChild(banner);
+    }
 
     // ── Page hydration ───────────────────────────────────────────────────────
     /**
