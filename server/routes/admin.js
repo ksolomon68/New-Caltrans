@@ -2,6 +2,7 @@ const express = require('express');
 const { db } = require('../database');
 const bcrypt = require('bcryptjs');
 const { requireAdmin } = require('../middleware/auth');
+const { sendEmail, getAdminWelcomeEmail } = require('../config/email');
 const router = express.Router();
 
 // Root admin endpoint
@@ -116,6 +117,22 @@ router.post('/users', requireAdmin, async (req, res) => {
             organization_name || null,
             status || 'active'
         ]);
+
+        // If it's an admin account, send welcome email
+        if (type === 'admin' || type === 'caltrans_admin') {
+            try {
+                const { html, text } = getAdminWelcomeEmail(email, password, type, organization_name || business_name);
+                await sendEmail({
+                    to: email,
+                    subject: 'New Administrator Account Created - CaltransBizConnect',
+                    html,
+                    text
+                });
+            } catch (mailErr) {
+                console.error('[Admin] Failed to send welcome email:', mailErr);
+                // We don't fail the request if only email fails, but we log it
+            }
+        }
 
         res.status(201).json({ id: result.insertId, email, type });
     } catch (error) {

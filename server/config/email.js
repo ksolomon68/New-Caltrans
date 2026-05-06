@@ -143,4 +143,44 @@ function getContactConfirmationEmail(userName, message) {
     return { html, text };
 }
 
-module.exports = { sendEmail, getPasswordResetEmail, getWelcomeEmail, getContactConfirmationEmail };
+/**
+ * Admin welcome email sent when a new administrator account is created.
+ * @param {string} email
+ * @param {string} password
+ * @param {string} type
+ * @param {string} name
+ */
+function getAdminWelcomeEmail(email, password, type, name) {
+    const roleLabel = type === 'caltrans_admin' ? 'CMS Editor' : 'System Administrator';
+    const loginUrl = `${process.env.APP_URL || 'https://caltransbizconnect.org'}/admin-login.html`;
+    const cmsUrl = `${process.env.APP_URL || 'https://caltransbizconnect.org'}/admin-cms.html`;
+
+    const html = emailWrapper(`
+        <h2 style="margin:0 0 8px;color:#003D5B;font-size:20px;">Administrator Account Created</h2>
+        <p style="color:#444;line-height:1.6;">Hi ${name || 'Administrator'},</p>
+        <p style="color:#444;line-height:1.6;">A new <strong>${roleLabel}</strong> account has been created for you on the CaltransBizConnect platform.</p>
+        <div style="background:#f8f9fa;padding:20px;border-radius:8px;margin:20px 0;border:1px solid #e0e0e0;">
+            <p style="margin:0 0 8px;font-weight:700;color:#003D5B;">Your Access Credentials:</p>
+            <p style="margin:4px 0;font-size:14px;"><strong>Email:</strong> ${email}</p>
+            <p style="margin:4px 0;font-size:14px;"><strong>Temporary Password:</strong> ${password}</p>
+        </div>
+        <p style="color:#444;line-height:1.6;">You can log in to the admin dashboard or the CMS using the buttons below. We recommend changing your password immediately after your first login.</p>
+        <div style="display:flex;gap:12px;">
+            ${btn(loginUrl, 'Admin Dashboard')}
+            ${btn(cmsUrl, 'CMS Manager')}
+        </div>
+        <p style="color:#666;font-size:13px;line-height:1.6;margin-top:20px;">If you were not expecting this access, please contact the platform lead at <a href="mailto:smallbusinesses@dot.ca.gov" style="color:#046B99;">smallbusinesses@dot.ca.gov</a>.</p>
+    `);
+
+    const text = `Administrator Account Created\n\nHi ${name || 'Administrator'},\n\nA new ${roleLabel} account has been created for you on CaltransBizConnect.\n\nCredentials:\nEmail: ${email}\nPassword: ${password}\n\nLog in at: ${loginUrl}\n\n© 2026 California Department of Transportation`;
+
+    return { html, text };
+}
+
+module.exports = { 
+    sendEmail, 
+    getPasswordResetEmail, 
+    getWelcomeEmail, 
+    getContactConfirmationEmail,
+    getAdminWelcomeEmail
+};
