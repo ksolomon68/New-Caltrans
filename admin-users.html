@@ -231,7 +231,6 @@
                         <option value="active">Active</option>
                         <option value="pending">Pending Verification</option>
                         <option value="suspended">Suspended</option>
-                        <option value="verified">Verified Small Business</option>
                     </select>
                 </div>
                 <div style="display: flex; gap: 1rem; justify-content: space-between;">
@@ -281,7 +280,7 @@
                 // Fallback for visual verification if backend is empty/broken during dev
                 if (!currentUsers.length) {
                     currentUsers = [
-                        { id: 1, business_name: 'Acme Construction', email: 'contact@acme.com', type: 'small_business', status: 'verified', created_at: '2025-01-15' },
+                        { id: 1, business_name: 'Acme Construction', email: 'contact@acme.com', type: 'small_business', status: 'active', created_at: '2025-01-15' },
                         { id: 2, organization_name: 'City of Sacramento', email: 'planning@city.gov', type: 'agency', status: 'active', created_at: '2025-02-01' }
                     ];
                 }

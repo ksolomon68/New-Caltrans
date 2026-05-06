@@ -601,8 +601,9 @@ function fieldCheckbox(fieldKey, label, checked) {
 }
 
 function mediaField(fieldKey, label, value, aspectRatio = '', hint = '') {
-    const id      = `field-${fieldKey.replace(/\./g, '-')}`;
-    const preview = value ? `<img src="${escHtml(value)}" alt="Preview"
+    const id        = `field-${fieldKey.replace(/\./g, '-').replace(/[\[\]]/g, '_')}`;
+    const previewId = `preview-${fieldKey.replace(/\./g, '-').replace(/[\[\]]/g, '_')}`;
+    const preview   = value ? `<img src="${escHtml(value)}" alt="Preview"
         style="max-width:200px;max-height:120px;border-radius:4px;border:1px solid var(--cms-border);margin-top:.4rem">` : '';
     return `
     <div class="cms-form-group" style="grid-column:1/-1">
@@ -614,7 +615,7 @@ function mediaField(fieldKey, label, value, aspectRatio = '', hint = '') {
         <button type="button" class="cms-btn cms-btn-outline cms-btn-sm"
                 data-media-pick="${escHtml(fieldKey)}">🖼️ Browse Media</button>
       </div>
-      ${preview}
+      <div id="${previewId}" class="cms-media-preview-container">${preview}</div>
       ${hint ? `<p class="cms-input-hint">${escHtml(hint)}</p>` : ''}
       <p class="cms-input-hint">Alt text for images is managed in the Media Library.</p>
     </div>`;
@@ -1240,20 +1241,33 @@ function openMediaPicker(fieldKey, sectionId) {
     backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
 
     renderMediaLibrary(document.getElementById('media-picker-body'), (url) => {
-        // Set the text input for this field
-        const input = document.querySelector(`[data-field="${fieldKey}"]`);
+        // Escape fieldKey for CSS selector (handles brackets like cards[0].image)
+        const escapedKey = fieldKey.replace(/([\[\]\.])/g, '\\$1');
+        const input = document.querySelector(`[data-field="${escapedKey}"]`);
+        
         if (input) {
             input.value = url;
-            // Also update in-memory activePage
-            if (activePage && sectionId) {
-                setFieldValue(`${sectionId}.${fieldKey.includes('.') ? fieldKey.split('.').slice(1).join('.') : fieldKey}`, url);
-            } else if (activePage && fieldKey.startsWith('header.')) {
-                if (!activePage.header) activePage.header = {};
-                activePage.header[fieldKey.slice(7)] = url;
+            
+            // Update preview immediately if container exists
+            const previewId = `preview-${fieldKey.replace(/\./g, '-').replace(/[\[\]]/g, '_')}`;
+            const previewWrap = document.getElementById(previewId);
+            if (previewWrap) {
+                previewWrap.innerHTML = `<img src="${url}" alt="Preview"
+                    style="max-width:200px;max-height:120px;border-radius:4px;border:1px solid var(--cms-border);margin-top:.4rem">`;
             }
         }
+
+        // Always update in-memory activePage to ensure persistence even if DOM find fails
+        if (activePage && sectionId) {
+            const relativeKey = fieldKey.includes('.') ? fieldKey.split('.').slice(1).join('.') : fieldKey;
+            setFieldValue(`${sectionId}.${relativeKey}`, url);
+        } else if (activePage && fieldKey.startsWith('header.')) {
+            if (!activePage.header) activePage.header = {};
+            activePage.header[fieldKey.slice(7)] = url;
+        }
+
         backdrop.remove();
-        showToast('Image selected. Remember to Save.', 'info');
+        showToast('Image selected. Remember to Save All Changes.', 'info');
     });
 }
 
