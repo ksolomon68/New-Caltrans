@@ -344,7 +344,7 @@
     function renderTileItem(tile, index) {
         var href     = safeAttr(tile.href || '#');
         var title    = safeText(tile.title || '');
-        var desc     = safeText(tile.description || '');
+        var desc     = String(tile.description || ''); // Allow HTML
         var linkText = safeText(tile.linkText || 'Learn More');
         var delay    = (index * 100) + 'ms';
         return '<a href="' + href + '" class="action-tile reveal-slide-up" data-delay="' + delay + '">' +
@@ -362,7 +362,7 @@
             ? '<h3 class="mb-xs" style="color:white;font-size:var(--font-size-md);">' + safeText(col.heading) + '</h3>'
             : '';
         var text = col.text
-            ? '<p class="mb-sm" style="opacity:0.9;font-size:0.9rem;">' + safeText(col.text) + '</p>'
+            ? '<p class="mb-sm" style="opacity:0.9;font-size:0.9rem;">' + String(col.text) + '</p>'
             : '';
         return '<div>' + heading + text +
                '<a href="' + href + '" class="btn btn-secondary">' + label + '</a></div>';
@@ -370,7 +370,7 @@
 
     function renderCardItem(card) {
         var title   = safeText(card.title || '');
-        var body    = safeText(card.body  || '');
+        var body    = String(card.body  || ''); // Allow HTML
         var imgHtml = card.image
             ? '<img src="' + safeAttr(card.image) + '" alt="' + safeAttr(card.imageAlt || '') +
               '" class="card-image" loading="lazy" style="width:100%;border-radius:4px;margin-bottom:.75rem">'

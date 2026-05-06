@@ -477,6 +477,7 @@ function openSectionEditor(sectionId) {
     if (sItem) { sItem.classList.add('active'); sItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 
     bodyEl.innerHTML = buildFieldEditors(section, schema);
+    attachToolbarHandlers(bodyEl);
 
     // Wire media pickers
     bodyEl.querySelectorAll('[data-media-pick]').forEach(btn => {
@@ -510,10 +511,10 @@ function buildFieldEditors(section, schema) {
         const val = getNestedVal(fields, f.key.split('.'));
         switch (f.inputType) {
             case 'text':
-                html += fieldInput(`${section.id}.${f.key}`, f.label, val || '', 'text', f.maxLength, f.required, f.note);
+                html += fieldInput(`${section.id}.${f.key}`, f.label, val || '', 'text', f.maxLength, f.required, f.note, !!f.richText);
                 break;
             case 'textarea':
-                html += fieldInput(`${section.id}.${f.key}`, f.label, val || '', 'textarea', f.maxLength, f.required, f.note);
+                html += fieldInput(`${section.id}.${f.key}`, f.label, val || '', 'textarea', f.maxLength, f.required, f.note, !!f.richText);
                 break;
             case 'url':
                 html += fieldInput(`${section.id}.${f.key}`, f.label, val || '', 'url', null, f.required, f.note);
@@ -549,11 +550,14 @@ function buildFieldEditors(section, schema) {
 }
 
 // ── Field HTML builders ────────────────────────────────────────────────────
-function fieldInput(fieldKey, label, value, type = 'text', maxLength = null, required = false, hint = '') {
+function fieldInput(fieldKey, label, value, type = 'text', maxLength = null, required = false, hint = '', richText = false) {
     const id   = `field-${fieldKey.replace(/\./g, '-')}`;
     const req  = required ? 'class="cms-label-required"' : '';
     const max  = maxLength ? `maxlength="${maxLength}"` : '';
     const isTA = type === 'textarea';
+
+    const toolbar = (isTA && richText) ? renderFormattingToolbar(id) : '';
+
     const ctrl = isTA
         ? `<textarea class="cms-input cms-textarea" id="${id}" data-field="${escHtml(fieldKey)}" ${max}
              ${required ? 'required' : ''} rows="3">${escHtml(String(value))}</textarea>`
@@ -563,9 +567,11 @@ function fieldInput(fieldKey, label, value, type = 'text', maxLength = null, req
     return `
     <div class="cms-form-group" style="grid-column: ${isTA ? '1/-1' : 'auto'}">
       <label class="cms-label ${req}" for="${id}">${escHtml(label)}</label>
+      ${toolbar}
       ${ctrl}
       ${hint ? `<p class="cms-input-hint">${escHtml(hint)}</p>` : ''}
       ${maxLength ? `<p class="cms-char-count" data-max="${maxLength}" data-for="${id}">0/${maxLength}</p>` : ''}
+      ${richText ? `<div class="cms-input-hint">Rich text supported: &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;a href=""&gt;</div>` : ''}
     </div>`;
 }
 
@@ -687,8 +693,8 @@ function renderListItem(fieldKey, item, index, listType, schema) {
             const val  = itemObj[f.key];
             const fKey = `${fieldKey}[${index}].${f.key}`;
             switch (f.inputType) {
-                case 'text':     return fieldInput(fKey, f.label, val || '', 'text',     f.maxLength, f.required, f.note || '');
-                case 'textarea': return fieldInput(fKey, f.label, val || '', 'textarea', f.maxLength, f.required, f.note || '');
+                case 'text':     return fieldInput(fKey, f.label, val || '', 'text',     f.maxLength, f.required, f.note || '', !!f.richText);
+                case 'textarea': return fieldInput(fKey, f.label, val || '', 'textarea', f.maxLength, f.required, f.note || '', !!f.richText);
                 case 'url':      return fieldInput(fKey, f.label, val || '', 'url',      null,         f.required, f.note || '');
                 case 'checkbox': return fieldCheckbox(fKey, f.label, !!val);
                 case 'media':    return mediaField(fKey, f.label, val || '', f.aspectRatio || '', f.note || '');
@@ -1657,12 +1663,7 @@ function openFAQModal(faq) {
 
       <div class="cms-form-group">
         <label class="cms-label cms-label-required" for="faq-answer-input">Answer</label>
-        <div class="cms-faq-editor-toolbar">
-          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="bold"><b>B</b></button>
-          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="italic"><i>I</i></button>
-          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="ul">• List</button>
-          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="link">🔗 Link</button>
-        </div>
+        ${renderFormattingToolbar('faq-answer-input')}
         <textarea id="faq-answer-input" class="cms-textarea" rows="8"
                   placeholder="Enter the FAQ answer (HTML supported)…">${faq ? escHtml(faq.answer) : ''}</textarea>
         <div class="cms-input-hint">Basic HTML supported: &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a href=""&gt;, &lt;br&gt;</div>
@@ -1719,28 +1720,7 @@ function openFAQModal(faq) {
     });
 
     // Mini formatting toolbar
-    backdrop.querySelectorAll('[data-fmt]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const ta = document.getElementById('faq-answer-input');
-            const start = ta.selectionStart;
-            const end   = ta.selectionEnd;
-            const sel   = ta.value.slice(start, end);
-            let insert  = '';
-            switch (btn.dataset.fmt) {
-                case 'bold':   insert = `<strong>${sel || 'bold text'}</strong>`; break;
-                case 'italic': insert = `<em>${sel || 'italic text'}</em>`; break;
-                case 'ul':     insert = `<ul>\n  <li>${sel || 'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`; break;
-                case 'link': {
-                    const href = prompt('Enter URL:', 'https://');
-                    if (!href) return;
-                    insert = `<a href="${escHtml(href)}">${sel || 'link text'}</a>`;
-                    break;
-                }
-            }
-            ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
-            ta.focus();
-        });
-    });
+    attachToolbarHandlers(backdrop);
 
     // Save
     document.getElementById('faq-modal-save').addEventListener('click', () => saveFAQ(faq?.id || null));
@@ -1909,6 +1889,55 @@ function formatKey(key) {
 
 function getSectionTypeLabel(type) {
     return schemaData?.componentTypes?.find(c => c.type === type)?.label || type;
+}
+
+/**
+ * Returns a small HTML toolbar for textarea formatting.
+ * Used by fieldInput and openFAQModal.
+ */
+function renderFormattingToolbar(targetId) {
+    return `
+    <div class="cms-faq-editor-toolbar" data-target-id="${targetId}">
+      <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="bold" title="Bold"><b>B</b></button>
+      <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="italic" title="Italic"><i>I</i></button>
+      <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="ul" title="Bullet List">• List</button>
+      <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="link" title="Insert Link">🔗 Link</button>
+    </div>`;
+}
+
+/**
+ * Attaches click handlers to a formatting toolbar's buttons.
+ */
+function attachToolbarHandlers(scope) {
+    scope.querySelectorAll('[data-fmt]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const toolbar = btn.closest('[data-target-id]');
+            const targetId = toolbar.getAttribute('data-target-id');
+            const ta = document.getElementById(targetId);
+            if (!ta) return;
+
+            const start = ta.selectionStart;
+            const end   = ta.selectionEnd;
+            const sel   = ta.value.slice(start, end);
+            let insert  = '';
+
+            switch (btn.dataset.fmt) {
+                case 'bold':   insert = `<strong>${sel || 'bold text'}</strong>`; break;
+                case 'italic': insert = `<em>${sel || 'italic text'}</em>`; break;
+                case 'ul':     insert = `<ul>\n  <li>${sel || 'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`; break;
+                case 'link': {
+                    const href = prompt('Enter URL:', 'https://');
+                    if (!href) return;
+                    insert = `<a href="${escHtml(href)}">${sel || 'link text'}</a>`;
+                    break;
+                }
+            }
+            ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
+            ta.focus();
+            // Trigger input event for char counters and auto-save if needed
+            ta.dispatchEvent(new Event('input'));
+        });
+    });
 }
 
 function getNestedVal(obj, keys) {

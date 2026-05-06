@@ -36,7 +36,7 @@
       "description": "A heading and rich text body paragraph.",
       "fields": [
         { "key": "heading", "label": "Heading", "inputType": "text",     "required": true,  "maxLength": 120 },
-        { "key": "body",    "label": "Body",    "inputType": "textarea", "required": true,  "maxLength": 5000 }
+        { "key": "body",    "label": "Body",    "inputType": "textarea", "required": true,  "maxLength": 5000, "richText": true }
       ]
     },
     {
@@ -50,7 +50,7 @@
       ],
       "cardFields": [
         { "key": "title",       "label": "Card Title",       "inputType": "text",     "required": true,  "maxLength": 80  },
-        { "key": "body",        "label": "Card Body",        "inputType": "textarea", "required": true,  "maxLength": 300 },
+        { "key": "body",        "label": "Card Body",        "inputType": "textarea", "required": true,  "maxLength": 300, "richText": true },
         { "key": "image",       "label": "Card Image",       "inputType": "media",    "required": false, "aspectRatio": "4:3" },
         { "key": "imageAlt",    "label": "Image Alt Text",   "inputType": "text",     "required": false, "maxLength": 200 },
         { "key": "buttonLabel", "label": "Button Label",     "inputType": "text",     "required": false, "maxLength": 60  },
@@ -68,7 +68,7 @@
       ],
       "tileFields": [
         { "key": "title",       "label": "Tile Title",      "inputType": "text",     "required": true, "maxLength": 60 },
-        { "key": "description", "label": "Description",     "inputType": "textarea", "required": true, "maxLength": 250 },
+        { "key": "description", "label": "Description",     "inputType": "textarea", "required": true, "maxLength": 250, "richText": true },
         { "key": "href",        "label": "Link URL",        "inputType": "url",      "required": true  },
         { "key": "linkText",    "label": "Link Text",       "inputType": "text",     "required": true, "maxLength": 40 }
       ]
@@ -84,7 +84,7 @@
       ],
       "columnFields": [
         { "key": "heading",     "label": "Column Heading",     "inputType": "text",     "required": false, "maxLength": 80 },
-        { "key": "text",        "label": "Column Text",        "inputType": "textarea", "required": false, "maxLength": 200 },
+        { "key": "text",        "label": "Column Text",        "inputType": "textarea", "required": false, "maxLength": 200, "richText": true },
         { "key": "buttonLabel", "label": "Button Label",       "inputType": "text",     "required": true,  "maxLength": 60 },
         { "key": "buttonHref",  "label": "Button Link URL",    "inputType": "url",      "required": true  }
       ]
@@ -135,7 +135,7 @@
       ],
       "stepFields": [
         { "key": "label",  "label": "Step Title",  "inputType": "text",     "required": true, "maxLength": 80  },
-        { "key": "detail", "label": "Step Detail", "inputType": "textarea", "required": true, "maxLength": 300 }
+        { "key": "detail", "label": "Step Detail", "inputType": "textarea", "required": true, "maxLength": 300, "richText": true }
       ]
     },
     {
