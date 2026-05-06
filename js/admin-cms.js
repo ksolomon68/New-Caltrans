@@ -551,6 +551,7 @@ function buildFieldEditors(section, schema) {
             case 'accordion-list':
             case 'cta-list':
             case 'string-list':
+            case 'video-list':
                 html += listEditorField(`${section.id}.${f.key}`, f.label, val || [], f.inputType, schema);
                 break;
             case 'pathway-card':
@@ -790,6 +791,7 @@ function newListItem(listType) {
         case 'accordion-list':return { question: 'New Question', answer: '' };
         case 'cta-list':      return { heading: '', text: '', buttonLabel: 'Learn More', buttonHref: '' };
         case 'string-list':   return '';
+        case 'video-list':    return { title: 'New Video', src: 'https://www.youtube.com/embed/' };
         default:              return {};
     }
 }

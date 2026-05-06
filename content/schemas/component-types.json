@@ -154,6 +154,19 @@
         { "key": "description", "label": "Description",    "inputType": "textarea","required": true, "maxLength": 200 },
         { "key": "srText",      "label": "Screen-reader extra text", "inputType": "text", "required": false, "maxLength": 100 }
       ]
+    },
+    {
+      "type": "video-gallery",
+      "label": "Video Gallery",
+      "description": "A grid of embedded YouTube videos.",
+      "fields": [
+        { "key": "heading", "label": "Section Heading", "inputType": "text", "required": false, "maxLength": 120 },
+        { "key": "videos", "label": "Videos", "inputType": "video-list", "required": true }
+      ],
+      "videoFields": [
+        { "key": "title", "label": "Video Title", "inputType": "text", "required": true, "maxLength": 120 },
+        { "key": "src", "label": "YouTube Embed URL", "inputType": "url", "required": true }
+      ]
     }
   ]
 }

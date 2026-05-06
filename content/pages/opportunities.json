@@ -14,6 +14,27 @@
         "title": "Current Opportunities",
         "subtitle": "Browse and filter contracting opportunities across all Caltrans districts. Log in to save opportunities and submit proposals."
       }
+    },
+    {
+      "id": "video-section",
+      "type": "video-gallery",
+      "fields": {
+        "heading": "Featured Videos",
+        "videos": [
+          {
+            "title": "Caltrans Opportunities Video 1",
+            "src": "https://youtu.be/-BuKsRoN0PY"
+          },
+          {
+            "title": "Caltrans Opportunities Video 2",
+            "src": "https://youtu.be/_pljsBMO0Is"
+          },
+          {
+            "title": "Caltrans Opportunities Video 3",
+            "src": "https://youtu.be/eXEldHlPpZQ"
+          }
+        ]
+      }
     }
   ]
 }

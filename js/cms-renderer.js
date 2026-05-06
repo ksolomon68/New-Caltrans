@@ -361,6 +361,7 @@
             case 'tile':       return renderTileItem(item, index);
             case 'cta-column': return renderCtaColumnItem(item);
             case 'card':       return renderCardItem(item);
+            case 'video-card': return renderVideoCardItem(item);
             default:           return '';
         }
     }
@@ -410,6 +411,29 @@
                '<h3 style="font-size:1.05rem;margin-bottom:.5rem;color:var(--color-primary)">' + title + '</h3>' +
                '<p style="color:var(--color-text-secondary);font-size:.9rem;margin-bottom:.75rem">' + body + '</p>' +
                btnHtml + '</div>';
+    }
+
+    function renderVideoCardItem(video) {
+        var title = safeText(video.title || '');
+        var src = safeAttr(video.src || '');
+        
+        // Ensure YouTube URLs are embeddable format
+        if (src.includes('youtu.be/')) {
+            var id = src.split('youtu.be/')[1].split('?')[0];
+            src = 'https://www.youtube.com/embed/' + id;
+        } else if (src.includes('youtube.com/watch')) {
+            var urlParams = new URL(src).searchParams;
+            var id = urlParams.get('v');
+            if (id) src = 'https://www.youtube.com/embed/' + id;
+        }
+
+        return '<div class="video-card" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;">' +
+               '<div class="video-wrapper" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">' +
+               '<iframe src="' + src + '" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>' +
+               '</div>' +
+               '<div style="padding:1rem;">' +
+               '<h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">' + title + '</h3>' +
+               '</div></div>';
     }
 
     // Safe-escaping helpers for renderer-generated HTML
