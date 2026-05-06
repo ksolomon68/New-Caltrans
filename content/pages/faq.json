@@ -11,7 +11,8 @@
       "id": "hero",
       "type": "hero-section",
       "fields": {
-        "title": "Frequently Asked Questions"
+        "title": "Frequently Asked Questions",
+        "subtitle": "Find answers to common questions about CaltransBizConnect"
       }
     }
   ]

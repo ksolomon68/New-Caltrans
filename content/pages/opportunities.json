@@ -11,7 +11,8 @@
       "id": "hero",
       "type": "hero-section",
       "fields": {
-        "title": "Current Opportunities"
+        "title": "Current Opportunities",
+        "subtitle": "Browse and filter contracting opportunities across all Caltrans districts. Log in to save opportunities and submit proposals."
       }
     }
   ]

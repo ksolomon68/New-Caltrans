@@ -1038,18 +1038,19 @@ async function renderMediaLibrary(container, onSelect) {
             <label class="cms-upload-zone" id="upload-zone" for="media-file-input" tabindex="0"
                    role="button" aria-label="Upload image — click or drag & drop">
               <div class="cms-upload-zone-icon" aria-hidden="true">📁</div>
-              <p><strong>Click to browse</strong> or drag & drop an image here</p>
-              <p class="cms-text-sm cms-text-muted">JPEG, PNG, GIF, WebP, SVG — max 10 MB</p>
+              <p><strong>Click to browse</strong> or drag &amp; drop an image here</p>
+              <p class="cms-text-sm cms-text-muted">JPEG · PNG · GIF · WebP · SVG &nbsp;|&nbsp; Max 10 MB</p>
+              <p id="upload-file-preview" class="cms-upload-file-preview" style="display:none"></p>
               <input type="file" id="media-file-input" accept="image/*" aria-hidden="true">
             </label>
             <div class="cms-settings-grid">
               ${fieldInput('upload-alt-text', 'Alt Text (required)', '', 'text', 200, true,
                 'Describe the image for screen reader users. E.g. "Construction workers reviewing blueprints".')}
             </div>
-            <button class="cms-btn cms-btn-primary" id="do-upload-btn">Upload Image</button>
-            <div id="upload-progress" class="cms-hidden cms-mt">
+            <button class="cms-btn cms-btn-primary" id="do-upload-btn">⬆️ Upload Image</button>
+            <div id="upload-progress" class="cms-mt" style="display:none;align-items:center;gap:.5rem;flex-wrap:wrap">
               <div class="cms-spinner" aria-hidden="true"></div>
-              <span>Uploading…</span>
+              <span>Uploading, please wait…</span>
             </div>
           </div>
         </div>
@@ -1059,28 +1060,53 @@ async function renderMediaLibrary(container, onSelect) {
           <div class="cms-panel-header"><h3 class="cms-panel-title">Uploaded Images</h3></div>
           <div class="cms-panel-body">
             ${media.length === 0
-              ? '<p class="cms-text-muted">No images uploaded yet.</p>'
+              ? `<div class="cms-media-empty">
+                   <div style="font-size:2.5rem;margin-bottom:.5rem" aria-hidden="true">🖼️</div>
+                   <p style="font-weight:700;margin:0 0 .25rem">No images uploaded yet</p>
+                   <p class="cms-text-sm">Use the Upload Image panel above to add your first image.</p>
+                 </div>`
               : `<div class="cms-media-grid" id="media-grid">
-                  ${media.map(f => `
+                  ${media.map(f => {
+                    const date = f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+                    return `
                     <div class="cms-media-card" data-url="${escHtml(f.url)}" data-alt="${escHtml(f.altText)}"
-                         role="button" tabindex="0" aria-label="Image: ${escHtml(f.altText || f.filename)}">
-                      <img class="cms-media-thumb" src="${escHtml(f.url)}" alt="${escHtml(f.altText)}"
-                           loading="lazy">
-                      <div class="cms-media-info">
-                        <p class="cms-media-filename">${escHtml(f.filename)}</p>
-                        <p class="cms-media-alt">${escHtml(f.altText || 'No alt text')}</p>
-                        <p class="cms-text-muted" style="margin:0">${formatBytes(f.size)}</p>
-                        <button class="cms-btn cms-btn-danger cms-btn-sm cms-w100" style="margin-top:.4rem"
-                                data-delete-media="${escHtml(f.filename)}">Delete</button>
+                         role="${onSelect ? 'button' : 'article'}" tabindex="${onSelect ? '0' : '-1'}"
+                         aria-label="Image: ${escHtml(f.altText || f.filename)}">
+                      <div class="cms-media-thumb-wrap">
+                        <img class="cms-media-thumb" src="${escHtml(f.url)}" alt="${escHtml(f.altText)}"
+                             loading="lazy">
+                        ${onSelect ? '<div class="cms-media-select-overlay">Click to select</div>' : ''}
                       </div>
-                    </div>`).join('')}
+                      <div class="cms-media-info">
+                        <p class="cms-media-filename" title="${escHtml(f.filename)}">${escHtml(f.filename)}</p>
+                        <p class="cms-media-alt" title="${escHtml(f.altText || '')}">${escHtml(f.altText || '⚠ No alt text')}</p>
+                        <p class="cms-media-meta">${formatBytes(f.size)}${date ? ' &middot; ' + date : ''}</p>
+                        <button class="cms-btn cms-btn-danger cms-btn-sm cms-w100"
+                                data-delete-media="${escHtml(f.filename)}" aria-label="Delete ${escHtml(f.filename)}">Delete</button>
+                      </div>
+                    </div>`;}).join('')}
                 </div>`}
           </div>
         </div>
         `;
 
-        // Drag & drop
-        const zone = document.getElementById('upload-zone');
+        // Drag & drop + file selection feedback
+        const zone = container.querySelector('#upload-zone');
+
+        function updateFilePreview(file) {
+            const preview = container.querySelector('#upload-file-preview');
+            if (!preview) return;
+            if (file) {
+                const mb = (file.size / 1048576).toFixed(2);
+                preview.textContent = `✅ ${file.name} (${mb} MB)`;
+                preview.style.display = '';
+                zone.classList.add('has-file');
+            } else {
+                preview.style.display = 'none';
+                zone.classList.remove('has-file');
+            }
+        }
+
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
         zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
         zone.addEventListener('drop', e => {
@@ -1088,11 +1114,15 @@ async function renderMediaLibrary(container, onSelect) {
             zone.classList.remove('drag-over');
             const file = e.dataTransfer.files[0];
             if (file) {
-                document.getElementById('media-file-input').files = e.dataTransfer.files;
+                container.querySelector('#media-file-input').files = e.dataTransfer.files;
+                updateFilePreview(file);
             }
         });
+        container.querySelector('#media-file-input').addEventListener('change', e => {
+            updateFilePreview(e.target.files[0] || null);
+        });
 
-        document.getElementById('do-upload-btn').addEventListener('click', () => doUpload(onSelect));
+        container.querySelector('#do-upload-btn').addEventListener('click', () => doUpload(container, onSelect));
 
         container.querySelectorAll('[data-delete-media]').forEach(btn => {
             btn.addEventListener('click', e => {
@@ -1124,20 +1154,20 @@ async function renderMediaLibrary(container, onSelect) {
     }
 }
 
-async function doUpload(onSelect) {
-    const fileInput = document.getElementById('media-file-input');
-    const altInput  = document.querySelector('[data-field="upload-alt-text"]');
+async function doUpload(container, onSelect) {
+    const fileInput = container.querySelector('#media-file-input');
+    const altInput  = container.querySelector('[data-field="upload-alt-text"]');
     const altText   = altInput ? altInput.value.trim() : '';
-    const progress  = document.getElementById('upload-progress');
+    const progress  = container.querySelector('#upload-progress');
 
-    if (!fileInput.files.length) { showToast('Please select a file.', 'error'); return; }
-    if (!altText) { showToast('Alt text is required.', 'error'); altInput?.focus(); return; }
+    if (!fileInput.files.length) { showToast('Please select a file first.', 'error'); return; }
+    if (!altText) { showToast('Alt text is required before uploading.', 'error'); altInput?.focus(); return; }
 
     const formData = new FormData();
     formData.append('image',   fileInput.files[0]);
     formData.append('altText', altText);
 
-    progress.classList.remove('cms-hidden');
+    if (progress) progress.style.display = 'flex';
 
     try {
         const res = await fetch(`${API}/cms/media`, {
@@ -1147,13 +1177,16 @@ async function doUpload(onSelect) {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Upload failed');
-        showToast(`"${data.filename}" uploaded.`, 'success');
-        if (onSelect) onSelect(data.url, data.altText);
-        renderMediaLibrary(document.getElementById('cms-main'), onSelect);
+        showToast(`"${data.filename}" uploaded successfully.`, 'success');
+        if (onSelect) {
+            onSelect(data.url, data.altText);
+        } else {
+            renderMediaLibrary(container, null);
+        }
     } catch (err) {
         showToast(`Upload failed: ${err.message}`, 'error');
     } finally {
-        progress.classList.add('cms-hidden');
+        if (progress) progress.style.display = 'none';
     }
 }
 

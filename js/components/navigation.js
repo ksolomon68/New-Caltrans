@@ -9,43 +9,59 @@ const Navigation = {
         small_business: {
             title: 'Small Business Portal',
             items: [
-                { label: 'Dashboard', href: 'dashboard-small-business.html', icon: '🏠' },
-                { label: 'Search Opportunities', href: 'search-opportunities.html', icon: '🏢' },
-                { label: 'My Applications', href: 'small-business-applications.html', icon: '📋' },
-                { label: 'Saved Items', href: 'saved-opportunities.html', icon: '⭐' },
-                { label: 'Messages', href: 'messages.html', icon: '✉️' },
-                { label: 'My Profile', href: 'small-business-profile.html', icon: '👤' },
-                { label: 'Settings', href: 'small-business-settings.html', icon: '⚙️' }
+                { label: 'Dashboard',             href: 'dashboard-small-business.html',  icon: '🏠' },
+                { label: 'Search Opportunities',  href: 'search-opportunities.html',       icon: '🔍' },
+                { label: 'My Applications',       href: 'small-business-applications.html',icon: '📋' },
+                { label: 'Saved Items',           href: 'saved-opportunities.html',        icon: '⭐' },
+                { label: 'Messages',              href: 'messages.html',                   icon: '✉️' },
+                { label: 'My Profile',            href: 'small-business-profile.html',     icon: '👤' },
+                { label: 'Preferences',           href: 'small-business-preferences.html', icon: '🎛️' },
+                { label: 'Settings',              href: 'small-business-settings.html',    icon: '⚙️' },
+                { label: 'Resources',             href: 'resources.html',                  icon: '📚' },
+                { label: 'Help & FAQ',            href: 'faq.html',                        icon: '❓' }
             ]
         },
         agency: {
             title: 'Prime Contractor Portal',
             items: [
-                { label: 'Dashboard', href: 'dashboard-prime-contractor.html', icon: '🏠' },
-                { label: 'Post Opportunity', href: 'post-opportunity.html', icon: '➕' },
-                { label: 'Manage Postings', href: 'manage-opportunities.html', icon: '📂' },
-                { label: 'Search Small Businesses', href: 'search-small-businesses.html', icon: '🔍' },
-                { label: 'Messages', href: 'messages.html', icon: '📬' },
-                { label: 'Analytics', href: 'prime-contractor-analytics.html', icon: '📈' },
-                { label: 'Settings', href: 'prime-contractor-settings.html', icon: '⚙️' }
+                { label: 'Dashboard',               href: 'dashboard-prime-contractor.html',  icon: '🏠' },
+                { label: 'Post Opportunity',        href: 'post-opportunity.html',             icon: '➕' },
+                { label: 'Manage Postings',         href: 'manage-opportunities.html',         icon: '📂' },
+                { label: 'View Applications',       href: 'view-applications.html',            icon: '📝' },
+                { label: 'Search Small Businesses', href: 'search-small-businesses.html',      icon: '🔍' },
+                { label: 'Messages',                href: 'messages.html',                     icon: '📬' },
+                { label: 'Analytics',               href: 'prime-contractor-analytics.html',   icon: '📈' },
+                { label: 'My Profile',              href: 'prime-contractor-profile.html',     icon: '👤' },
+                { label: 'Settings',                href: 'prime-contractor-settings.html',    icon: '⚙️' },
+                { label: 'Help & FAQ',              href: 'faq.html',                          icon: '❓' }
             ]
         },
         admin: {
             title: 'Admin Console',
             items: [
-                { label: 'Dashboard', href: 'dashboard-admin.html', icon: '🏠' },
-                { label: 'User Management', href: 'admin-users.html', icon: '👥' },
-                { label: 'Opportunity Approval', href: 'manage-opportunities.html', icon: '✅' },
-                { label: 'Analytics', href: 'admin-analytics.html', icon: '📊' }
+                { label: 'Dashboard',            href: 'dashboard-admin.html',    icon: '🏠' },
+                { label: 'User Management',      href: 'admin-users.html',        icon: '👥' },
+                { label: 'Opportunity Approval', href: 'manage-opportunities.html',icon: '✅' },
+                { label: 'Analytics',            href: 'admin-analytics.html',    icon: '📊' },
+                { label: 'Content Management',   href: 'admin-cms.html',          icon: '🖊️' },
+                { label: 'Report Issue',         href: 'report-issue.html',       icon: '🚨' },
+                { label: 'Admin Guide',          href: 'admin-tutorial.html',     icon: '📖' },
+                { label: 'Help & FAQ',           href: 'faq.html',                icon: '❓' }
             ]
         },
         staff: {
-            title: 'Staff Dashboard',
+            title: 'Caltrans Staff Portal',
             items: [
-                { label: 'Overview', href: 'dashboard-caltrans.html', icon: '🏠' },
-                { label: 'Analytics', href: 'prime-contractor-analytics.html', icon: '📈' },
-                { label: 'Support Services', href: 'support-services.html', icon: '🎧' },
-                { label: 'Search Small Businesses', href: 'search-small-businesses.html', icon: '🔍' }
+                { label: 'Overview',                href: 'dashboard-caltrans.html',          icon: '🏠' },
+                { label: 'Manage Opportunities',    href: 'manage-opportunities.html',         icon: '📂' },
+                { label: 'Search Small Businesses', href: 'search-small-businesses.html',      icon: '🔍' },
+                { label: 'Analytics',               href: 'prime-contractor-analytics.html',   icon: '📈' },
+                { label: 'Support Services',        href: 'support-services.html',             icon: '🎧' },
+                { label: 'Content Management',      href: 'admin-cms.html',                    icon: '🖊️' },
+                { label: 'Resources',               href: 'resources.html',                    icon: '📚' },
+                { label: 'Report Issue',            href: 'report-issue.html',                 icon: '🚨' },
+                { label: 'CMS Guide',               href: 'cms-tutorial.html',                 icon: '📖' },
+                { label: 'Help & FAQ',              href: 'faq.html',                          icon: '❓' }
             ]
         }
     },
