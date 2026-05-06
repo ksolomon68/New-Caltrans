@@ -106,13 +106,13 @@ function getPasswordResetEmail(resetLink, userName) {
  * @param {'small_business'|'agency'} userType
  */
 function getWelcomeEmail(userName, userType) {
-    const typeLabel = userType === 'agency' ? 'Agency' : 'Small Business';
+    const typeLabel = userType === 'agency' ? 'Prime Contractor' : 'Small Business';
     const dashboardHref = `${process.env.APP_URL || 'https://caltransbizconnect.org'}/login.html`;
 
     const html = emailWrapper(`
         <h2 style="margin:0 0 8px;color:#003D5B;font-size:20px;">Welcome to CaltransBizConnect!</h2>
         <p style="color:#444;line-height:1.6;">Hi ${userName},</p>
-        <p style="color:#444;line-height:1.6;">Your <strong>${typeLabel}</strong> account has been created. You can now access the platform to ${userType === 'agency' ? 'post opportunities and find qualified small businesses' : 'browse contracting opportunities, upload your capability statement, and connect with agencies'}.</p>
+        <p style="color:#444;line-height:1.6;">Your <strong>${typeLabel}</strong> account has been created. You can now access the platform to ${userType === 'agency' ? 'post opportunities and find qualified small businesses' : 'browse contracting opportunities, upload your capability statement, and connect with Prime Contractors'}.</p>
         ${btn(dashboardHref, 'Go to Dashboard')}
         <p style="color:#666;font-size:13px;line-height:1.6;">If you have questions, contact us at <a href="mailto:smallbusinesses@dot.ca.gov" style="color:#046B99;">smallbusinesses@dot.ca.gov</a> or call (916) 324-1700.</p>
     `);

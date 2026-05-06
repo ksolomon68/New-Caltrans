@@ -225,13 +225,13 @@ async function initDatabase() {
             const defaultFaqs = [
                 ['General Questions', 0, 'Do I need to be Small Business certified to use the platform?', '<p>No, you don\'t need Small Business certification to create an account and browse opportunities. However, some opportunities may require Small Business certification. Check the requirements for each opportunity listing.</p><p><strong>How do I get Small Business certified?</strong> Visit our <a href="eligibility.html">Eligibility page</a> to learn about the Small Business certification process, requirements, and how to apply.</p>'],
                 ['General Questions', 1, 'What is a capability statement?', '<p>A capability statement is a one-page document that showcases your business qualifications, past performance, and capabilities. It\'s like a resume for your business.</p><p>You can download our template from the <a href="resources.html">Resources page</a>. Capability statements must be uploaded as PDF files with a maximum size of 10MB.</p>'],
-                ['General Questions', 2, 'How do I apply for an opportunity?', '<p>Each opportunity listing includes contact information for the posting agency. You\'ll need to contact them directly using the information provided and follow their specific application process.</p>'],
-                ['General Questions', 3, 'Can I select multiple work categories?', '<p>Yes, you can select all work categories that apply to your business capabilities. This helps agencies find you when searching for small businesses in those categories.</p>'],
-                ['For Small Businesses', 0, 'How often are new opportunities posted?', '<p>Opportunities are posted regularly as agencies have new projects. We recommend checking the platform frequently or enabling email notifications for new opportunities in your selected categories.</p>'],
+                ['General Questions', 2, 'How do I apply for an opportunity?', '<p>Each opportunity listing includes contact information for the posting prime contractor. You\'ll need to contact them directly using the information provided and follow their specific application process.</p>'],
+                ['General Questions', 3, 'Can I select multiple work categories?', '<p>Yes, you can select all work categories that apply to your business capabilities. This helps prime contractors find you when searching for small businesses in those categories.</p>'],
+                ['For Small Businesses', 0, 'How often are new opportunities posted?', '<p>Opportunities are posted regularly as prime contractors have new projects. We recommend checking the platform frequently or enabling email notifications for new opportunities in your selected categories.</p>'],
                 ['For Small Businesses', 1, 'How long does it take for an opportunity to be posted?', '<p>Opportunities that meet our quality standards are typically posted within 1–2 business days after submission for review.</p>'],
                 ['For Small Businesses', 2, 'Can I edit an opportunity after it\'s posted?', '<p>Yes, you can edit your posted opportunities through your prime contractor dashboard. Updates will be reflected immediately on the platform.</p>'],
                 ['For Small Businesses', 3, 'How do I search for qualified small businesses?', '<p>Use the small business search feature in your dashboard to filter by work category, district, and certification status. You can review small business profiles and capability statements to find qualified partners.</p>'],
-                ['For Prime Contractors', 0, 'Who can post opportunities?', '<p>Caltrans districts, other government agencies, and agencies working on Caltrans projects can post opportunities on the platform.</p>'],
+                ['For Prime Contractors', 0, 'Who can post opportunities?', '<p>Caltrans districts, other government agencies, and prime contractors working on Caltrans projects can post opportunities on the platform.</p>'],
                 ['For Prime Contractors', 1, 'What information is required to post an opportunity?', '<p>You\'ll need to provide project title, description, location (district), work category, timeline, budget range, requirements, and contact information. All fields are required to ensure small businesses receive complete information.</p>'],
                 ['For Prime Contractors', 2, 'How long does it take for an opportunity to be posted?', '<p>Opportunities that meet our quality standards are typically posted within 1–2 business days after submission for review.</p>'],
                 ['For Prime Contractors', 3, 'Can I edit an opportunity after it\'s posted?', '<p>Yes, you can edit your posted opportunities through your prime contractor dashboard. Updates will be reflected immediately on the platform.</p>'],
@@ -272,6 +272,13 @@ async function initDatabase() {
             if (savedCols && savedCols.length > 0) {
                 await db.execute("ALTER TABLE saved_opportunities CHANGE vendor_id small_business_id INT NOT NULL");
             }
+
+            // FAQ Categories migration
+            await db.execute("UPDATE cms_faqs SET category = 'For Prime Contractors' WHERE category = 'For Agencies'");
+            // Update "agency" mentions in FAQ answers
+            await db.execute("UPDATE cms_faqs SET answer = REPLACE(answer, 'posting agency', 'posting prime contractor')");
+            await db.execute("UPDATE cms_faqs SET answer = REPLACE(answer, 'helps agencies find you', 'helps prime contractors find you')");
+            await db.execute("UPDATE cms_faqs SET answer = REPLACE(answer, 'regularly as agencies have', 'regularly as prime contractors have')");
         } catch (migErr) {
             console.warn('CaltransBizConnect DB: Terminology migration warning:', migErr.message);
         }
