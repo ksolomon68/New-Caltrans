@@ -212,6 +212,13 @@ router.post('/:id/approve', requireAdmin, async (req, res) => {
             const senderId = existing[0].posted_by || req.user?.id || 1;
             const senderName = existing[0].posted_by_name || 'Caltrans Admin';
             await notifyApplicantsOfStatusChange(id, existing[0].title, 'published', senderId, senderName);
+            
+            // Mark the admin notification message as completed
+            await db.execute(`
+                UPDATE messages 
+                SET is_read = 1, subject = CONCAT('[Completed] ', subject)
+                WHERE opportunity_id = ? AND message_type = 'system' AND subject LIKE 'Pending Approval:%'
+            `, [id]);
         }
 
         res.json({ id, status: 'published' });
