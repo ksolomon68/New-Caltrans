@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>CMS Admin Guide | CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#005A8C">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/design-system.css?v=1774555160000">
+    <link rel="stylesheet" href="css/main.css?v=1774555160000">
+    <link rel="stylesheet" href="css/accessibility-widget.css?v=1774549569000">
+    <style>
+        /* ── Tutorial page layout ── */
+        .tutorial-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: var(--space-2xl);
+            align-items: start;
+            padding: var(--space-2xl) var(--container-padding);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (max-width: 900px) {
+            .tutorial-layout { grid-template-columns: 1fr; }
+            .toc-sidebar { position: static !important; }
+        }
+
+        /* ── Sticky sidebar TOC ── */
+        .toc-sidebar {
+            position: sticky;
+            top: 100px;
+            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-lg);
+        }
+        .toc-sidebar h2 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin: 0 0 var(--space-md) 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--color-secondary);
+            padding-bottom: var(--space-sm);
+        }
+        .toc-sidebar ol {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            counter-reset: toc-counter;
+        }
+        .toc-sidebar ol li {
+            counter-increment: toc-counter;
+            margin-bottom: var(--space-xs);
+        }
+        .toc-sidebar ol li::before {
+            content: counter(toc-counter) ". ";
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+        }
+        .toc-sidebar a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            line-height: 1.4;
+        }
+        .toc-sidebar a:hover { text-decoration: underline; }
+
+        /* ── Tutorial main content ── */
+        .tutorial-main h2.section-heading {
+            background: var(--color-primary);
+            color: var(--color-text-inverse);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+            margin: var(--space-2xl) 0 0 0;
+            font-size: var(--font-size-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .tutorial-main h2.section-heading .section-num {
+            background: var(--color-secondary);
+            color: var(--color-text-primary);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            flex-shrink: 0;
+        }
+        .section-body {
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+            padding: var(--space-xl);
+            background: var(--color-bg-primary);
+            margin-bottom: var(--space-lg);
+        }
+        .tutorial-main h3 {
+            color: var(--color-primary-dark);
+            font-size: var(--font-size-lg);
+            margin: var(--space-xl) 0 var(--space-sm) 0;
+            padding-bottom: var(--space-xs);
+            border-bottom: 2px solid var(--color-secondary);
+        }
+        .tutorial-main h4 {
+            color: var(--color-primary);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            margin: var(--space-lg) 0 var(--space-xs) 0;
+        }
+        .tutorial-main p { line-height: var(--line-height-relaxed); margin: 0 0 var(--space-md) 0; }
+
+        /* ── Step lists ── */
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+            margin: var(--space-md) 0;
+        }
+        .steps li {
+            counter-increment: step-counter;
+            display: grid;
+            grid-template-columns: 36px 1fr;
+            gap: var(--space-sm);
+            align-items: start;
+            margin-bottom: var(--space-md);
+        }
+        .steps li::before {
+            content: counter(step-counter);
+            background: var(--color-primary);
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* ── Callout boxes ── */
+        .callout {
+            border-radius: var(--border-radius-md);
+            padding: var(--space-md) var(--space-lg);
+            margin: var(--space-md) 0;
+            display: flex;
+            gap: var(--space-sm);
+            align-items: flex-start;
+        }
+        .callout-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 2px; }
+        .callout-body { flex: 1; }
+        .callout-body strong { display: block; margin-bottom: var(--space-xs); font-size: var(--font-size-base); }
+        .callout-body p, .callout-body ul { margin: 0; font-size: var(--font-size-base); }
+        .callout.tip { background: var(--color-info-light); border-left: 4px solid var(--color-info); }
+        .callout.warning { background: var(--color-warning-light); border-left: 4px solid var(--color-warning); }
+        .callout.danger { background: var(--color-error-light); border-left: 4px solid var(--color-error); }
+        .callout.success { background: var(--color-success-light); border-left: 4px solid var(--color-success); }
+
+        /* ── Field reference tables ── */
+        .field-table { width: 100%; border-collapse: collapse; margin: var(--space-md) 0; font-size: var(--font-size-sm); }
+        .field-table th { background: var(--color-primary); color: white; padding: var(--space-sm) var(--space-md); text-align: left; }
+        .field-table td { padding: var(--space-sm) var(--space-md); border-bottom: 1px solid #ddd; vertical-align: top; }
+        .field-table tr:nth-child(even) td { background: var(--color-bg-secondary); }
+        .field-table td:first-child { font-weight: var(--font-weight-semibold); white-space: nowrap; }
+
+        /* ── Inline UI element labels ── */
+        .ui-label {
+            display: inline-block;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 4px;
+            padding: 1px 8px;
+            font-size: 0.8rem;
+            font-weight: var(--font-weight-semibold);
+            vertical-align: middle;
+        }
+        .ui-label.gold { background: var(--color-secondary); color: #000; }
+        .ui-label.green { background: var(--color-success); }
+        .ui-label.red { background: var(--color-error); }
+        .ui-label.gray { background: #666; }
+
+        /* ── Intro banner ── */
+        .tutorial-intro-banner {
+            background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+            color: white;
+            padding: var(--space-2xl) var(--container-padding);
+            margin-bottom: 0;
+        }
+        .tutorial-intro-banner .badge {
+            display: inline-block;
+            background: var(--color-secondary);
+            color: #000;
+            border-radius: 100px;
+            padding: var(--space-xs) var(--space-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-md);
+        }
+        .tutorial-intro-banner h1 { color: white; margin: 0 0 var(--space-md) 0; font-size: var(--font-size-3xl); }
+        .tutorial-intro-banner p { color: rgba(255,255,255,0.9); font-size: var(--font-size-lg); margin: 0; }
+
+        code { background: #f1f1f1; border: 1px solid #ccc; border-radius: 3px; padding: 1px 5px; font-family: monospace; font-size: 0.875em; }
+        .back-to-top { display: block; text-align: right; margin-top: var(--space-md); font-size: var(--font-size-sm); color: var(--color-primary); }
+        hr.section-rule { border: none; border-top: 1px solid #e0e0e0; margin: var(--space-xl) 0; }
+
+        /* ── Component type cards ── */
+        .component-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-md); margin: var(--space-md) 0; }
+        .component-card { border: 1px solid #ccc; border-radius: var(--border-radius-md); padding: var(--space-md); background: var(--color-bg-secondary); }
+        .component-card h5 { margin: 0 0 var(--space-xs) 0; color: var(--color-primary); font-size: var(--font-size-base); display: flex; align-items: center; gap: var(--space-xs); }
+        .component-card h5 code { background: var(--color-primary); color: white; border: none; font-size: 0.75em; padding: 2px 6px; border-radius: 3px; }
+        .component-card p { margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-normal); }
+
+        /* ── Sidebar section ── */
+        .cms-sidebar-diagram {
+            background: var(--color-primary-dark);
+            color: white;
+            border-radius: var(--border-radius-md);
+            padding: var(--space-md);
+            margin: var(--space-md) 0;
+            font-size: var(--font-size-sm);
+        }
+        .cms-sidebar-diagram .sidebar-section { margin-bottom: var(--space-sm); }
+        .cms-sidebar-diagram .sidebar-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+        .cms-sidebar-diagram .sidebar-item { background: rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 10px; margin-bottom: 3px; cursor: default; }
+        .cms-sidebar-diagram .sidebar-item.active { background: var(--color-secondary); color: #000; font-weight: 600; }
+    </style>
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="site-header" role="banner">
+        <div class="container">
+            <a href="index.html" class="site-logo">
+                <img src="images/caltrans-logo.png" alt="Caltrans">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span></button>
+            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="for-small-businesses.html">Small Businesses</a></li>
+                    <li><a href="for-prime-contractors.html">Prime Contractors</a></li>
+                    <li><a href="opportunities.html">Opportunities</a></li>
+                    <li><a href="how-it-works.html">How It Works</a></li>
+                    <li><a href="resources.html">Resources</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html" class="btn btn-secondary btn-small">Log In</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <!-- Intro Banner -->
+        <div class="tutorial-intro-banner">
+            <div class="container">
+                <span class="badge">Internal Documentation</span>
+                <h1>CaltransBizConnect CMS Admin Guide</h1>
+                <p>A complete reference for content administrators managing pages, FAQs, media, and site settings through the CaltransBizConnect content management system.</p>
+                <p style="margin-top: var(--space-md); font-size: var(--font-size-sm); color: rgba(255,255,255,0.7);">
+                    Access: <code style="background: rgba(255,255,255,0.2); border:none; color: white;">/admin-cms.html</code> &nbsp;&bull;&nbsp; Last updated: May 2026
+                </p>
+            </div>
+        </div>
+
+        <div class="tutorial-layout">
+
+            <!-- Sidebar Table of Contents -->
+            <aside class="toc-sidebar" aria-label="Table of contents">
+                <h2>Contents</h2>
+                <ol>
+                    <li><a href="#sec-intro">Introduction &amp; What the CMS Controls</a></li>
+                    <li><a href="#sec-login">Logging In</a></li>
+                    <li><a href="#sec-dashboard">CMS Dashboard Overview</a></li>
+                    <li><a href="#sec-pages">Pages Management</a></li>
+                    <li><a href="#sec-sections">Section Types Reference</a></li>
+                    <li><a href="#sec-editor">Rich Text Editor</a></li>
+                    <li><a href="#sec-faq">FAQ Manager</a></li>
+                    <li><a href="#sec-global">Global Settings</a></li>
+                    <li><a href="#sec-media">Media Library</a></li>
+                    <li><a href="#sec-password">Changing Your Password</a></li>
+                    <li><a href="#sec-bestpractices">Best Practices</a></li>
+                    <li><a href="#sec-troubleshooting">Troubleshooting</a></li>
+                </ol>
+            </aside>
+
+            <!-- Main Tutorial Content -->
+            <div class="tutorial-main">
+
+                <!-- SECTION 1: INTRO -->
+                <h2 class="section-heading" id="sec-intro">
+                    <span class="section-num" aria-hidden="true">1</span>
+                    Introduction &amp; What the CMS Controls
+                </h2>
+                <div class="section-body">
+                    <p>The CaltransBizConnect Content Management System (CMS) is a web-based editor built into the platform at <code>/admin-cms.html</code>. It allows authorized administrators to update the text, images, and structured content shown on the public-facing website — without touching any code.</p>
+
+                    <h3>What Can You Edit with the CMS?</h3>
+                    <table class="field-table">
+                        <thead><tr><th>CMS Module</th><th>What It Controls</th></tr></thead>
+                        <tbody>
+                            <tr><td>Pages</td><td>Hero text, page sections, component content, page metadata (title, description)</td></tr>
+                            <tr><td>FAQ Manager</td><td>All questions and answers on the FAQ page and any FAQ-style sections</td></tr>
+                            <tr><td>Global Settings</td><td>Site-wide values: site title, contact email, phone number, social links, logo URL</td></tr>
+                            <tr><td>Media Library</td><td>All images used in CMS-editable sections; upload, manage, and delete</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>What the CMS Does NOT Control</h3>
+                    <p>Some parts of the website are static or controlled by the platform application and cannot be edited through the CMS:</p>
+                    <ul>
+                        <li>The site navigation menu links</li>
+                        <li>User account dashboard pages</li>
+                        <li>Form functionality and validation</li>
+                        <li>The opportunities listing (live database content)</li>
+                        <li>Application processing workflows</li>
+                        <li>CSS styling and visual design (requires a developer)</li>
+                    </ul>
+
+                    <div class="callout tip">
+                        <span class="callout-icon" aria-hidden="true">ℹ️</span>
+                        <div class="callout-body">
+                            <strong>Platform administration is separate</strong>
+                            <p>If you need to manage user accounts, approve opportunities, or view analytics, refer to the <a href="admin-tutorial.html"><strong>Platform Admin Guide</strong></a>. The CMS only handles website content.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 2: LOGIN -->
+                <h2 class="section-heading" id="sec-login">
+                    <span class="section-num" aria-hidden="true">2</span>
+                    Logging In
+                </h2>
+                <div class="section-body">
+                    <h3>How to Access the CMS</h3>
+                    <ol class="steps">
+                        <li>Open your browser and navigate to: <code>caltransbizconnect.org/admin-cms.html</code></li>
+                        <li>The CMS login screen will load. You will see two fields: <strong>Email</strong> and <strong>Password</strong>.</li>
+                        <li>Enter the email address associated with your admin account. This is the same email you use to log in to the main platform.</li>
+                        <li>Enter your CMS password. Note: depending on how your account was set up, this may be the same as your platform login password or a separate CMS-specific password.</li>
+                        <li>Click <span class="ui-label">Sign In</span>. If your credentials are correct, the CMS dashboard will load within a few seconds.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Session duration</strong>
+                            <p>Your CMS session lasts 24 hours. After that, you will be logged out automatically and must sign in again. Always save your work before leaving the CMS, as unsaved changes are lost when your session expires.</p>
+                        </div>
+                    </div>
+
+                    <h3>If Your Login Fails</h3>
+                    <ul>
+                        <li>Double-check for typos in your email address — it must match exactly.</li>
+                        <li>Check that Caps Lock is not on when entering your password.</li>
+                        <li>If you have recently changed your password via the CMS "Change Password" feature, use the new password.</li>
+                        <li>If you still cannot log in, contact the platform administrator to verify your account has CMS access.</li>
+                    </ul>
+
+                    <h3>How to Log Out</h3>
+                    <ol class="steps">
+                        <li>Locate the <span class="ui-label red">Logout</span> button in the CMS sidebar (left column, near the bottom).</li>
+                        <li>Click it. Your session token is invalidated immediately and you are returned to the login screen.</li>
+                        <li>Always log out when you are done, especially on shared computers.</li>
+                    </ol>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 3: DASHBOARD OVERVIEW -->
+                <h2 class="section-heading" id="sec-dashboard">
+                    <span class="section-num" aria-hidden="true">3</span>
+                    CMS Dashboard Overview
+                </h2>
+                <div class="section-body">
+                    <p>After login, you will see the CMS dashboard — a two-panel interface. The left side is the navigation sidebar; the right side is the content area that changes based on your selection.</p>
+
+                    <h3>Sidebar Navigation</h3>
+                    <p>The sidebar is your primary navigation tool in the CMS. It is always visible on the left side of the screen. Here is what each section contains:</p>
+
+                    <div class="cms-sidebar-diagram" role="img" aria-label="CMS sidebar diagram showing navigation sections">
+                        <div class="sidebar-section">
+                            <div class="sidebar-label">Pages</div>
+                            <div class="sidebar-item active">Pages</div>
+                        </div>
+                        <div class="sidebar-section">
+                            <div class="sidebar-label">Site</div>
+                            <div class="sidebar-item">FAQ Manager</div>
+                            <div class="sidebar-item">Global Settings</div>
+                            <div class="sidebar-item">Media Library</div>
+                            <div class="sidebar-item">Page Builder</div>
+                        </div>
+                        <div class="sidebar-section" style="margin-top: var(--space-md); border-top: 1px solid rgba(255,255,255,0.2); padding-top: var(--space-sm);">
+                            <div class="sidebar-item" style="background: rgba(255,255,255,0.15);">Change Password</div>
+                            <div class="sidebar-item" style="background: #C62828;">Logout</div>
+                        </div>
+                    </div>
+
+                    <h3>Dashboard Stats Panel</h3>
+                    <p>When no section is selected, the dashboard shows a summary of your site's content inventory:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Stat</th><th>What It Counts</th></tr></thead>
+                        <tbody>
+                            <tr><td>Total Pages</td><td>All system and custom pages registered in the CMS</td></tr>
+                            <tr><td>Active FAQs</td><td>FAQ entries with status set to Active</td></tr>
+                            <tr><td>Media Files</td><td>Images uploaded to the Media Library</td></tr>
+                            <tr><td>Active Users</td><td>Platform users with Active or Verified status (read-only reference)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 4: PAGES MANAGEMENT -->
+                <h2 class="section-heading" id="sec-pages">
+                    <span class="section-num" aria-hidden="true">4</span>
+                    Pages Management
+                </h2>
+                <div class="section-body">
+                    <p>The <strong>Pages</strong> module is where you edit the content of all public-facing website pages. Click <strong>Pages</strong> in the sidebar to open it.</p>
+
+                    <h3>Reading the Page List</h3>
+                    <p>The page list displays every page the CMS manages, in display order. Each row shows:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Column</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td>Page Title</td><td>The human-readable title shown in the editor</td></tr>
+                            <tr><td>Last Updated</td><td>Date and time of the most recent save</td></tr>
+                            <tr><td>System Page</td><td>A badge shown for built-in pages that cannot be deleted</td></tr>
+                            <tr><td>Actions</td><td>Edit, View (live link), and Delete (custom pages only)</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Page Display Order</h4>
+                    <p>System pages appear first in this fixed order: Home, For Small Businesses, For Prime Contractors, Opportunities, How It Works, Resources, FAQ, Support Services, Eligibility, Contact. Custom pages you create appear after these, sorted alphabetically.</p>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Edit a Page</h3>
+                    <ol class="steps">
+                        <li>In the Pages list, find the page you want to edit and click its <span class="ui-label">Edit</span> button.</li>
+                        <li>The Page Editor opens. It has two main areas: <strong>Page Metadata</strong> at the top and <strong>Page Sections</strong> below.</li>
+                        <li>Edit the <strong>Page Title</strong> field if you need to update the title shown in the browser tab and in search results.</li>
+                        <li>Edit the <strong>Meta Description</strong> field if you need to update the snippet shown in Google search results. Keep it under 160 characters for best results.</li>
+                        <li>To edit a section's content, click the <span class="ui-label">Edit</span> button on that section's row. The Section Editor will open below (or in-line).</li>
+                        <li>Make your changes in the Section Editor fields (see Section 5 for a guide to each field type).</li>
+                        <li>When done editing, click <span class="ui-label green">Save</span> at the top of the page editor. Your changes are saved to the database and appear live on the website immediately.</li>
+                    </ol>
+
+                    <div class="callout danger">
+                        <span class="callout-icon" aria-hidden="true">🚫</span>
+                        <div class="callout-body">
+                            <strong>No auto-save</strong>
+                            <p>The CMS does <strong>not</strong> auto-save. If you navigate away from the page editor without clicking Save, all your changes will be lost. Save frequently, especially after making significant edits.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>Editing the Page Header (Hero)</h3>
+                    <p>The top of many pages has a "hero" banner with a title, subtitle, and optionally a background image. These are editable in the Page Editor:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Field</th><th>Where It Appears</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Background Image</td><td>Behind the hero banner</td><td>Pick from Media Library; use a wide landscape image (min 1400px wide)</td></tr>
+                            <tr><td>Logo Image</td><td>Inside the hero, above the title</td><td>Optional; used on some branded pages</td></tr>
+                            <tr><td>Logo Alt Text</td><td>Screen readers</td><td>Always required if a logo image is set</td></tr>
+                        </tbody>
+                    </table>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Reorder Page Sections</h3>
+                    <p>Each section in the Page Editor has up-arrow and down-arrow buttons on the left side of its row.</p>
+                    <ol class="steps">
+                        <li>Locate the section you want to move in the section list.</li>
+                        <li>Click the <strong>up arrow</strong> button to move it one position up, or the <strong>down arrow</strong> button to move it one position down.</li>
+                        <li>Repeat until the section is in the desired position.</li>
+                        <li>Click <span class="ui-label green">Save</span> to preserve the new order.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Add a New Section</h3>
+                    <ol class="steps">
+                        <li>In the Page Editor, scroll to the bottom of the section list.</li>
+                        <li>Click <span class="ui-label green">+ Add New Section</span>. A dropdown menu appears listing all available component types.</li>
+                        <li>Select the component type that best fits the content you want to add (see Section 5 for a full reference of component types).</li>
+                        <li>A new empty section of that type is added to the bottom of the list. Click <span class="ui-label">Edit</span> on the new section to fill in its content.</li>
+                        <li>Click <span class="ui-label green">Save</span> when finished.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Delete a Section</h3>
+                    <ol class="steps">
+                        <li>In the Page Editor, locate the section you want to remove.</li>
+                        <li>Click the <span class="ui-label red">Delete Section</span> button (trash icon) on that section's row.</li>
+                        <li>A confirmation prompt will appear: "Are you sure you want to delete this section?" Click <strong>Delete</strong> to confirm.</li>
+                        <li>Click <span class="ui-label green">Save</span> to apply. The section is removed permanently from that page.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Section deletion is immediate</strong>
+                            <p>Once you click Save after deleting a section, the content is gone. There is no Undo. Before deleting, copy the content to a text document if there's any chance you'll need to restore it.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Create a New Custom Page</h3>
+                    <ol class="steps">
+                        <li>In the Pages list, click <span class="ui-label green">+ New Page</span>.</li>
+                        <li>Enter a <strong>Page Title</strong> and a <strong>Page Slug</strong>. The slug is the URL path — for example, a slug of <code>vendor-resources</code> means the page will be at <code>/vendor-resources.html</code>. Use only lowercase letters, numbers, and hyphens.</li>
+                        <li>Optionally enter a meta description.</li>
+                        <li>Click <span class="ui-label green">Create Page</span>. The new page appears in the Pages list.</li>
+                        <li>Click <span class="ui-label">Edit</span> on the new page to start adding sections.</li>
+                    </ol>
+
+                    <div class="callout tip">
+                        <span class="callout-icon" aria-hidden="true">💡</span>
+                        <div class="callout-body">
+                            <strong>Custom pages are not linked automatically</strong>
+                            <p>Creating a page in the CMS does not add it to the site navigation menu. To make a custom page accessible, you must either link to it from another page's content or ask a developer to add it to the nav.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to View a Live Page</h3>
+                    <ol class="steps">
+                        <li>In the Pages list, click the <span class="ui-label">View</span> button (external link icon) next to any page.</li>
+                        <li>The live page opens in a new browser tab, showing exactly what public visitors see.</li>
+                        <li>After saving changes in the editor, refresh this tab to see your updates.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Delete a Custom Page</h3>
+                    <p>Only custom pages (those without the "System Page" badge) can be deleted. System pages are permanent.</p>
+                    <ol class="steps">
+                        <li>In the Pages list, click <span class="ui-label red">Delete</span> on the custom page row.</li>
+                        <li>Confirm in the prompt. The page and all its content are permanently removed from the CMS and will return a 404 error if visited.</li>
+                    </ol>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 5: SECTION TYPES -->
+                <h2 class="section-heading" id="sec-sections">
+                    <span class="section-num" aria-hidden="true">5</span>
+                    Section Types Reference
+                </h2>
+                <div class="section-body">
+                    <p>When you add or edit a page section, the editing interface changes depending on the section's component type. Below is a complete reference for every available type.</p>
+
+                    <div class="component-grid">
+                        <div class="component-card">
+                            <h5><code>text</code> Single-line Text</h5>
+                            <p>A plain text input for short content like titles, names, or labels. No formatting is allowed. Use this for headings or captions.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>textarea</code> Multi-line Text</h5>
+                            <p>A larger text area for paragraphs. Basic HTML tags (bold, italic, links) are supported. Use for body copy, descriptions, or summaries.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>url</code> URL Field</h5>
+                            <p>A validated text input for web addresses. Used for button links, image source URLs, or external references. Always include <code>https://</code>.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>select</code> Dropdown</h5>
+                            <p>A predefined list of options. Common uses: selecting a layout variant, a color theme, or a content alignment. The available options are fixed by the developer.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>checkbox</code> Toggle</h5>
+                            <p>A boolean on/off switch. Example: show or hide a section, enable or disable a feature flag, or control visibility of an element.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>media</code> Image Picker</h5>
+                            <p>Opens the Media Library to select an uploaded image. Set the image and its alt text here. Always provide a meaningful alt text for accessibility compliance.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>button</code> CTA Button</h5>
+                            <p>Configures a call-to-action button: button text, destination URL, and style (primary/secondary). Used for prominent action links within sections.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>card-list</code> Card Grid</h5>
+                            <p>A repeating list of cards, each with a title, body text, optional image, and optional button. Use for feature highlights, program overviews, or resource listings. Add, edit, reorder, and delete individual cards.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>steps-list</code> Numbered Steps</h5>
+                            <p>A numbered process list where each step has a short label and a detail text. Use for how-it-works sequences, onboarding flows, or application processes.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>tile-list</code> Tile Grid</h5>
+                            <p>A grid of tiles, each with a title, short description, and optional link. Similar to card-list but more compact. Use for quick-link tiles or icon-based navigation sections.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>accordion-list</code> Expandable FAQ</h5>
+                            <p>A set of collapsible question/answer pairs (accordion). Each item has a question (always visible) and an answer (shown when expanded). Use for inline FAQs or help content within a page.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>cta-list</code> CTA Sections</h5>
+                            <p>One or more full call-to-action sections, each with a headline, supporting text, and a button. Use for key program actions at the bottom of a page or between major sections.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>string-list</code> Simple List</h5>
+                            <p>A plain bullet list of text strings with no sub-fields. Use for eligibility requirements, features lists, or quick facts that don't need individual titles.</p>
+                        </div>
+                        <div class="component-card">
+                            <h5><code>pathway-card</code> Pathway Card</h5>
+                            <p>A specialized card component for "pathway" navigation — used on the Home page to direct users to Small Business or Prime Contractor sections. Has a fixed structure defined by the developer.</p>
+                        </div>
+                    </div>
+
+                    <h3>Working with List-Type Sections</h3>
+                    <p>For any component type with "list" in its name (card-list, steps-list, tile-list, accordion-list, cta-list, string-list), the editing interface provides a list of items that you can manage individually:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Action</th><th>How to Do It</th></tr></thead>
+                        <tbody>
+                            <tr><td>Add a new item</td><td>Click the <span class="ui-label green">+ Add Item</span> button below the item list. A new empty item row is created at the bottom.</td></tr>
+                            <tr><td>Edit an item</td><td>Click the <span class="ui-label">Edit</span> pencil icon on the item row. The item's fields expand inline for editing.</td></tr>
+                            <tr><td>Reorder items</td><td>Use the up and down arrow buttons on each item row to change its position in the list.</td></tr>
+                            <tr><td>Delete an item</td><td>Click the <span class="ui-label red">Delete</span> (trash) icon on the item row. Confirm in the dialog. The item is removed immediately — save the page to finalize.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 6: RICH TEXT EDITOR -->
+                <h2 class="section-heading" id="sec-editor">
+                    <span class="section-num" aria-hidden="true">6</span>
+                    Rich Text Editor
+                </h2>
+                <div class="section-body">
+                    <p>Some fields — particularly long text answers in FAQs, accordion answers, and description fields — display a formatting toolbar above the text area. This is the Rich Text Editor.</p>
+
+                    <h3>Toolbar Buttons</h3>
+                    <table class="field-table">
+                        <thead><tr><th>Button</th><th>What It Does</th><th>When to Use</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>B</strong> Bold</td><td>Wraps the selected text in <code>&lt;strong&gt;</code> tags, making it bold on the page.</td><td>Highlight key terms, requirements, or important phrases. Use sparingly.</td></tr>
+                            <tr><td><em>I</em> Italic</td><td>Wraps the selected text in <code>&lt;em&gt;</code> tags, making it italic.</td><td>Titles of documents, technical terms, or gentle emphasis. Use sparingly.</td></tr>
+                            <tr><td>&#8226; List</td><td>Inserts an unordered (bullet) list <code>&lt;ul&gt;&lt;li&gt;</code> structure at the cursor position.</td><td>Eligibility criteria, document checklists, feature lists.</td></tr>
+                            <tr><td>&#128279; Link</td><td>Inserts an anchor tag <code>&lt;a href=""&gt;</code> at the cursor. You will be prompted for the URL and link text.</td><td>References to external resources, other pages, or downloadable forms.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Character Count</h3>
+                    <p>Fields that have a maximum character limit display a live character counter below the text area (e.g., "143 / 160 characters"). When you exceed the limit, the counter turns red. This most commonly applies to meta description fields.</p>
+
+                    <h3>Tips for Rich Text Fields</h3>
+                    <ul>
+                        <li><strong>Select first, then click the toolbar button</strong> — highlight the text you want to format before clicking Bold or Italic.</li>
+                        <li><strong>Don't paste formatted content from Word or Google Docs</strong> — it may carry hidden formatting that breaks the layout. Paste as plain text first (Ctrl+Shift+V on most systems), then format using the toolbar.</li>
+                        <li><strong>Test all links before saving</strong> — paste the URL into a new browser tab to confirm it works before embedding it in the CMS.</li>
+                        <li><strong>Use lists for three or more items</strong> — if you have two or fewer items, write them as inline text instead.</li>
+                    </ul>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 7: FAQ MANAGER -->
+                <h2 class="section-heading" id="sec-faq">
+                    <span class="section-num" aria-hidden="true">7</span>
+                    FAQ Manager
+                </h2>
+                <div class="section-body">
+                    <p>The FAQ Manager controls all questions and answers displayed on the FAQ page and any FAQ accordion sections across the site. Click <strong>FAQ Manager</strong> in the sidebar to open it.</p>
+
+                    <h3>Viewing and Filtering FAQs</h3>
+                    <p>The FAQ Manager shows a table of all FAQ entries. Use these controls to find what you need:</p>
+                    <ul>
+                        <li><strong>Category filter dropdown</strong> — show FAQs from one category only. Select "All Categories" to see everything.</li>
+                        <li><strong>Search field</strong> — filter by keywords in the question text. Results update as you type.</li>
+                    </ul>
+                    <p>The table displays: Category badge, Question (first 50 characters), Answer snippet (first 100 characters), Status (Active/Inactive), and action buttons.</p>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Create a New FAQ</h3>
+                    <ol class="steps">
+                        <li>Click <span class="ui-label green">+ New FAQ</span> above the FAQ table. The FAQ editor modal opens.</li>
+                        <li>Fill in the <strong>Category</strong> field. Either select an existing category from the dropdown or type a new category name. Categories group FAQs on the FAQ page under headings.</li>
+                        <li>Type the <strong>Question</strong> in the question textarea. Write it as a complete question (e.g., "How do I submit my capability statement?").</li>
+                        <li>Type the <strong>Answer</strong> in the answer field. Use the Rich Text Editor toolbar to add formatting if needed. Keep answers concise and to the point.</li>
+                        <li>Set the <strong>Status</strong> dropdown to <em>Active</em> to make the FAQ visible on the site, or <em>Inactive</em> to save it as a draft.</li>
+                        <li>Click <span class="ui-label green">Save FAQ</span>. The new entry appears in the table immediately.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Edit an Existing FAQ</h3>
+                    <ol class="steps">
+                        <li>Locate the FAQ in the table (use the search or category filter to narrow it down).</li>
+                        <li>Click <span class="ui-label">Edit</span> on that row. The FAQ editor modal opens with the current content pre-filled.</li>
+                        <li>Make your changes to any field: category, question, answer, or status.</li>
+                        <li>Click <span class="ui-label green">Save FAQ</span>. The changes take effect on the live FAQ page immediately.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>Deactivating vs. Deleting an FAQ</h3>
+                    <table class="field-table">
+                        <thead><tr><th>Action</th><th>Result</th><th>When to Use</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Deactivate</strong> (set status to Inactive)</td><td>FAQ is hidden from the public site but preserved in the database</td><td>Temporarily remove a FAQ without losing the content (e.g., pending legal review, seasonal content)</td></tr>
+                            <tr><td><strong>Delete</strong></td><td>FAQ is permanently removed from the database</td><td>The question is entirely obsolete and will never be needed again</td></tr>
+                        </tbody>
+                    </table>
+                    <p>To deactivate: open the FAQ editor, change Status to <em>Inactive</em>, and save.<br>
+                    To delete: click <span class="ui-label red">Delete</span> on the FAQ row, then confirm in the dialog.</p>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Reorder FAQs with Drag-and-Drop</h3>
+                    <p>Within each category, you can reorder FAQs to control the order they appear on the FAQ page.</p>
+                    <ol class="steps">
+                        <li>Filter the FAQ table to show a single category (use the Category filter dropdown).</li>
+                        <li>Click and hold the drag handle (&#9776; icon) on the left side of any FAQ row.</li>
+                        <li>Drag the row up or down to the desired position, then release.</li>
+                        <li>Repeat for any other rows you want to reorder.</li>
+                        <li>Click <span class="ui-label green">Save Order</span> at the top of the table. The new display order is saved to the database.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Save Order is a separate save</strong>
+                            <p>Reordering FAQs requires clicking the dedicated <strong>Save Order</strong> button, which is separate from the main Save button. If you close the FAQ Manager without clicking Save Order, your reordering will be lost.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Export FAQs</h3>
+                    <ol class="steps">
+                        <li>Click the <span class="ui-label">Export FAQs</span> button at the top of the FAQ Manager.</li>
+                        <li>Your browser downloads a JSON file containing all active FAQs, including their categories, questions, answers, and sort order.</li>
+                        <li>This file can be used as a backup or for content review outside the CMS.</li>
+                    </ol>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 8: GLOBAL SETTINGS -->
+                <h2 class="section-heading" id="sec-global">
+                    <span class="section-num" aria-hidden="true">8</span>
+                    Global Settings
+                </h2>
+                <div class="section-body">
+                    <p>Global Settings control site-wide values that appear across multiple pages. Click <strong>Global Settings</strong> in the sidebar to open it.</p>
+
+                    <div class="callout danger">
+                        <span class="callout-icon" aria-hidden="true">🚨</span>
+                        <div class="callout-body">
+                            <strong>Changes are site-wide and immediate</strong>
+                            <p>When you save Global Settings, the changes take effect on <em>every page</em> of the website immediately. There is no preview mode. Double-check all values before clicking Save.</p>
+                        </div>
+                    </div>
+
+                    <h3>Available Global Settings Fields</h3>
+                    <table class="field-table">
+                        <thead><tr><th>Field</th><th>Where It Appears</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Site Title</td><td>Browser tab title on pages that use it</td><td>Typically "CaltransBizConnect" — change only if the program is rebranded</td></tr>
+                            <tr><td>Site Description</td><td>Meta description fallback for pages without a custom description</td><td>Keep under 160 characters; should describe the site's purpose clearly</td></tr>
+                            <tr><td>Contact Email</td><td>Footer, contact page, and automated notifications</td><td>Use the official Caltrans program email; changes here update all footers</td></tr>
+                            <tr><td>Phone Number</td><td>Footer and contact page</td><td>Format as (916) 324-1700 for consistency</td></tr>
+                            <tr><td>Social Media Links</td><td>Footer social icons</td><td>Full URLs only; leave blank to hide that social icon</td></tr>
+                            <tr><td>Logo URL</td><td>Site header and footer (if using CMS-driven logo)</td><td>Must be a URL to an image in the Media Library or an absolute external URL</td></tr>
+                            <tr><td>Favicon URL</td><td>Browser tab icon</td><td>Should be a small square image (32×32 or 16×16 pixels), preferably .ico or .png</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>How to Update Global Settings</h3>
+                    <ol class="steps">
+                        <li>Click <strong>Global Settings</strong> in the CMS sidebar.</li>
+                        <li>The settings form loads with all current values. Update only the fields you need to change — leave others as-is.</li>
+                        <li>Review your changes carefully.</li>
+                        <li>Click <span class="ui-label green">Save Settings</span>. A success message confirms the save. Changes are live immediately.</li>
+                    </ol>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 9: MEDIA LIBRARY -->
+                <h2 class="section-heading" id="sec-media">
+                    <span class="section-num" aria-hidden="true">9</span>
+                    Media Library
+                </h2>
+                <div class="section-body">
+                    <p>The Media Library is a centralized repository for all images used in CMS-editable sections. Click <strong>Media Library</strong> in the sidebar to open it.</p>
+
+                    <h3>Viewing Uploaded Media</h3>
+                    <p>The Media Library displays all uploaded images as a grid of thumbnails. Each image shows:</p>
+                    <ul>
+                        <li><strong>Thumbnail preview</strong> — a small preview of the image</li>
+                        <li><strong>Filename</strong> — the original file name with extension</li>
+                        <li><strong>File size</strong> — displayed as KB or MB</li>
+                        <li><strong>Upload date</strong> — when the file was added</li>
+                        <li><strong>Alt text</strong> — the accessibility description set at upload</li>
+                        <li><strong>Download</strong> — link to download the original file</li>
+                        <li><strong>Delete</strong> — button to permanently remove the file</li>
+                    </ul>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Upload an Image</h3>
+                    <ol class="steps">
+                        <li>In the Media Library, locate the <strong>Upload Image</strong> section below the media grid.</li>
+                        <li>Click <strong>Choose File</strong> (or drag and drop a file onto the upload area). Select your image file from your computer.</li>
+                        <li>Accepted formats: JPEG (.jpg, .jpeg), PNG (.png), GIF (.gif), WebP (.webp), SVG (.svg). Maximum file size: <strong>10 MB</strong>.</li>
+                        <li>In the <strong>Alt Text</strong> field that appears, type a description of the image. This is required by Caltrans accessibility policy. Write what the image shows — for example, "Construction workers installing a guardrail on a California highway" — not generic text like "image" or "photo."</li>
+                        <li>Click <span class="ui-label green">Upload</span>. The image is uploaded to the server and appears in the media grid immediately.</li>
+                        <li>You can now select this image from the media picker when editing page sections.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Alt text is required — and matters</strong>
+                            <p>Alt text is not just a form requirement. Screen reader users cannot see images; they rely entirely on alt text to understand what the image shows. Write descriptive, specific alt text for every image. Do not use filenames as alt text.</p>
+                        </div>
+                    </div>
+
+                    <h4>Image Size Recommendations</h4>
+                    <table class="field-table">
+                        <thead><tr><th>Use Case</th><th>Recommended Size</th><th>Format</th></tr></thead>
+                        <tbody>
+                            <tr><td>Hero / Banner background</td><td>1400 × 600 px minimum</td><td>JPEG (smaller file size)</td></tr>
+                            <tr><td>Card images</td><td>600 × 400 px</td><td>JPEG or WebP</td></tr>
+                            <tr><td>Logos / Icons</td><td>200 × 200 px (square)</td><td>PNG (transparency support) or SVG</td></tr>
+                            <tr><td>Thumbnails</td><td>400 × 300 px</td><td>JPEG or WebP</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="callout tip">
+                        <span class="callout-icon" aria-hidden="true">💡</span>
+                        <div class="callout-body">
+                            <strong>Optimize images before uploading</strong>
+                            <p>Large image files slow down page load times for all visitors. Before uploading, compress your images using a tool like <a href="https://squoosh.app" target="_blank" rel="noopener noreferrer">Squoosh</a> or <a href="https://tinypng.com" target="_blank" rel="noopener noreferrer">TinyPNG</a>. Aim for under 300 KB for most images.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Select an Image When Editing a Page Section</h3>
+                    <ol class="steps">
+                        <li>While editing a page section that has a <code>media</code>-type field, click the <span class="ui-label">Choose Image</span> or <span class="ui-label">Select from Library</span> button.</li>
+                        <li>The Media Picker modal opens, showing all uploaded images. Scroll to find the image you want.</li>
+                        <li>Click on the image thumbnail to select it. The modal closes automatically and the image is applied to the section.</li>
+                        <li>The image's existing alt text is filled in automatically, but you can override it for this specific usage if the context requires a different description.</li>
+                        <li>Click <span class="ui-label green">Save</span> to preserve the image selection.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Delete a Media File</h3>
+                    <ol class="steps">
+                        <li>In the Media Library grid, locate the image you want to delete.</li>
+                        <li>Click the <span class="ui-label red">Delete</span> button below that image's thumbnail.</li>
+                        <li>Confirm in the dialog. The file is permanently deleted from the server.</li>
+                    </ol>
+
+                    <div class="callout danger">
+                        <span class="callout-icon" aria-hidden="true">🚫</span>
+                        <div class="callout-body">
+                            <strong>Check before deleting</strong>
+                            <p>If an image is currently used in a page section, deleting it from the Media Library will cause that section to display a broken image placeholder. Before deleting, search page sections for any use of that image and replace it with another image first.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 10: CHANGE PASSWORD -->
+                <h2 class="section-heading" id="sec-password">
+                    <span class="section-num" aria-hidden="true">10</span>
+                    Changing Your Password
+                </h2>
+                <div class="section-body">
+                    <p>You can update your CMS login password directly within the CMS — no need to contact a developer or administrator.</p>
+
+                    <h3>How to Change Your CMS Password</h3>
+                    <ol class="steps">
+                        <li>Click <strong>Change Password</strong> in the CMS sidebar (near the bottom).</li>
+                        <li>In the form that appears, enter your <strong>Current Password</strong> in the first field.</li>
+                        <li>Enter your new password in the <strong>New Password</strong> field. Requirements:
+                            <ul style="margin-top: var(--space-sm);">
+                                <li>Minimum 8 characters</li>
+                                <li>Mix of uppercase and lowercase letters recommended</li>
+                                <li>Include at least one number or special character</li>
+                            </ul>
+                        </li>
+                        <li>Enter your new password again in the <strong>Confirm New Password</strong> field to ensure there are no typos.</li>
+                        <li>Click <span class="ui-label green">Update Password</span>. A confirmation message will appear. Your new password takes effect immediately.</li>
+                        <li>The next time you log in to the CMS, use the new password.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Password change logs you out of other sessions</strong>
+                            <p>Changing your password invalidates any existing CMS sessions. If you are logged in on multiple devices, you will need to log in again with the new password on each device.</p>
+                        </div>
+                    </div>
+
+                    <h3>Password Best Practices</h3>
+                    <ul>
+                        <li>Change your password every 90 days, or immediately if you suspect it has been compromised.</li>
+                        <li>Never use a password you use on any other website or application.</li>
+                        <li>Do not share your CMS password with colleagues. Each admin should have their own account.</li>
+                        <li>Consider using a password manager (like 1Password or Bitwarden) to generate and store a strong, unique password.</li>
+                    </ul>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 11: BEST PRACTICES -->
+                <h2 class="section-heading" id="sec-bestpractices">
+                    <span class="section-num" aria-hidden="true">11</span>
+                    Best Practices
+                </h2>
+                <div class="section-body">
+                    <h3>Content Quality Standards</h3>
+                    <ul>
+                        <li><strong>Write in plain language.</strong> Avoid jargon. If a 10th-grader can't understand your content, rewrite it. Caltrans accessibility standards require plain language across all public-facing content.</li>
+                        <li><strong>Be consistent.</strong> Use the same terminology throughout the site. For example, always write "Small Business Enterprise" not "Small Business" on first reference, followed by "(SBE)" in parentheses.</li>
+                        <li><strong>Keep sentences short.</strong> Aim for 20 words or fewer per sentence in body copy.</li>
+                        <li><strong>Proofread before saving.</strong> Changes go live immediately. Read your content aloud before clicking Save.</li>
+                    </ul>
+
+                    <h3>Accessibility Requirements</h3>
+                    <ul>
+                        <li><strong>Always provide alt text for images.</strong> Never leave the alt text field blank when uploading to the Media Library.</li>
+                        <li><strong>Don't use color alone to convey meaning.</strong> If you use formatting in rich text, make sure the meaning is also clear from the text itself.</li>
+                        <li><strong>Use heading hierarchy correctly.</strong> In FAQ answers and section body text, use bold or strong for emphasis — do not skip to heading styles for stylistic purposes.</li>
+                        <li><strong>Test your links.</strong> Every URL you add must be valid and working at the time you publish it.</li>
+                    </ul>
+
+                    <h3>Preview Before Publishing</h3>
+                    <ol class="steps">
+                        <li>After saving, click the <span class="ui-label">View</span> button (live page link) on the page in the Pages list.</li>
+                        <li>Review the page in the live view on a desktop-sized window.</li>
+                        <li>Resize your browser or use browser DevTools to check the mobile view.</li>
+                        <li>If anything looks wrong, return to the CMS and make corrections.</li>
+                    </ol>
+
+                    <h3>Content Review Workflow</h3>
+                    <p>For significant content updates (especially to program eligibility requirements, fee information, or legal language), follow this review process before publishing:</p>
+                    <ol class="steps">
+                        <li>Draft the content in a shared Google Doc or Word document.</li>
+                        <li>Have at least one colleague review the draft for accuracy and clarity.</li>
+                        <li>Obtain approval from the program manager or legal team if the content involves program rules or compliance language.</li>
+                        <li>Only then enter the reviewed, approved content into the CMS and save.</li>
+                    </ol>
+
+                    <div class="callout success">
+                        <span class="callout-icon" aria-hidden="true">✅</span>
+                        <div class="callout-body">
+                            <strong>Good content update cadence</strong>
+                            <p>Plan to review and refresh the FAQ and program overview pages at least quarterly. Outdated information — especially around deadlines, contact details, and program requirements — erodes user trust and can cause compliance issues.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 12: TROUBLESHOOTING -->
+                <h2 class="section-heading" id="sec-troubleshooting">
+                    <span class="section-num" aria-hidden="true">12</span>
+                    Troubleshooting
+                </h2>
+                <div class="section-body">
+                    <h3>Common Issues and Resolutions</h3>
+
+                    <h4>My login is failing even though my password is correct</h4>
+                    <ul>
+                        <li>Confirm you are going to <code>/admin-cms.html</code> (not <code>/login.html</code>, which is the platform login for vendors and agencies).</li>
+                        <li>Check for browser autofill filling in an old password — clear the field and type manually.</li>
+                        <li>Your session may have been invalidated. Try logging in from a fresh browser tab.</li>
+                        <li>If the problem persists, contact the platform administrator to reset your CMS credentials.</li>
+                    </ul>
+
+                    <h4>I saved a page but my changes are not showing on the live site</h4>
+                    <ul>
+                        <li>Hard-refresh the live page: press <strong>Ctrl+Shift+R</strong> (Windows) or <strong>Cmd+Shift+R</strong> (Mac) to bypass the browser cache.</li>
+                        <li>Open the live page in a private/incognito window — this always loads fresh content.</li>
+                        <li>If the old content still shows after a hard refresh, check that the save action completed successfully (look for the green "Saved" confirmation in the CMS).</li>
+                    </ul>
+
+                    <h4>The Pages list is empty or shows an error</h4>
+                    <ul>
+                        <li>This is usually a temporary server issue. Wait 30 seconds and refresh the CMS page.</li>
+                        <li>If the error persists, the server may be down. Contact the technical administrator.</li>
+                    </ul>
+
+                    <h4>I can't upload an image — the upload button is greyed out or gives an error</h4>
+                    <ul>
+                        <li>Verify the file is one of the accepted formats: JPEG, PNG, GIF, WebP, SVG.</li>
+                        <li>Check the file size — it must be under 10 MB. Compress the image and try again.</li>
+                        <li>Ensure you have filled in the Alt Text field — the upload will not proceed without it.</li>
+                        <li>If the error message says "Upload failed" after a valid file and alt text, the server storage may be full — contact the technical administrator.</li>
+                    </ul>
+
+                    <h4>My FAQ reordering was not saved</h4>
+                    <ul>
+                        <li>After dragging FAQs to their new positions, you must click the <strong>Save Order</strong> button (not just any Save button). This is a dedicated action.</li>
+                        <li>If Save Order is not visible, scroll to the top of the FAQ table.</li>
+                    </ul>
+
+                    <h4>I deleted a section or page by mistake</h4>
+                    <p>Deletions in the CMS are permanent and cannot be undone from within the tool. If the deletion was very recent, contact the server administrator immediately to request a database restore from backup. For small sections, recreate the content manually using the Add Section feature.</p>
+
+                    <hr class="section-rule">
+
+                    <h3>Getting Help</h3>
+                    <p>For CMS access issues or technical errors that you cannot resolve:</p>
+                    <ul>
+                        <li><strong>Email:</strong> <a href="mailto:smallbusinesses@dot.ca.gov">smallbusinesses@dot.ca.gov</a></li>
+                        <li><strong>Phone:</strong> (916) 324-1700</li>
+                        <li><strong>Platform Admin Guide:</strong> <a href="admin-tutorial.html">Platform Admin Tutorial</a></li>
+                    </ul>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+            </div><!-- /.tutorial-main -->
+        </div><!-- /.tutorial-layout -->
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section footer-brand">
+                    <a href="index.html">
+                        <img src="images/caltrans-logo.png" alt="Caltrans" style="height: 48px; width: auto; filter: brightness(0) invert(1);" loading="lazy">
+                    </a>
+                    <p>CaltransBizConnect connects certified Small Business Enterprises with subcontracting opportunities on California transportation projects.</p>
+                    <p>California Department of Transportation<br>
+                        1120 N Street, MS-79<br>
+                        Sacramento, CA 95814</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="for-small-businesses.html">For Small Businesses</a></li>
+                        <li><a href="for-prime-contractors.html">For Prime Contractors</a></li>
+                        <li><a href="opportunities.html">View Opportunities</a></li>
+                        <li><a href="how-it-works.html">How It Works</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Caltrans Resources</h3>
+                    <ul>
+                        <li><a href="https://dot.ca.gov" target="_blank" rel="noopener noreferrer">Caltrans Home &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights" target="_blank" rel="noopener noreferrer">Civil Rights <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+                        <li><a href="https://ccop.dot.ca.gov/" target="_blank" rel="noopener noreferrer">Contracting Portal &nearrow;</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 California Department of Transportation. All rights reserved.</p>
+                <p>CaltransBizConnect — Small Business Enterprise Supportive Services Program</p>
+                <p><a href="terms-of-service.html">Terms of Service</a> &bull; <a href="privacy-policy.html">Privacy Policy</a> &bull; <a href="accessibility-statement.html">Accessibility</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js?v=1774549569000"></script>
+    <script src="js/main.js?v=1774549569000"></script>
+    <script src="js/accessibility-widget.js?v=1774549569000"></script>
+</body>
+</html>

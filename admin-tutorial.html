@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Platform Admin Guide | CaltransBizConnect</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#005A8C">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/design-system.css?v=1774555160000">
+    <link rel="stylesheet" href="css/main.css?v=1774555160000">
+    <link rel="stylesheet" href="css/accessibility-widget.css?v=1774549569000">
+    <style>
+        /* ── Tutorial page layout ── */
+        .tutorial-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: var(--space-2xl);
+            align-items: start;
+            padding: var(--space-2xl) var(--container-padding);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (max-width: 900px) {
+            .tutorial-layout { grid-template-columns: 1fr; }
+            .toc-sidebar { position: static !important; }
+        }
+
+        /* ── Sticky sidebar TOC ── */
+        .toc-sidebar {
+            position: sticky;
+            top: 100px;
+            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-lg);
+        }
+        .toc-sidebar h2 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin: 0 0 var(--space-md) 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--color-secondary);
+            padding-bottom: var(--space-sm);
+        }
+        .toc-sidebar ol {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            counter-reset: toc-counter;
+        }
+        .toc-sidebar ol li {
+            counter-increment: toc-counter;
+            margin-bottom: var(--space-xs);
+        }
+        .toc-sidebar ol li::before {
+            content: counter(toc-counter) ". ";
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+        }
+        .toc-sidebar a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            line-height: 1.4;
+        }
+        .toc-sidebar a:hover { text-decoration: underline; }
+
+        /* ── Tutorial main content ── */
+        .tutorial-main h2.section-heading {
+            background: var(--color-primary);
+            color: var(--color-text-inverse);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+            margin: var(--space-2xl) 0 0 0;
+            font-size: var(--font-size-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .tutorial-main h2.section-heading .section-num {
+            background: var(--color-secondary);
+            color: var(--color-text-primary);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            flex-shrink: 0;
+        }
+        .section-body {
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+            padding: var(--space-xl);
+            background: var(--color-bg-primary);
+            margin-bottom: var(--space-lg);
+        }
+        .tutorial-main h3 {
+            color: var(--color-primary-dark);
+            font-size: var(--font-size-lg);
+            margin: var(--space-xl) 0 var(--space-sm) 0;
+            padding-bottom: var(--space-xs);
+            border-bottom: 2px solid var(--color-secondary);
+        }
+        .tutorial-main h4 {
+            color: var(--color-primary);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            margin: var(--space-lg) 0 var(--space-xs) 0;
+        }
+        .tutorial-main p { line-height: var(--line-height-relaxed); margin: 0 0 var(--space-md) 0; }
+
+        /* ── Step lists ── */
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+            margin: var(--space-md) 0;
+        }
+        .steps li {
+            counter-increment: step-counter;
+            display: grid;
+            grid-template-columns: 36px 1fr;
+            gap: var(--space-sm);
+            align-items: start;
+            margin-bottom: var(--space-md);
+        }
+        .steps li::before {
+            content: counter(step-counter);
+            background: var(--color-primary);
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* ── Callout boxes ── */
+        .callout {
+            border-radius: var(--border-radius-md);
+            padding: var(--space-md) var(--space-lg);
+            margin: var(--space-md) 0;
+            display: flex;
+            gap: var(--space-sm);
+            align-items: flex-start;
+        }
+        .callout-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 2px; }
+        .callout-body { flex: 1; }
+        .callout-body strong { display: block; margin-bottom: var(--space-xs); font-size: var(--font-size-base); }
+        .callout-body p, .callout-body ul { margin: 0; font-size: var(--font-size-base); }
+        .callout.tip { background: var(--color-info-light); border-left: 4px solid var(--color-info); }
+        .callout.warning { background: var(--color-warning-light); border-left: 4px solid var(--color-warning); }
+        .callout.danger { background: var(--color-error-light); border-left: 4px solid var(--color-error); }
+        .callout.success { background: var(--color-success-light); border-left: 4px solid var(--color-success); }
+
+        /* ── Field reference tables ── */
+        .field-table { width: 100%; border-collapse: collapse; margin: var(--space-md) 0; font-size: var(--font-size-sm); }
+        .field-table th { background: var(--color-primary); color: white; padding: var(--space-sm) var(--space-md); text-align: left; }
+        .field-table td { padding: var(--space-sm) var(--space-md); border-bottom: 1px solid #ddd; vertical-align: top; }
+        .field-table tr:nth-child(even) td { background: var(--color-bg-secondary); }
+        .field-table td:first-child { font-weight: var(--font-weight-semibold); white-space: nowrap; }
+
+        /* ── Inline UI element labels ── */
+        .ui-label {
+            display: inline-block;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 4px;
+            padding: 1px 8px;
+            font-size: 0.8rem;
+            font-weight: var(--font-weight-semibold);
+            vertical-align: middle;
+        }
+        .ui-label.gold { background: var(--color-secondary); color: #000; }
+        .ui-label.green { background: var(--color-success); }
+        .ui-label.red { background: var(--color-error); }
+        .ui-label.gray { background: #666; }
+
+        /* ── Intro banner ── */
+        .tutorial-intro-banner {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            padding: var(--space-2xl) var(--container-padding);
+            margin-bottom: 0;
+        }
+        .tutorial-intro-banner .badge {
+            display: inline-block;
+            background: var(--color-secondary);
+            color: #000;
+            border-radius: 100px;
+            padding: var(--space-xs) var(--space-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-md);
+        }
+        .tutorial-intro-banner h1 { color: white; margin: 0 0 var(--space-md) 0; font-size: var(--font-size-3xl); }
+        .tutorial-intro-banner p { color: rgba(255,255,255,0.9); font-size: var(--font-size-lg); margin: 0; }
+
+        .role-badge { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
+        .role-admin { background: #1a237e; color: white; }
+        .role-caltrans { background: var(--color-primary); color: white; }
+        code { background: #f1f1f1; border: 1px solid #ccc; border-radius: 3px; padding: 1px 5px; font-family: monospace; font-size: 0.875em; }
+        .back-to-top { display: block; text-align: right; margin-top: var(--space-md); font-size: var(--font-size-sm); color: var(--color-primary); }
+        hr.section-rule { border: none; border-top: 1px solid #e0e0e0; margin: var(--space-xl) 0; }
+    </style>
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="site-header" role="banner">
+        <div class="container">
+            <a href="index.html" class="site-logo">
+                <img src="images/caltrans-logo.png" alt="Caltrans">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span></button>
+            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="for-small-businesses.html">Small Businesses</a></li>
+                    <li><a href="for-prime-contractors.html">Prime Contractors</a></li>
+                    <li><a href="opportunities.html">Opportunities</a></li>
+                    <li><a href="how-it-works.html">How It Works</a></li>
+                    <li><a href="resources.html">Resources</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html" class="btn btn-secondary btn-small">Log In</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <!-- Intro Banner -->
+        <div class="tutorial-intro-banner">
+            <div class="container">
+                <span class="badge">Internal Documentation</span>
+                <h1>CaltransBizConnect Platform Admin Guide</h1>
+                <p>A complete reference for platform administrators managing users, opportunities, and system settings on CaltransBizConnect.</p>
+                <p style="margin-top: var(--space-md); font-size: var(--font-size-sm); color: rgba(255,255,255,0.7);">
+                    Applies to roles: <span class="role-badge role-admin">admin</span>&nbsp;<span class="role-badge role-caltrans">caltrans_admin</span> &nbsp;&bull;&nbsp; Last updated: May 2026
+                </p>
+            </div>
+        </div>
+
+        <div class="tutorial-layout">
+
+            <!-- Sidebar Table of Contents -->
+            <aside class="toc-sidebar" aria-label="Table of contents">
+                <h2>Contents</h2>
+                <ol>
+                    <li><a href="#sec-intro">Introduction &amp; Access</a></li>
+                    <li><a href="#sec-analytics">Analytics Dashboard</a></li>
+                    <li><a href="#sec-users">User Management</a></li>
+                    <li><a href="#sec-opportunities">Opportunity Management</a></li>
+                    <li><a href="#sec-applications">Application Review</a></li>
+                    <li><a href="#sec-security">Security Best Practices</a></li>
+                    <li><a href="#sec-troubleshooting">Troubleshooting</a></li>
+                </ol>
+            </aside>
+
+            <!-- Main Tutorial Content -->
+            <div class="tutorial-main">
+
+                <!-- SECTION 1: INTRODUCTION -->
+                <h2 class="section-heading" id="sec-intro">
+                    <span class="section-num" aria-hidden="true">1</span>
+                    Introduction &amp; Access
+                </h2>
+                <div class="section-body">
+                    <h3>About This Guide</h3>
+                    <p>This guide is for Caltrans staff who have been granted <strong>admin</strong> or <strong>caltrans_admin</strong> platform roles on CaltransBizConnect. It covers every administrative action available, including user account management, opportunity review and approval, application oversight, and platform analytics.</p>
+
+                    <div class="callout tip">
+                        <span class="callout-icon" aria-hidden="true">ℹ️</span>
+                        <div class="callout-body">
+                            <strong>Who this guide is for</strong>
+                            <p>Platform admins manage <em>accounts and operations</em>. If you manage <em>website content</em> (page text, FAQs, images), refer to the separate <a href="cms-tutorial.html"><strong>CMS Admin Guide</strong></a>.</p>
+                        </div>
+                    </div>
+
+                    <h3>Your Admin Pages</h3>
+                    <p>As a platform admin, you have access to three dedicated pages:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Page</th><th>URL</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>Analytics</td><td><code>/admin-analytics.html</code></td><td>View real-time platform metrics and user activity</td></tr>
+                            <tr><td>User Management</td><td><code>/admin-users.html</code></td><td>Create, edit, approve, suspend, and delete user accounts</td></tr>
+                            <tr><td>CMS (Content)</td><td><code>/admin-cms.html</code></td><td>Edit page content, FAQs, and site settings (see CMS Guide)</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>How to Log In</h3>
+                    <ol class="steps">
+                        <li>Navigate to <a href="login.html"><code>caltransbizconnect.org/login.html</code></a> in your browser.</li>
+                        <li>Enter your admin email address and password, then click <span class="ui-label">Log In</span>.</li>
+                        <li>If your credentials are valid and your account has admin privileges, you will be redirected automatically to the admin analytics dashboard.</li>
+                        <li>Use the navigation links in your dashboard header to move between analytics, user management, and other admin areas.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Session expiry</strong>
+                            <p>Admin sessions expire after 7 days of inactivity. If you see a "Please log in" message, your session has expired — return to the login page and sign in again.</p>
+                        </div>
+                    </div>
+
+                    <h3>Role Differences: admin vs. caltrans_admin</h3>
+                    <p>Both roles have identical access to the admin UI. The <code>caltrans_admin</code> role is reserved for Caltrans Civil Rights staff and is the highest-privilege role on the platform. The <code>admin</code> role is used for delegated administrators. Both can perform all actions described in this guide.</p>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 2: ANALYTICS -->
+                <h2 class="section-heading" id="sec-analytics">
+                    <span class="section-num" aria-hidden="true">2</span>
+                    Analytics Dashboard
+                </h2>
+                <div class="section-body">
+                    <p>The Analytics Dashboard (<code>/admin-analytics.html</code>) gives you a real-time view of platform health. It is the first page you see after logging in as an admin.</p>
+
+                    <h3>Top-Line Metrics</h3>
+                    <p>Four key figures are displayed at the top of the dashboard:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Metric</th><th>What It Counts</th><th>When to Act</th></tr></thead>
+                        <tbody>
+                            <tr><td>Total Registered Users</td><td>All accounts regardless of status</td><td>Rapid drops may indicate account deletions</td></tr>
+                            <tr><td>Total Opportunities</td><td>All opportunities regardless of status</td><td>Monitor against expected agency posting activity</td></tr>
+                            <tr><td>Active Opportunities</td><td>Opportunities with status <code>open</code></td><td>Low count = few open bids; follow up with agencies</td></tr>
+                            <tr><td>New Users This Week</td><td>Accounts registered in the past 7 days</td><td>High spikes may indicate automated signups</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Users by Type Breakdown</h3>
+                    <p>A visual bar chart shows the distribution of account types across the platform:</p>
+                    <ul>
+                        <li><strong>Small Business</strong> — certified SBE/DBE firms registered to apply for subcontracting work</li>
+                        <li><strong>Prime Contractor</strong> — agencies and prime contractors posting opportunities</li>
+                        <li><strong>Admin</strong> — internal staff accounts</li>
+                    </ul>
+                    <p>The percentage shown is each type as a share of all registered users. A healthy ratio typically shows small businesses as the majority.</p>
+
+                    <h3>Opportunities by Status</h3>
+                    <p>This breakdown shows the pipeline health of all posted opportunities:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>open</code></td><td>Published and accepting applications from small businesses</td></tr>
+                            <tr><td><code>pending</code></td><td>Posted by an agency but not yet reviewed/approved by admin</td></tr>
+                            <tr><td><code>closed</code></td><td>Past due date or manually closed; no new applications accepted</td></tr>
+                            <tr><td><code>awarded</code></td><td>Contract has been awarded to a small business</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="callout tip">
+                        <span class="callout-icon" aria-hidden="true">💡</span>
+                        <div class="callout-body">
+                            <strong>Watch the pending count</strong>
+                            <p>A growing "Pending" count means agencies are posting opportunities that haven't been reviewed yet. You or another admin should approve or reject these in the Opportunity Manager (see Section 4).</p>
+                        </div>
+                    </div>
+
+                    <h3>Recent Registrations Table</h3>
+                    <p>The bottom of the analytics page shows the 10 most recently registered users, including their name/business, account type badge, and join date. Each row includes a <span class="ui-label">Manage</span> link that opens that user's record directly in the User Management page.</p>
+
+                    <h3>Refreshing Data</h3>
+                    <ol class="steps">
+                        <li>Click the <span class="ui-label">Refresh</span> button at the top of the analytics page.</li>
+                        <li>All four metrics and both breakdowns will reload from the live database. The recent registrations table also refreshes.</li>
+                    </ol>
+                    <p>Data does <strong>not</strong> auto-refresh. Reload the page or click the Refresh button to see current figures.</p>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 3: USER MANAGEMENT -->
+                <h2 class="section-heading" id="sec-users">
+                    <span class="section-num" aria-hidden="true">3</span>
+                    User Management
+                </h2>
+                <div class="section-body">
+                    <p>User Management (<code>/admin-users.html</code>) is your primary tool for managing who has access to the platform. You can view, create, edit, approve, suspend, and delete user accounts from this page.</p>
+
+                    <h3>Reading the User Table</h3>
+                    <p>The main table lists every registered account. Each row shows:</p>
+                    <table class="field-table">
+                        <thead><tr><th>Column</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td>User / Business</td><td>Business or organization name with the contact email below it</td></tr>
+                            <tr><td>Account Type</td><td>Colored badge: Small Business, Prime Contractor, or Admin</td></tr>
+                            <tr><td>Status</td><td>Current account state (see status reference below)</td></tr>
+                            <tr><td>Join Date</td><td>When the account was created</td></tr>
+                            <tr><td>Actions</td><td>Buttons to manage the account (context-dependent)</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Account Status Reference</h4>
+                    <table class="field-table">
+                        <thead><tr><th>Status</th><th>Meaning</th><th>Can Log In?</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="ui-label gold" style="color:#000">Pending</span></td><td>Account created but not yet reviewed by admin</td><td>Limited access</td></tr>
+                            <tr><td><span class="ui-label green">Active</span></td><td>Fully active, normal access</td><td>Yes</td></tr>
+                            <tr><td><span class="ui-label green" style="background:#1b5e20">Verified</span></td><td>Active + SBE/DBE certification confirmed</td><td>Yes</td></tr>
+                            <tr><td><span class="ui-label red">Suspended</span></td><td>Account temporarily disabled by admin</td><td>No</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Searching and Filtering</h3>
+                    <ol class="steps">
+                        <li>Locate the search bar at the top of the user table labeled "Search users."</li>
+                        <li>Type any part of the business name, contact name, or email address. The table filters in real time — no button to press.</li>
+                        <li>Clear the search field to restore all users.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Approve a New User</h3>
+                    <p>When a new user registers, their account status is <span class="ui-label gold" style="color:#000">Pending</span>. They have limited platform access until an admin approves them.</p>
+                    <ol class="steps">
+                        <li>In the user table, locate the pending account. Filter by status or search by business name to find it quickly.</li>
+                        <li>Click the <span class="ui-label green">Approve</span> button in that user's Actions column. This button only appears for accounts with <em>Pending</em> status.</li>
+                        <li>The status badge updates immediately to <span class="ui-label green">Active</span> and the Approve button disappears. The user can now log in with full access.</li>
+                        <li>If the business is a certified SBE/DBE, open their record (click <span class="ui-label">Manage</span>) and change their status to <span class="ui-label green" style="background:#1b5e20">Verified Small Business</span> using the Status dropdown, then click <span class="ui-label">Save Changes</span>.</li>
+                    </ol>
+
+                    <div class="callout tip">
+                        <span class="callout-icon" aria-hidden="true">💡</span>
+                        <div class="callout-body">
+                            <strong>Verify certification numbers</strong>
+                            <p>Before setting a user to Verified status, confirm their SBE certification number in <a href="https://ccop.dot.ca.gov/" target="_blank" rel="noopener noreferrer">CalTrans CCOP</a> or the relevant certifying agency database.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Suspend or Deactivate a User</h3>
+                    <p>Use suspension for policy violations, account security concerns, or temporary holds. Suspension prevents login but preserves the account and all its data.</p>
+                    <ol class="steps">
+                        <li>Locate the user's row in the table.</li>
+                        <li>Click <span class="ui-label red">Deactivate</span> in the Actions column. This button only appears for accounts that are currently Active or Verified.</li>
+                        <li>Confirm the action in the dialog that appears. The status updates to Suspended immediately.</li>
+                        <li>To re-activate, click <span class="ui-label">Manage</span>, change the Status dropdown back to <em>Active</em> or <em>Verified Small Business</em>, and click <span class="ui-label">Save Changes</span>.</li>
+                    </ol>
+
+                    <div class="callout danger">
+                        <span class="callout-icon" aria-hidden="true">🚫</span>
+                        <div class="callout-body">
+                            <strong>Suspension vs. Deletion</strong>
+                            <p>Suspension is reversible. Deletion is permanent and removes the user's account, all their saved opportunities, and any applications they submitted. Only delete accounts when you are certain they will never be needed again.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Create a New User Account</h3>
+                    <p>Admins can manually create accounts — for example, when onboarding an agency that needs platform access before their self-registration is processed.</p>
+                    <ol class="steps">
+                        <li>Click the <span class="ui-label green">+ Add New User</span> button above the user table.</li>
+                        <li>A modal dialog titled "Create User Account" will open. Fill in all required fields:</li>
+                    </ol>
+                    <table class="field-table">
+                        <thead><tr><th>Field</th><th>Required?</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>User / Organization Name</td><td>Yes</td><td>Business or organization name (not a personal name)</td></tr>
+                            <tr><td>Email Address</td><td>Yes</td><td>Must be unique — this is the login email</td></tr>
+                            <tr><td>Password</td><td>Yes (new users)</td><td>Minimum 8 characters. Share securely with the user; they should change it after first login</td></tr>
+                            <tr><td>Account Type</td><td>Yes</td><td>Small Business, Prime Contractor, or Administrator</td></tr>
+                            <tr><td>Account Status</td><td>Yes</td><td>Set to Active for immediate access or Pending if review is needed</td></tr>
+                        </tbody>
+                    </table>
+                    <ol class="steps" start="3">
+                        <li>Click <span class="ui-label green">Create User</span>. The new account appears in the table immediately.</li>
+                        <li>Communicate the login credentials to the new user through a secure channel (not email in plaintext).</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Edit an Existing User</h3>
+                    <ol class="steps">
+                        <li>Find the user in the table and click <span class="ui-label">Manage</span> in their Actions column.</li>
+                        <li>The "Manage User Account" modal opens, pre-filled with their current information.</li>
+                        <li>Update any of the following fields as needed:
+                            <ul style="margin-top: var(--space-sm);">
+                                <li><strong>User / Organization Name</strong> — correct typos or update after a name change</li>
+                                <li><strong>Email Address</strong> — update if the user's contact email changed</li>
+                                <li><strong>Password</strong> — leave blank to keep the current password; enter a new value to reset it</li>
+                                <li><strong>Account Type</strong> — change role if the user's relationship to the platform changes</li>
+                                <li><strong>Account Status</strong> — move between Active, Pending, Suspended, and Verified Small Business</li>
+                            </ul>
+                        </li>
+                        <li>Click <span class="ui-label">Save Changes</span> to apply. Changes take effect immediately.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Changing account type</strong>
+                            <p>Changing a user from Small Business to Administrator or Prime Contractor will change their dashboard and what pages they can access. Confirm the change with your supervisor before upgrading any account to Admin or caltrans_admin.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Delete a User</h3>
+                    <ol class="steps">
+                        <li>Click <span class="ui-label">Manage</span> for the user you wish to delete.</li>
+                        <li>In the modal, scroll to the bottom and click the <span class="ui-label red">Delete User</span> button.</li>
+                        <li>A confirmation prompt will appear: "Are you sure you want to delete this account? This action cannot be undone." Click <strong>Confirm Delete</strong> only if you are certain.</li>
+                        <li>The account is permanently removed from the database. The modal closes and the user disappears from the table.</li>
+                    </ol>
+
+                    <div class="callout danger">
+                        <span class="callout-icon" aria-hidden="true">🚫</span>
+                        <div class="callout-body">
+                            <strong>Deletion is irreversible</strong>
+                            <p>Deleted users cannot be recovered. Their capability statements, saved opportunities, messages, and application history are permanently erased. Prefer Suspension over Deletion in all but the most clear-cut cases.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 4: OPPORTUNITIES -->
+                <h2 class="section-heading" id="sec-opportunities">
+                    <span class="section-num" aria-hidden="true">4</span>
+                    Opportunity Management
+                </h2>
+                <div class="section-body">
+                    <p>Agencies and prime contractors post subcontracting opportunities on the platform. Before an opportunity appears to small businesses, a platform admin must review and approve it. This section covers the full approval workflow and ongoing opportunity management.</p>
+
+                    <h3>The Opportunity Approval Workflow</h3>
+                    <p>When an agency posts a new opportunity, it enters the system with a status of <code>pending</code>. It is invisible to small businesses until an admin changes its status to <code>open</code>. The flow is:</p>
+                    <p style="background: var(--color-bg-secondary); border-radius: var(--border-radius-md); padding: var(--space-md); font-family: monospace; font-size: 0.875rem;">
+                        Agency posts &rarr; <strong>pending</strong> &rarr; Admin reviews &rarr; <strong>open</strong> (published) &rarr; Bids close &rarr; <strong>closed</strong> &rarr; Award selected &rarr; <strong>awarded</strong>
+                    </p>
+
+                    <h3>How to Review and Approve a Pending Opportunity</h3>
+                    <ol class="steps">
+                        <li>From your admin dashboard, look for the <strong>Pending Reviews</strong> count on the analytics page, or navigate directly to the opportunities section in the admin dashboard.</li>
+                        <li>Locate opportunities with <span class="ui-label gold" style="color:#000">Pending</span> status. Review the following before approving:
+                            <ul style="margin-top: var(--space-sm);">
+                                <li>Title and scope summary — is the work described clearly and professionally?</li>
+                                <li>Due date — is it at least 5 business days in the future?</li>
+                                <li>Estimated value — is a dollar amount provided?</li>
+                                <li>NAICS codes — is at least one code listed so the matching system works?</li>
+                                <li>District — is a Caltrans district or "Statewide" selected?</li>
+                                <li>Certifications — are SBE/DBE requirements accurately stated?</li>
+                            </ul>
+                        </li>
+                        <li>If the opportunity meets standards, click <span class="ui-label green">Approve</span>. The status changes to <code>open</code> and the opportunity is immediately visible to small businesses on the Opportunities page.</li>
+                        <li>If the opportunity needs corrections, contact the posting agency directly and ask them to update the posting before you approve it.</li>
+                    </ol>
+
+                    <div class="callout tip">
+                        <span class="callout-icon" aria-hidden="true">💡</span>
+                        <div class="callout-body">
+                            <strong>Pending count on analytics</strong>
+                            <p>Check the Analytics Dashboard regularly. The "Pending Reviews" metric shows how many opportunities are waiting for your approval. A target of 0 pending items means small businesses have the most up-to-date opportunities available.</p>
+                        </div>
+                    </div>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Edit an Opportunity</h3>
+                    <p>Admins may edit any opportunity, including those posted by agencies. This is typically used to fix factual errors, update due dates, or add missing NAICS codes.</p>
+                    <ol class="steps">
+                        <li>Navigate to the opportunity in the admin interface and click <span class="ui-label">Edit</span>.</li>
+                        <li>The opportunity editor opens with all current values pre-filled. Modify only the fields that need correction.</li>
+                        <li>Click <span class="ui-label">Save</span>. Changes are applied immediately, even for published opportunities.</li>
+                    </ol>
+
+                    <h4>Editable Opportunity Fields</h4>
+                    <table class="field-table">
+                        <thead><tr><th>Field</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Title</td><td>Short, clear description of the work being subcontracted</td></tr>
+                            <tr><td>Scope Summary</td><td>Full description of scope, requirements, and deliverables</td></tr>
+                            <tr><td>District</td><td>Caltrans district number (1–12) or Statewide</td></tr>
+                            <tr><td>Category</td><td>Work category (e.g., Construction, Environmental, IT)</td></tr>
+                            <tr><td>Estimated Value</td><td>Dollar amount; required for small businesses to assess fit</td></tr>
+                            <tr><td>Due Date &amp; Time</td><td>Submission deadline</td></tr>
+                            <tr><td>Submission Method</td><td>How small businesses should apply (email, portal, etc.)</td></tr>
+                            <tr><td>Status</td><td>open, closed, pending, awarded</td></tr>
+                            <tr><td>NAICS Codes</td><td>JSON array; drives the automatic small business matching</td></tr>
+                            <tr><td>Certifications Required</td><td>SBE, DBE, DVBE, etc.</td></tr>
+                            <tr><td>Tags</td><td>Free-form searchable keywords</td></tr>
+                        </tbody>
+                    </table>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Close an Opportunity</h3>
+                    <p>When the due date passes, opportunities should be closed to prevent further applications.</p>
+                    <ol class="steps">
+                        <li>Open the opportunity editor.</li>
+                        <li>Change the <strong>Status</strong> field to <code>closed</code>.</li>
+                        <li>Save. The opportunity will no longer appear as active on the Opportunities page but remains searchable in its history.</li>
+                    </ol>
+
+                    <h3>How to Mark an Opportunity as Awarded</h3>
+                    <ol class="steps">
+                        <li>Open the opportunity editor for a closed opportunity.</li>
+                        <li>Change the <strong>Status</strong> to <code>awarded</code>.</li>
+                        <li>Optionally add the winning small business name in the tags field for reference.</li>
+                        <li>Save. The opportunity displays an "Awarded" badge on the platform.</li>
+                    </ol>
+
+                    <hr class="section-rule">
+
+                    <h3>How to Delete an Opportunity</h3>
+                    <ol class="steps">
+                        <li>Open the opportunity in the admin interface.</li>
+                        <li>Click <span class="ui-label red">Delete Opportunity</span>.</li>
+                        <li>Confirm the deletion. The opportunity and all associated applications are permanently removed.</li>
+                    </ol>
+
+                    <div class="callout danger">
+                        <span class="callout-icon" aria-hidden="true">🚫</span>
+                        <div class="callout-body">
+                            <strong>Prefer closing over deleting</strong>
+                            <p>Deleting an opportunity removes all application records associated with it, which may affect small businesses that applied and agency reporting. In most cases, set the status to <code>closed</code> rather than deleting.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 5: APPLICATIONS -->
+                <h2 class="section-heading" id="sec-applications">
+                    <span class="section-num" aria-hidden="true">5</span>
+                    Application Review
+                </h2>
+                <div class="section-body">
+                    <p>When a small business applies to an opportunity, an application record is created. Normally, the posting agency reviews and acts on applications. However, admins can view all applications across the platform and override statuses when needed.</p>
+
+                    <h3>Application Statuses Explained</h3>
+                    <table class="field-table">
+                        <thead><tr><th>Status</th><th>Meaning</th><th>Who Sets It</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="ui-label gold" style="color:#000">pending</span></td><td>Application submitted, not yet reviewed</td><td>System (on submission)</td></tr>
+                            <tr><td><span class="ui-label" style="background:#0277BD">under_review</span></td><td>Agency is actively reviewing the application</td><td>Agency / Admin</td></tr>
+                            <tr><td><span class="ui-label green">approved</span></td><td>Application approved for the opportunity</td><td>Agency / Admin</td></tr>
+                            <tr><td><span class="ui-label red">declined</span></td><td>Application rejected</td><td>Agency / Admin</td></tr>
+                            <tr><td><span class="ui-label green" style="background:#1b5e20">awarded</span></td><td>This applicant was awarded the contract</td><td>Agency / Admin</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Viewing Applications</h3>
+                    <ol class="steps">
+                        <li>Navigate to the Applications section in the admin dashboard.</li>
+                        <li>Use the filter controls to narrow by opportunity, small business, or status.</li>
+                        <li>Click any application row to view the full details: applicant profile, capability statement, applied date, and status history.</li>
+                    </ol>
+
+                    <h3>Updating Application Status (Admin Override)</h3>
+                    <ol class="steps">
+                        <li>Open the application record.</li>
+                        <li>Use the Status dropdown to change to the appropriate status.</li>
+                        <li>Click <span class="ui-label">Save</span>. The change is logged and the applicant's dashboard will reflect the new status.</li>
+                    </ol>
+
+                    <div class="callout warning">
+                        <span class="callout-icon" aria-hidden="true">⚠️</span>
+                        <div class="callout-body">
+                            <strong>Communicate status changes to applicants</strong>
+                            <p>Status changes trigger no automatic email notification to the small business. If you change an application status as an admin override, consider sending the small business a direct message through the platform or an email to inform them.</p>
+                        </div>
+                    </div>
+
+                    <h3>Viewing Applications for a Specific Opportunity</h3>
+                    <ol class="steps">
+                        <li>Open the opportunity in the admin interface.</li>
+                        <li>Click the <span class="ui-label">View Applications</span> button.</li>
+                        <li>All applications for that opportunity are listed with their current status, applicant name, and submission date.</li>
+                    </ol>
+
+                    <h3>Viewing All Applications from a Specific Small Business</h3>
+                    <ol class="steps">
+                        <li>Open the small business's account in User Management (click <span class="ui-label">Manage</span>).</li>
+                        <li>From the user profile, click <span class="ui-label">View Applications</span> to see every opportunity this business has applied to.</li>
+                    </ol>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 6: SECURITY -->
+                <h2 class="section-heading" id="sec-security">
+                    <span class="section-num" aria-hidden="true">6</span>
+                    Security Best Practices
+                </h2>
+                <div class="section-body">
+                    <h3>Protecting Your Admin Account</h3>
+                    <ul>
+                        <li><strong>Use a strong, unique password</strong> — minimum 12 characters, mix of letters, numbers, and symbols. Never reuse a password from another account.</li>
+                        <li><strong>Never share your admin credentials</strong> — if another staff member needs admin access, create them a separate account.</li>
+                        <li><strong>Log out when done</strong> — especially on shared or government-issued computers. Your session lasts up to 7 days if not explicitly logged out.</li>
+                        <li><strong>Access on secured networks only</strong> — avoid logging into the admin panel on public Wi-Fi. Use your agency VPN if working remotely.</li>
+                    </ul>
+
+                    <h3>Account Lifecycle Hygiene</h3>
+                    <ul>
+                        <li>Conduct a quarterly audit of all admin accounts. Suspend or delete accounts for staff who have left the program.</li>
+                        <li>Review the Recent Activity feed monthly for unexpected registrations or changes.</li>
+                        <li>Verify that no user has an inappropriately elevated account type (e.g., a contractor account set to Admin).</li>
+                    </ul>
+
+                    <h3>Suspicious Activity</h3>
+                    <p>If you observe any of the following, contact the technical team immediately:</p>
+                    <ul>
+                        <li>Unexpected admin account creations</li>
+                        <li>Opportunities approved that you did not approve</li>
+                        <li>Unusual spikes in new user registrations</li>
+                        <li>User accounts with unknown email domains</li>
+                        <li>Any content change you cannot explain</li>
+                    </ul>
+
+                    <div class="callout danger">
+                        <span class="callout-icon" aria-hidden="true">🚨</span>
+                        <div class="callout-body">
+                            <strong>If you suspect a compromise</strong>
+                            <p>Immediately change your admin password and notify the Caltrans Civil Rights IT contact. Do not attempt to investigate on your own — preserve the audit trail for forensic analysis.</p>
+                        </div>
+                    </div>
+
+                    <h3>Credential Rotation Schedule</h3>
+                    <table class="field-table">
+                        <thead><tr><th>Credential</th><th>Recommended Rotation</th></tr></thead>
+                        <tbody>
+                            <tr><td>Admin account password</td><td>Every 90 days</td></tr>
+                            <tr><td>CMS admin password</td><td>Every 90 days</td></tr>
+                            <tr><td>Email service app password</td><td>Every 6 months or upon any personnel change</td></tr>
+                            <tr><td>JWT secret (server config)</td><td>Upon any suspected compromise; otherwise annually</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+                <!-- SECTION 7: TROUBLESHOOTING -->
+                <h2 class="section-heading" id="sec-troubleshooting">
+                    <span class="section-num" aria-hidden="true">7</span>
+                    Troubleshooting
+                </h2>
+                <div class="section-body">
+                    <h3>Common Issues and Resolutions</h3>
+
+                    <h4>I can't log in to the admin panel</h4>
+                    <ul>
+                        <li>Verify you are using your <em>admin</em> account email, not a regular user account.</li>
+                        <li>Confirm your password hasn't expired or been changed by another admin.</li>
+                        <li>Clear your browser cache and cookies, then try again.</li>
+                        <li>If still unable to log in, contact the technical administrator to verify your account status and role in the database.</li>
+                    </ul>
+
+                    <h4>The user table shows no data</h4>
+                    <ul>
+                        <li>Check that the search field is empty — an active search filter can hide all users if no matches are found.</li>
+                        <li>Click the <span class="ui-label">Refresh</span> button or reload the page.</li>
+                        <li>If the table consistently shows no data, the database connection may be down — contact the server administrator.</li>
+                    </ul>
+
+                    <h4>An opportunity I approved is not showing on the public Opportunities page</h4>
+                    <ul>
+                        <li>Confirm the opportunity status is <code>open</code>, not <code>pending</code> or <code>closed</code>.</li>
+                        <li>Check the due date — if the due date has already passed, the opportunity may be automatically hidden.</li>
+                        <li>Try viewing the page in a private/incognito browser window to rule out a caching issue.</li>
+                    </ul>
+
+                    <h4>Analytics data looks incorrect</h4>
+                    <ul>
+                        <li>Click the Refresh button to force a live reload from the database.</li>
+                        <li>Analytics figures are not cached; a discrepancy may indicate a database query issue. Report persistent inaccuracies to the technical team.</li>
+                    </ul>
+
+                    <h4>I accidentally deleted a user account</h4>
+                    <p>Account deletions are permanent and cannot be undone from the admin UI. If the deletion was recent and the database has a backup, contact the server administrator immediately to request a restore. Otherwise, you will need to create a new account for the affected user and inform them to re-register their profile information.</p>
+
+                    <hr class="section-rule">
+
+                    <h3>Getting Help</h3>
+                    <p>For technical issues with the platform, contact:</p>
+                    <ul>
+                        <li><strong>Email:</strong> <a href="mailto:smallbusinesses@dot.ca.gov">smallbusinesses@dot.ca.gov</a></li>
+                        <li><strong>Phone:</strong> (916) 324-1700</li>
+                        <li><strong>CMS Guide:</strong> <a href="cms-tutorial.html">CMS Admin Tutorial</a></li>
+                    </ul>
+                </div>
+                <a href="#main-content" class="back-to-top">Back to top &uarr;</a>
+
+            </div><!-- /.tutorial-main -->
+        </div><!-- /.tutorial-layout -->
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section footer-brand">
+                    <a href="index.html">
+                        <img src="images/caltrans-logo.png" alt="Caltrans" style="height: 48px; width: auto; filter: brightness(0) invert(1);" loading="lazy">
+                    </a>
+                    <p>CaltransBizConnect connects certified Small Business Enterprises with subcontracting opportunities on California transportation projects.</p>
+                    <p>California Department of Transportation<br>
+                        1120 N Street, MS-79<br>
+                        Sacramento, CA 95814</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="for-small-businesses.html">For Small Businesses</a></li>
+                        <li><a href="for-prime-contractors.html">For Prime Contractors</a></li>
+                        <li><a href="opportunities.html">View Opportunities</a></li>
+                        <li><a href="how-it-works.html">How It Works</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Caltrans Resources</h3>
+                    <ul>
+                        <li><a href="https://dot.ca.gov" target="_blank" rel="noopener noreferrer">Caltrans Home &nearrow;</a></li>
+                        <li><a href="https://dot.ca.gov/programs/civil-rights" target="_blank" rel="noopener noreferrer">Civil Rights <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+                        <li><a href="https://ccop.dot.ca.gov/" target="_blank" rel="noopener noreferrer">Contracting Portal &nearrow;</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 California Department of Transportation. All rights reserved.</p>
+                <p>CaltransBizConnect — Small Business Enterprise Supportive Services Program</p>
+                <p><a href="terms-of-service.html">Terms of Service</a> &bull; <a href="privacy-policy.html">Privacy Policy</a> &bull; <a href="accessibility-statement.html">Accessibility</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js?v=1774549569000"></script>
+    <script src="js/main.js?v=1774549569000"></script>
+    <script src="js/accessibility-widget.js?v=1774549569000"></script>
+</body>
+</html>
