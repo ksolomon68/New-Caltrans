@@ -6,7 +6,7 @@
  *   - Navigations (HTML pages):            Network-first, fallback to cached page or offline shell
  */
 
-const CACHE_VERSION = 'v1.0.6';
+const CACHE_VERSION = 'v1.0.7';
 const STATIC_CACHE  = `caltrans-static-${CACHE_VERSION}`;
 const API_CACHE     = `caltrans-api-${CACHE_VERSION}`;
 const ALL_CACHES    = [STATIC_CACHE, API_CACHE];
@@ -109,8 +109,8 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Static assets → Cache-first
-  event.respondWith(cacheFirst(request, STATIC_CACHE));
+  // Static assets → Network-first (to ensure users always see the latest version)
+  event.respondWith(networkFirst(request, STATIC_CACHE));
 });
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
