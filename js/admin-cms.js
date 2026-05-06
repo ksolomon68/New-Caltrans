@@ -377,7 +377,7 @@ function renderTutorialsTab(container) {
               <iframe src="https://www.youtube.com/embed/_pljsBMO0Is" title="Tutorial Video 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
             </div>
             <div style="padding:1rem;">
-              <h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">Managing Content</h3>
+              <h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">Platform Details</h3>
             </div>
           </div>
 
@@ -386,7 +386,7 @@ function renderTutorialsTab(container) {
               <iframe src="https://www.youtube.com/embed/eXEldHlPpZQ" title="Tutorial Video 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
             </div>
             <div style="padding:1rem;">
-              <h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">Advanced Features</h3>
+              <h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">Scaling CaltransBizConnect</h3>
             </div>
           </div>
 
