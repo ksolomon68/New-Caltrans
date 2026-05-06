@@ -151,6 +151,7 @@ async function showShell() {
             <li><a href="#" data-tab="global"><span aria-hidden="true">⚙️</span> Global Settings</a></li>
             <li><a href="#" data-tab="media"><span aria-hidden="true">🖼️</span> Media Library</a></li>
             <li><a href="#" data-tab="builder"><span aria-hidden="true">🏗️</span> Page Builder</a></li>
+            <li><a href="#" data-tab="admins"><span aria-hidden="true">👥</span> Admin Accounts</a></li>
           </ul>
         </div>
         <div class="cms-nav-section">
@@ -287,6 +288,8 @@ async function navigateTab(tab, extra) {
         case 'global':  await renderGlobalSettings(main);     break;
         case 'media':   await renderMediaLibrary(main);       break;
         case 'builder': await renderPageBuilder(main);        break;
+        case 'admins':  await renderAdminsTab(main);          break;
+        default:        await renderPagesList(main);          break;
     }
 }
 
@@ -2040,4 +2043,139 @@ function getSubFieldSchema(schema, listType) {
 function stripSectionPrefix(fieldKey, sectionId) {
     const prefix = sectionId + '.';
     return fieldKey.startsWith(prefix) ? fieldKey.slice(prefix.length) : fieldKey;
+}
+
+/* ── Admin Management ────────────────────────────────────────────────────────── */
+async function renderAdminsTab(container) {
+    container.innerHTML = `<div class="cms-loading-state"><div class="cms-spinner"></div> Loading admin accounts…</div>`;
+    try {
+        const users = await apiFetch('GET', '/admin/users');
+        // Filter for only admin and caltrans_admin types
+        const admins = (users || []).filter(u => u.type === 'admin' || u.type === 'caltrans_admin');
+        
+        container.innerHTML = `
+            <div class="cms-tab-header">
+                <div>
+                    <h1 class="cms-page-title">👥 Admin Accounts</h1>
+                    <p class="cms-page-subtitle">Manage users with access to the Caltrans CMS and admin dashboards.</p>
+                </div>
+                <button class="cms-btn cms-btn-primary" onclick="showAdminModal()">+ Add New Admin</button>
+            </div>
+            <div class="cms-content-card">
+                <table class="cms-table">
+                    <thead>
+                        <tr>
+                            <th>Administrator / Contact</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th style="text-align:right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cms-admins-list">
+                        ${admins.map(a => `
+                            <tr>
+                                <td>
+                                    <div style="font-weight:600;color:var(--cms-primary)">${a.organization_name || a.contact_name || 'Administrator'}</div>
+                                    <div style="font-size:0.85rem;color:var(--cms-text-muted)">${a.email}</div>
+                                </td>
+                                <td><span class="cms-badge ${a.type === 'caltrans_admin' ? 'cms-badge-primary' : 'cms-badge-secondary'}">${a.type}</span></td>
+                                <td>${new Date(a.created_at).toLocaleDateString()}</td>
+                                <td style="text-align:right">
+                                    <button class="cms-btn cms-btn-sm" onclick="showAdminModal(${JSON.stringify(a).replace(/"/g, '&quot;')})">Edit</button>
+                                </td>
+                            </tr>
+                        `).join('') || '<tr><td colspan="4" style="text-align:center;padding:2rem">No other admin accounts found.</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } catch (err) {
+        container.innerHTML = `<div class="cms-alert cms-alert-error">Failed to load admins: ${err.message}</div>`;
+    }
+}
+
+window.showAdminModal = function(adminData = null) {
+    const isEdit = !!adminData;
+    const existing = document.getElementById('cms-admin-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'cms-admin-modal';
+    modal.className = 'cms-modal-overlay';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+        <div class="cms-modal-container" style="background:#fff;border-radius:8px;padding:2rem;width:450px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+            <h2 style="margin:0 0 1.5rem;font-size:1.2rem;">${isEdit ? 'Edit Admin Account' : 'Add New Administrator'}</h2>
+            <form id="cms-admin-form">
+                <div class="cms-form-group">
+                    <label class="cms-label cms-label-required">Display Name (Department/Name)</label>
+                    <input type="text" id="adm-name" class="cms-input" style="width:100%" value="${adminData?.organization_name || adminData?.contact_name || ''}" required>
+                </div>
+                <div class="cms-form-group">
+                    <label class="cms-label cms-label-required">Email Address</label>
+                    <input type="email" id="adm-email" class="cms-input" style="width:100%" value="${adminData?.email || ''}" required ${isEdit ? 'disabled' : ''}>
+                </div>
+                <div class="cms-form-group">
+                    <label class="cms-label ${isEdit ? '' : 'cms-label-required'}">Password ${isEdit ? '(Leave blank to keep current)' : ''}</label>
+                    <input type="password" id="adm-password" class="cms-input" style="width:100%" ${isEdit ? '' : 'required'}>
+                </div>
+                <div class="cms-form-group">
+                    <label class="cms-label cms-label-required">Role / Permission Level</label>
+                    <select id="adm-type" class="cms-input" style="width:100%">
+                        <option value="admin" ${adminData?.type === 'admin' ? 'selected' : ''}>System Admin</option>
+                        <option value="caltrans_admin" ${adminData?.type === 'caltrans_admin' ? 'selected' : ''}>Caltrans CMS Editor</option>
+                    </select>
+                </div>
+                <div id="adm-error" style="display:none;color:var(--cms-error);font-size:.85rem;margin-bottom:1rem;"></div>
+                <div style="display:flex;gap:.75rem;justify-content:space-between;margin-top:1.5rem;">
+                    ${isEdit ? `<button type="button" class="cms-btn" style="color:var(--cms-error);border-color:var(--cms-error)" onclick="deleteAdmin(${adminData.id})">Delete Account</button>` : '<div></div>'}
+                    <div style="display:flex;gap:.75rem;">
+                        <button type="button" class="cms-btn" onclick="document.getElementById('cms-admin-modal').remove()">Cancel</button>
+                        <button type="submit" class="cms-btn cms-btn-primary">${isEdit ? 'Save Changes' : 'Create Admin'}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('cms-admin-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            email: document.getElementById('adm-email').value.trim(),
+            type: document.getElementById('adm-type').value,
+            organization_name: document.getElementById('adm-name').value.trim(),
+            status: 'active'
+        };
+        const password = document.getElementById('adm-password').value;
+        if (password) payload.password = password;
+
+        const errEl = document.getElementById('adm-error');
+        errEl.style.display = 'none';
+
+        try {
+            if (isEdit) {
+                await apiFetch('PUT', `/admin/users/${adminData.id}`, payload);
+            } else {
+                await apiFetch('POST', '/admin/users', payload);
+            }
+            modal.remove();
+            showToast(isEdit ? 'Admin updated.' : 'Admin created.', 'success');
+            navigateTab('admins');
+        } catch (err) {
+            errEl.textContent = err.message; errEl.style.display = 'block';
+        }
+    };
+}
+
+window.deleteAdmin = async function(id) {
+    if (!confirm('Permanently delete this admin account? They will lose all access immediately.')) return;
+    try {
+        await apiFetch('DELETE', `/admin/users/${id}`);
+        document.getElementById('cms-admin-modal').remove();
+        showToast('Admin account deleted.', 'success');
+        navigateTab('admins');
+    } catch (err) {
+        alert('Delete failed: ' + err.message);
+    }
 }
