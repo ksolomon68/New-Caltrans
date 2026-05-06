@@ -123,7 +123,7 @@ Antig2/
 
 ## Contact
 For questions or support:
-- **Email**: SBEss@dot.ca.gov
+- **Contact**: Use the platform's Contact Page for support.
 - **Phone**: (916) 324-1700
 - **Hours**: Monday - Friday, 8:00 AM - 5:00 PM PST
 

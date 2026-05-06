@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
           .then(response => {
             if (response.ok) {
-              showSuccessMessage('Thank you for your message. It has been sent to SBEss@dot.ca.gov. We will get back to you soon.', contactForm.parentElement);
+              showSuccessMessage('Thank you for your message. It has been received and we will get back to you soon.', contactForm.parentElement);
               contactForm.reset();
               window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
           .then(response => {
             if (response.ok) {
-              showSuccessMessage('Your issue report has been sent to SBEss@dot.ca.gov. Our technical team will review it.', issueForm.parentElement);
+              showSuccessMessage('Your issue report has been received. Our technical team will review it.', issueForm.parentElement);
               issueForm.reset();
               window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {

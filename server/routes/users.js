@@ -3,6 +3,16 @@ const { db } = require('../database');
 const { requireRole } = require('../middleware/auth');
 const router = express.Router();
 
+const ensureHttps = (url) => {
+    if (!url) return url;
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return trimmed;
+    }
+    return `https://${trimmed}`;
+};
+
 // Get public users list (filtered by type, district, category)
 router.get('/', async (req, res) => {
     const { type, district, category, search } = req.query;
@@ -127,7 +137,7 @@ router.put('/:id', requireRole('any'), async (req, res) => {
         const newOrgName = safeVal(organization_name, existingUser.organization_name);
         const newContactName = safeVal(contact_name, existingUser.contact_name);
         const newPhone = safeVal(phone, existingUser.phone);
-        const newWebsite = safeVal(website, existingUser.website);
+        const newWebsite = ensureHttps(safeVal(website, existingUser.website));
         const newAddress = safeVal(address, existingUser.address);
         const newCity = safeVal(city, existingUser.city);
         const newState = safeVal(state, existingUser.state);

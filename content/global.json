@@ -6,7 +6,7 @@
     "logoImage": "images/caltrans-logo.png",
     "logoAlt": "CaltransBizConnect Logo",
     "faviconPath": "assets/favicon.ico",
-    "contactEmail": "SBEss@dot.ca.gov",
+    "contactEmail": "",
     "copyrightText": "© 2026 California Department of Transportation. All rights reserved.",
     "programName": "CaltransBizConnect - Small Business Enterprise Supportive Services Business Development Program"
   },
@@ -54,8 +54,7 @@
         "heading": "Contact",
         "links": [
           { "label": "Contact Us",       "href": "contact.html"         },
-          { "label": "Report Site Issue","href": "report-issue.html"    },
-          { "label": "SBEss@dot.ca.gov", "href": "mailto:SBEss@dot.ca.gov" }
+          { "label": "Report Site Issue","href": "report-issue.html"    }
         ]
       },
       {
@@ -124,7 +123,7 @@
   "announcement": {
     "enabled": true,
     "version": "v1",
-    "message": "BizConnect is currently accepting new Small Business registrations. For certification questions, contact <a href=\"mailto:smallbusinesses@dot.ca.gov\">smallbusinesses@dot.ca.gov</a>.",
+    "message": "BizConnect is currently accepting new Small Business registrations. For certification questions, please visit our Contact page.",
     "linkText": "",
     "linkUrl": ""
   },

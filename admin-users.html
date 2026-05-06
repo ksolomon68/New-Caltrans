@@ -239,6 +239,10 @@
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Website URL</label>
+                    <input type="url" id="modalWebsite" class="form-input" placeholder="https://..." style="width: 100%;">
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Business Description</label>
                     <textarea id="modalBusinessDescription" class="form-input" placeholder="Enter description" style="width: 100%; min-height: 80px;"></textarea>
                 </div>
@@ -401,6 +405,7 @@
             document.getElementById('modalUserName').value = '';
             document.getElementById('modalContactName').value = '';
             document.getElementById('modalPhone').value = '';
+            document.getElementById('modalWebsite').value = '';
             document.getElementById('modalEIN').value = '';
             document.getElementById('modalBusinessDescription').value = '';
             document.getElementById('modalAddress').value = '';
@@ -424,6 +429,7 @@
             document.getElementById('modalUserName').value = u.business_name || u.organization_name || '';
             document.getElementById('modalContactName').value = u.contact_name || '';
             document.getElementById('modalPhone').value = u.phone || '';
+            document.getElementById('modalWebsite').value = u.website || '';
             document.getElementById('modalEIN').value = u.ein || '';
             document.getElementById('modalBusinessDescription').value = u.business_description || '';
             document.getElementById('modalAddress').value = u.address || '';
@@ -457,6 +463,7 @@
                 status: document.getElementById('modalUserStatus').value,
                 contact_name: document.getElementById('modalContactName').value,
                 phone: document.getElementById('modalPhone').value,
+                website: document.getElementById('modalWebsite').value,
                 ein: document.getElementById('modalEIN').value,
                 business_description: document.getElementById('modalBusinessDescription').value,
                 address: document.getElementById('modalAddress').value,

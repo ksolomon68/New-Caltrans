@@ -155,8 +155,7 @@
           <h3>Contact</h3>
           <ul>
             <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="report-issue.html">Report Site Issue</a></li>
-            <li><a href="mailto:smallbusinesses@dot.ca.gov">smallbusinesses@dot.ca.gov</a></li>
+            <li><a href="report-issue.html" aria-current="page">Report Site Issue</a></li>
           </ul>
         </div>
 
@@ -274,8 +273,7 @@
             var severeNote = isSevere
               ? '<p style="margin-top:1rem;padding:1rem;background:#fff3cd;border:1px solid #ffc107;border-radius:4px;color:#6d4c00;">'
                 + '<strong>For urgent login or account access issues:</strong> Call '
-                + '<a href="tel:9163241700" style="color:#6d4c00;">(916) 324-1700</a> or email '
-                + '<a href="mailto:smallbusinesses@dot.ca.gov" style="color:#6d4c00;">smallbusinesses@dot.ca.gov</a>'
+                + '<a href="tel:9163241700" style="color:#6d4c00;">(916) 324-1700</a>'
                 + ' during business hours (M–F, 8:00 AM – 5:00 PM PST).</p>'
               : '';
             alertSuccess.hidden = false;
@@ -293,7 +291,7 @@
           }
         } catch {
           alertDanger.hidden = false;
-          alertDanger.textContent = 'Unable to submit. Please email us directly at smallbusinesses@dot.ca.gov';
+          alertDanger.textContent = 'Unable to submit. Please try again later.';
           submitBtn.disabled    = false;
           submitBtn.textContent = 'Submit Issue Report';
         }

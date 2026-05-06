@@ -114,10 +114,10 @@ function getWelcomeEmail(userName, userType) {
         <p style="color:#444;line-height:1.6;">Hi ${userName},</p>
         <p style="color:#444;line-height:1.6;">Your <strong>${typeLabel}</strong> account has been created. You can now access the platform to ${userType === 'agency' ? 'post opportunities and find qualified small businesses' : 'browse contracting opportunities, upload your capability statement, and connect with Prime Contractors'}.</p>
         ${btn(dashboardHref, 'Go to Dashboard')}
-        <p style="color:#666;font-size:13px;line-height:1.6;">If you have questions, contact us at <a href="mailto:smallbusinesses@dot.ca.gov" style="color:#046B99;">smallbusinesses@dot.ca.gov</a> or call (916) 324-1700.</p>
+        <p style="color:#666;font-size:13px;line-height:1.6;">If you have questions, please visit our <a href="https://caltransbizconnect.org/contact.html" style="color:#046B99;">Contact Page</a> or call (916) 324-1700.</p>
     `);
 
-    const text = `Welcome to CaltransBizConnect!\n\nHi ${userName},\n\nYour ${typeLabel} account has been created successfully.\n\nLog in at: ${dashboardHref}\n\nQuestions? Email smallbusinesses@dot.ca.gov or call (916) 324-1700.\n\n© 2026 California Department of Transportation`;
+    const text = `Welcome to CaltransBizConnect!\n\nHi ${userName},\n\nYour ${typeLabel} account has been created successfully.\n\nLog in at: ${dashboardHref}\n\nQuestions? Visit caltransbizconnect.org/contact.html or call (916) 324-1700.\n\n© 2026 California Department of Transportation`;
 
     return { html, text };
 }
@@ -169,7 +169,7 @@ function getAdminWelcomeEmail(email, password, type, name) {
             ${btn(loginUrl, 'Admin Dashboard')}
             ${btn(cmsUrl, 'CMS Manager')}
         </div>
-        <p style="color:#666;font-size:13px;line-height:1.6;margin-top:20px;">If you were not expecting this access, please contact the platform lead at <a href="mailto:smallbusinesses@dot.ca.gov" style="color:#046B99;">smallbusinesses@dot.ca.gov</a>.</p>
+        <p style="color:#666;font-size:13px;line-height:1.6;margin-top:20px;">If you were not expecting this access, please contact the platform lead via the <a href="https://caltransbizconnect.org/contact.html" style="color:#046B99;">Contact Page</a>.</p>
     `);
 
     const text = `Administrator Account Created\n\nHi ${name || 'Administrator'},\n\nA new ${roleLabel} account has been created for you on CaltransBizConnect.\n\nCredentials:\nEmail: ${email}\nPassword: ${password}\n\nLog in at: ${loginUrl}\n\n© 2026 California Department of Transportation`;

@@ -175,7 +175,7 @@ async function registerSmallBusiness(formData) {
     } catch (error) {
         clearTimeout(timeout);
         if (error.name === 'AbortError') {
-            throw new Error('Registration timed out. The server is taking too long to respond. Please try again or contact us at smallbusinesses@dot.ca.gov.');
+            throw new Error('Registration timed out. The server is taking too long to respond. Please try again later or check your internet connection.');
         }
         // Mock fallback if API is unreachable
         if (error.message.includes('Failed to fetch') || error.message.includes('Server API is not responding')) {
@@ -220,7 +220,7 @@ async function registerPrimeContractor(formData) {
     } catch (error) {
         clearTimeout(timeout);
         if (error.name === 'AbortError') {
-            throw new Error('Registration timed out. The server is taking too long to respond. Please try again or contact us at smallbusinesses@dot.ca.gov.');
+            throw new Error('Registration timed out. The server is taking too long to respond. Please try again later or check your internet connection.');
         }
         // Mock fallback if API is unreachable
         if (error.message.includes('Failed to fetch') || error.message.includes('Server API is not responding')) {
@@ -352,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = {
                 organizationType: document.getElementById('organizationType').value,
                 organizationName: document.getElementById('organizationName').value,
+                website: document.getElementById('website').value,
                 district: document.getElementById('district') ? document.getElementById('district').value : null,
                 address: document.getElementById('address').value,
                 city: document.getElementById('city').value,

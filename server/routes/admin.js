@@ -5,6 +5,16 @@ const { requireAdmin } = require('../middleware/auth');
 const { sendEmail, getAdminWelcomeEmail } = require('../config/email');
 const router = express.Router();
 
+const ensureHttps = (url) => {
+    if (!url) return url;
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return trimmed;
+    }
+    return `https://${trimmed}`;
+};
+
 // Root admin endpoint
 router.get('/', (req, res) => {
     res.json({ message: 'Admin API is working' });
@@ -169,15 +179,17 @@ router.put('/users/:id', requireAdmin, async (req, res) => {
             'business_name', 'organization_name', 'contact_name', 'phone', 'ein', 
             'status', 'type', 'business_description', 'address', 'city', 'state', 
             'zip', 'years_in_business', 'certification_number', 'certifications',
-            'districts', 'categories'
+            'districts', 'categories', 'website'
         ];
         const updates = [];
         const params = [];
 
         allowedFields.forEach(field => {
             if (data[field] !== undefined) {
+                let value = data[field];
+                if (field === 'website') value = ensureHttps(value);
                 updates.push(`${field} = ?`);
-                params.push(data[field]);
+                params.push(value);
             }
         });
 

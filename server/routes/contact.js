@@ -4,7 +4,7 @@ const express = require('express');
 const { sendEmail, getContactConfirmationEmail } = require('../config/email');
 
 const router = express.Router();
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'SBEss@dot.ca.gov';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'michael.buniak@dot.ca.gov';
 
 // ── POST /api/contact/submit ─────────────────────────────────────────────────
 router.post('/submit', async (req, res) => {
@@ -67,7 +67,7 @@ router.post('/submit', async (req, res) => {
         res.json({ success: true, message: 'Your message has been sent. We\'ll be in touch shortly.' });
     } catch (err) {
         console.error('Contact form error:', err);
-        res.status(500).json({ success: false, message: 'Server error. Please try again or email us directly.' });
+        res.status(500).json({ success: false, message: 'Server error. Please try again later.' });
     }
 });
 

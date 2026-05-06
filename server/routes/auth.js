@@ -6,6 +6,16 @@ const { JWT_SECRET, requireRole } = require('../middleware/auth');
 const { sendEmail, getWelcomeEmail } = require('../config/email');
 const router = express.Router();
 
+const ensureHttps = (url) => {
+    if (!url) return url;
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return trimmed;
+    }
+    return `https://${trimmed}`;
+};
+
 // Register user
 router.post('/register', async (req, res) => {
     let { email, password, type, ...profileData } = req.body;
@@ -57,7 +67,7 @@ router.post('/register', async (req, res) => {
             profileData.address || profileData.businessAddress || profileData.business_address || null,
             profileData.city || null,
             profileData.zip || profileData.zipCode || profileData.zip_code || null,
-            profileData.website || null
+            ensureHttps(profileData.website) || null
         ]);
 
         console.log(`CaltransBizConnect Auth: Registration successful for ${email}, ID: ${result.insertId}`);
@@ -194,7 +204,7 @@ router.put('/:id', requireRole('any'), async (req, res) => {
             profileData.address || null,
             profileData.city || null,
             profileData.zip || profileData.zipCode || null,
-            profileData.website || null,
+            ensureHttps(profileData.website) || null,
             profileData.yearsInBusiness || profileData.years_in_business || null,
             profileData.businessDescription || profileData.business_description || null,
             profileData.certifications || null,
