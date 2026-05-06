@@ -152,6 +152,7 @@ async function showShell() {
             <li><a href="#" data-tab="media"><span aria-hidden="true">🖼️</span> Media Library</a></li>
             <li><a href="#" data-tab="builder"><span aria-hidden="true">🏗️</span> Page Builder</a></li>
             <li><a href="#" data-tab="admins"><span aria-hidden="true">👥</span> Admin Accounts</a></li>
+            <li><a href="#" data-tab="tutorials"><span aria-hidden="true">🎓</span> Help & Tutorials</a></li>
           </ul>
         </div>
         <div class="cms-nav-section">
@@ -289,6 +290,7 @@ async function navigateTab(tab, extra) {
         case 'media':   await renderMediaLibrary(main);       break;
         case 'builder': await renderPageBuilder(main);        break;
         case 'admins':  await renderAdminsTab(main);          break;
+        case 'tutorials': renderTutorialsTab(main);           break;
         default:        await renderPagesList(main);          break;
     }
 }
@@ -347,6 +349,51 @@ async function renderPagesList(container) {
     } catch (err) {
         container.innerHTML = `<div class="cms-alert cms-alert-error">Failed to load pages: ${escHtml(err.message)}</div>`;
     }
+}
+
+// ── Tutorials Tab ──────────────────────────────────────────────────────────
+function renderTutorialsTab(container) {
+    container.innerHTML = `
+    <div class="cms-flex-between cms-mb">
+      <h2 style="margin:0;color:var(--cms-primary)">Help & Tutorials</h2>
+    </div>
+    <div class="cms-panel">
+      <div class="cms-panel-body">
+        <p class="cms-text-muted mb-md">Watch these tutorial videos to learn how to manage content, pages, and administration in the CaltransBizConnect CMS.</p>
+        
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:2rem;">
+          
+          <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;">
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+              <iframe src="https://www.youtube.com/embed/-BuKsRoN0PY" title="Tutorial Video 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+            </div>
+            <div style="padding:1rem;">
+              <h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">Platform Overview</h3>
+            </div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;">
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+              <iframe src="https://www.youtube.com/embed/_pljsBMO0Is" title="Tutorial Video 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+            </div>
+            <div style="padding:1rem;">
+              <h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">Managing Content</h3>
+            </div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;">
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+              <iframe src="https://www.youtube.com/embed/eXEldHlPpZQ" title="Tutorial Video 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+            </div>
+            <div style="padding:1rem;">
+              <h3 style="font-size:1.05rem;margin:0;color:var(--color-primary)">Advanced Features</h3>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    `;
 }
 
 // ── Page Editor ────────────────────────────────────────────────────────────
