@@ -7,6 +7,14 @@
     "logoAlt": "CaltransBizConnect Logo",
     "faviconPath": "assets/favicon.ico",
     "contactEmail": "",
+    "contactPhone": "(916) 324-1700",
+    "contactPhoneHours": "Monday–Friday, 8:00 AM – 5:00 PM PST",
+    "mailingAddress": {
+      "org": "California Department of Transportation",
+      "dept": "Office of Civil Rights Small Business Development Branch",
+      "street": "1120 N Street, MS-79",
+      "cityStateZip": "Sacramento, CA 95814"
+    },
     "copyrightText": "© 2026 California Department of Transportation. All rights reserved.",
     "programName": "CaltransBizConnect - Small Business Enterprise Supportive Services Business Development Program"
   },

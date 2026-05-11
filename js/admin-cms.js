@@ -972,8 +972,14 @@ async function renderGlobalSettings(container) {
               ${fieldInput('site.name',          'Site Name',        globalData.site?.name          || '', 'text',     80, true)}
               ${fieldInput('site.tagline',        'Tagline',          globalData.site?.tagline       || '', 'text',     120)}
               ${fieldInput('site.contactEmail',   'Contact Email',    globalData.site?.contactEmail  || '', 'text',     100)}
+              ${fieldInput('site.contactPhone',   'Contact Phone',    globalData.site?.contactPhone  || '', 'text',     30)}
+              ${fieldInput('site.contactPhoneHours', 'Phone Hours',   globalData.site?.contactPhoneHours || '', 'text', 100)}
               ${fieldInput('site.copyrightText',  'Copyright Text',   globalData.site?.copyrightText || '', 'text',     200)}
               ${fieldInput('site.programName',    'Program Name (footer)', globalData.site?.programName|| '', 'textarea',300)}
+              ${fieldInput('site.mailingAddress.org',        'Mailing Address — Organization',  globalData.site?.mailingAddress?.org        || '', 'text', 150)}
+              ${fieldInput('site.mailingAddress.dept',       'Mailing Address — Department',    globalData.site?.mailingAddress?.dept       || '', 'text', 150)}
+              ${fieldInput('site.mailingAddress.street',     'Mailing Address — Street',        globalData.site?.mailingAddress?.street     || '', 'text', 100)}
+              ${fieldInput('site.mailingAddress.cityStateZip','Mailing Address — City, State ZIP', globalData.site?.mailingAddress?.cityStateZip || '', 'text', 60)}
             </div>
           </div>
         </div>
