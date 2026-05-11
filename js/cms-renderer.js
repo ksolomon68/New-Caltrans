@@ -36,34 +36,33 @@
     // ── Main entry ──────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', async function () {
         const slug = document.body.getAttribute('data-cms-page');
-        if (!slug) return; // Page not opted into CMS
 
         try {
-            // Check for preview mode
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPreview = urlParams.get('preview') === 'true';
-            
-            let pageDataPromise;
-            if (isPreview) {
-                const previewData = localStorage.getItem('cms_preview_' + slug);
-                if (previewData) {
-                    pageDataPromise = Promise.resolve(JSON.parse(previewData));
-                    showPreviewBanner();
-                } else {
-                    pageDataPromise = fetchJson(`${API}/cms/pages/${slug}`);
-                }
-            } else {
-                pageDataPromise = fetchJson(`${API}/cms/pages/${slug}`);
-            }
-
-            const [pageData, globalData] = await Promise.all([
-                pageDataPromise,
-                fetchJson(`${API}/cms/global`)
-            ]);
-
-            if (pageData)   hydratePage(pageData, globalData);
-            if (pageData)   hydrateListSections(pageData);
+            // Global data always fetched — applies to every page (email, announcement, etc.)
+            const globalData = await fetchJson(`${API}/cms/global`);
             if (globalData) hydrateGlobal(globalData);
+
+            // Page-specific hydration only when page is opted into CMS
+            if (slug) {
+                const urlParams  = new URLSearchParams(window.location.search);
+                const isPreview  = urlParams.get('preview') === 'true';
+                let pageData;
+
+                if (isPreview) {
+                    const previewData = localStorage.getItem('cms_preview_' + slug);
+                    if (previewData) {
+                        pageData = JSON.parse(previewData);
+                        showPreviewBanner();
+                    } else {
+                        pageData = await fetchJson(`${API}/cms/pages/${slug}`);
+                    }
+                } else {
+                    pageData = await fetchJson(`${API}/cms/pages/${slug}`);
+                }
+
+                if (pageData) hydratePage(pageData, globalData);
+                if (pageData) hydrateListSections(pageData);
+            }
 
         } catch (err) {
             console.warn('[CMS Renderer] Failed to load CMS content:', err.message);
@@ -189,9 +188,9 @@
             }
         }
 
-        // Contact email
+        // Contact email — targets all elements marked data-cms-contact-email
         if (globalData.site && globalData.site.contactEmail) {
-            document.querySelectorAll('a[href^="mailto:CaltransBizSupport"]').forEach(el => {
+            document.querySelectorAll('[data-cms-contact-email]').forEach(el => {
                 el.href        = `mailto:${globalData.site.contactEmail}`;
                 if (el.textContent.includes('@')) el.textContent = globalData.site.contactEmail;
             });
