@@ -175,7 +175,7 @@ async function registerSmallBusiness(formData) {
     } catch (error) {
         clearTimeout(timeout);
         if (error.name === 'AbortError') {
-            throw new Error('Registration timed out. The server is taking too long to respond. Please try again later or check your internet connection.');
+            throw new Error('Registration timed out. The server is taking too long to respond. Please try again or contact us at CaltransBizSupport@dot.ca.gov for assistance.');
         }
         // Mock fallback if API is unreachable
         if (error.message.includes('Failed to fetch') || error.message.includes('Server API is not responding')) {
@@ -220,7 +220,7 @@ async function registerPrimeContractor(formData) {
     } catch (error) {
         clearTimeout(timeout);
         if (error.name === 'AbortError') {
-            throw new Error('Registration timed out. The server is taking too long to respond. Please try again later or check your internet connection.');
+            throw new Error('Registration timed out. The server is taking too long to respond. Please try again or contact us at CaltransBizSupport@dot.ca.gov for assistance.');
         }
         // Mock fallback if API is unreachable
         if (error.message.includes('Failed to fetch') || error.message.includes('Server API is not responding')) {

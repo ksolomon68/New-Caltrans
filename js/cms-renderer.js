@@ -191,7 +191,7 @@
 
         // Contact email
         if (globalData.site && globalData.site.contactEmail) {
-            document.querySelectorAll('a[href^="mailto:SBEss"]').forEach(el => {
+            document.querySelectorAll('a[href^="mailto:CaltransBizSupport"]').forEach(el => {
                 el.href        = `mailto:${globalData.site.contactEmail}`;
                 if (el.textContent.includes('@')) el.textContent = globalData.site.contactEmail;
             });
