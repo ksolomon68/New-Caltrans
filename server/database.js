@@ -18,12 +18,12 @@ let pool;
 function getDb() {
     if (!pool) {
         try {
-            const dbHost = process.env.DB_HOST || 'localhost';
+            const dbHost = process.env.DB_HOST || 'caltransbizconnect.org';
             pool = mysql.createPool({
                 host: dbHost,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME,
+                user: process.env.DB_USER || 'u579331817_caltrans',
+                password: process.env.DB_PASSWORD || ',_>!5V\\VEYP]Nl[W^Fv)',
+                database: process.env.DB_NAME || 'u579331817_caltrans',
                 waitForConnections: true,
                 connectionLimit: 10,
                 queueLimit: 0,

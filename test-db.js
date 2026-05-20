@@ -3,9 +3,9 @@ const mysql = require('mysql2/promise');
 async function testConnection() {
     try {
         const connection = await mysql.createConnection({
-            host: '127.0.0.1',
-            user: 'root',
-            password: '',
+            host: 'caltransbizconnect.org',
+            user: 'u579331817_caltrans',
+            password: ',_>!5V\\VEYP]Nl[W^Fv)',
             database: 'u579331817_caltrans'
         });
         console.log('Successfully connected to local MySQL as root!');
