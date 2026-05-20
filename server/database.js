@@ -2,10 +2,20 @@ const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// First try to load the default .env file
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// ─── Permanent DB credentials (Hostinger / caltransbizconnect.org) ────────────
+// These are the hard-coded fallback values. Even if the .env files fail to load,
+// the server will always connect to the correct database.
+const DB_DEFAULTS = {
+    host:     'localhost',           // Hostinger runs MySQL on localhost for the app
+    user:     'u579331817_caltrans',
+    password: ',_>!5V\\VEYP]Nl[W^Fv)',
+    database: 'u579331817_caltrans',
+    port:     3306
+};
+// ─────────────────────────────────────────────────────────────────────────────
 
-// If on a live server, conditionally load .env.production overrides (if it exists)
+// Load .env (local dev) then .env.production (live server) — both are optional
+dotenv.config({ path: path.join(__dirname, '../.env') });
 const isLive = !!(process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO || process.env.NODE_ENV === 'production');
 if (isLive) {
     dotenv.config({ path: path.join(__dirname, '../.env.production'), override: true });
@@ -15,22 +25,34 @@ console.log('CaltransBizConnect DB: Initializing MySQL Connection Pool...');
 
 let pool;
 
+function createPool() {
+    const cfg = {
+        host:             process.env.DB_HOST     || DB_DEFAULTS.host,
+        user:             process.env.DB_USER     || DB_DEFAULTS.user,
+        password:         process.env.DB_PASSWORD || DB_DEFAULTS.password,
+        database:         process.env.DB_NAME     || DB_DEFAULTS.database,
+        port:             parseInt(process.env.DB_PORT || DB_DEFAULTS.port, 10),
+        waitForConnections: true,
+        connectionLimit:  10,
+        queueLimit:       0,
+        // Keep connections alive — prevents Hostinger's idle-timeout from dropping them
+        enableKeepAlive:        true,
+        keepAliveInitialDelay:  10000,
+    };
+    const p = mysql.createPool(cfg);
+    // Log pool-level connection errors and reset the pool so getDb() rebuilds it
+    p.pool.on('error', (err) => {
+        console.error('CaltransBizConnect DB: Pool connection error —', err.message, '— will reconnect on next request.');
+        pool = null; // force rebuild on next getDb() call
+    });
+    console.log(`CaltransBizConnect DB: MySQL Pool Created → ${cfg.user}@${cfg.host}/${cfg.database}`);
+    return p;
+}
+
 function getDb() {
     if (!pool) {
         try {
-            const dbHost = process.env.DB_HOST || 'caltransbizconnect.org';
-            pool = mysql.createPool({
-                host: dbHost,
-                user: process.env.DB_USER || 'u579331817_caltrans',
-                password: process.env.DB_PASSWORD || ',_>!5V\\VEYP]Nl[W^Fv)',
-                database: process.env.DB_NAME || 'u579331817_caltrans',
-                waitForConnections: true,
-                connectionLimit: 10,
-                queueLimit: 0,
-                enableKeepAlive: true,
-                keepAliveInitialDelay: 10000
-            });
-            console.log('CaltransBizConnect DB: MySQL Pool Created.');
+            pool = createPool();
         } catch (err) {
             console.error('CaltransBizConnect DB Error: Failed to create pool:', err.message);
             throw err;
@@ -38,6 +60,17 @@ function getDb() {
     }
     return pool;
 }
+
+// Ping the pool every 5 minutes to prevent idle timeout disconnections
+setInterval(async () => {
+    try {
+        await getDb().execute('SELECT 1');
+    } catch (e) {
+        console.warn('CaltransBizConnect DB: Keep-alive ping failed — pool will reconnect:', e.message);
+        pool = null;
+    }
+}, 5 * 60 * 1000);
+
 
 async function initDatabase() {
     console.log('CaltransBizConnect DB: Running initDatabase()...');
