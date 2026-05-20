@@ -29,11 +29,11 @@ const startServer = async () => {
             contentSecurityPolicy: {
                 directives: {
                     defaultSrc:     ["'self'"],
-                    scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+                    scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://primereachgov.com'],
                     styleSrc:       ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
                     fontSrc:        ["'self'", 'https://fonts.gstatic.com'],
                     imgSrc:         ["'self'", 'data:', 'blob:'],
-                    connectSrc:     ["'self'"],
+                    connectSrc:     ["'self'", 'https://primereachgov.com'],
                     frameSrc:       ["'none'"],
                     objectSrc:      ["'none'"],
                     baseUri:        ["'self'"],
