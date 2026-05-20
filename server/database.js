@@ -6,7 +6,7 @@ const path = require('path');
 // These are the hard-coded fallback values. Even if the .env files fail to load,
 // the server will always connect to the correct database.
 const DB_DEFAULTS = {
-    host:     'localhost',           // Hostinger runs MySQL on localhost for the app
+    host:     '127.0.0.1',           // Use IPv4 explicitly — Hostinger MySQL rejects ::1 (IPv6)
     user:     'u579331817_caltrans',
     password: 'ySZSZU=0+B',
     database: 'u579331817_caltrans',
