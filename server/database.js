@@ -8,7 +8,7 @@ const path = require('path');
 const DB_DEFAULTS = {
     host:     'localhost',           // Hostinger runs MySQL on localhost for the app
     user:     'u579331817_caltrans',
-    password: ',_>!5V\\VEYP]Nl[W^Fv)',
+    password: 'ySZSZU=0+B',
     database: 'u579331817_caltrans',
     port:     3306
 };

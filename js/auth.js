@@ -177,18 +177,6 @@ async function registerSmallBusiness(formData) {
         if (error.name === 'AbortError') {
             throw new Error('Registration timed out. The server is taking too long to respond. Please try again or contact us at CaltransBizSupport@dot.ca.gov for assistance.');
         }
-        // Mock fallback if API is unreachable
-        if (error.message.includes('Failed to fetch') || error.message.includes('Server API is not responding')) {
-            console.warn('API Unreachable. Triggering Mock Fallback.');
-            const mockUser = {
-                id: 'v-' + Date.now(),
-                ...formData,
-                type: 'small_business',
-                password: null
-            };
-            localStorage.setItem('caltrans_user', JSON.stringify(mockUser));
-            return mockUser;
-        }
         throw error;
     }
 }
@@ -221,18 +209,6 @@ async function registerPrimeContractor(formData) {
         clearTimeout(timeout);
         if (error.name === 'AbortError') {
             throw new Error('Registration timed out. The server is taking too long to respond. Please try again or contact us at CaltransBizSupport@dot.ca.gov for assistance.');
-        }
-        // Mock fallback if API is unreachable
-        if (error.message.includes('Failed to fetch') || error.message.includes('Server API is not responding')) {
-            console.warn('API Unreachable. Triggering Mock Fallback.');
-            const mockUser = {
-                id: 'a-' + Date.now(),
-                ...formData,
-                type: 'agency',
-                password: null
-            };
-            localStorage.setItem('caltrans_user', JSON.stringify(mockUser));
-            return mockUser;
         }
         throw error;
     }
