@@ -383,8 +383,10 @@ async function initDatabase() {
     }
 }
 
+// Export getDb as a lazy getter so every require('../database').db always
+// returns the current live pool — never a stale reference from startup.
 module.exports = {
-    db: getDb(),
+    get db() { return getDb(); },
     getDb,
     initDatabase
 };
