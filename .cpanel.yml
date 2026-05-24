@@ -1,0 +1,8 @@
+
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/caltransbizconne/New-Caltrans/
+    - /bin/cp -R %{project_root}/* $DEPLOYPATH
+    - cd $DEPLOYPATH && npm install --production
+    - cd $DEPLOYPATH && npm start
