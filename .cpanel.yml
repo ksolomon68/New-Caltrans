@@ -3,4 +3,3 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/caltransbizconne/New-Caltrans
     - /bin/cp -R . $DEPLOYPATH
-    - cd $DEPLOYPATH && npm install --omit=dev
