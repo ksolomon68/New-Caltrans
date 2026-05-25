@@ -1,15 +1,6 @@
 # CaltransBizConnect .htaccess
-
-# ---------------------------------------------------------------
-# Phusion Passenger / cPanel Node.js App
-# IMPORTANT: Do not remove these lines — they tell Apache to hand
-# all requests to the Node.js application instead of serving files
-# directly. Removing them causes the "It works!" Apache default page.
-# ---------------------------------------------------------------
-PassengerEnabled On
-PassengerNodejs /usr/local/bin/node
-PassengerStartupFile index.js
-PassengerAppType node
+# NOTE: Passenger/Node.js directives are managed automatically by
+# cPanel Node.js Selector — do not add them here.
 
 # HTTPS Redirect
 RewriteEngine On
