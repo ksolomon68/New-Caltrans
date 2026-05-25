@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - echo "deployed"
+    - /usr/bin/rsync -av --exclude='.git' --exclude='node_modules' . /home/caltransbizconne/New-Caltrans/
