@@ -38,7 +38,7 @@ const startServer = async () => {
                     objectSrc:      ["'none'"],
                     baseUri:        ["'self'"],
                     formAction:     ["'self'"],
-                    upgradeInsecureRequests: isLive ? [] : null
+                    upgradeInsecureRequests: isLive ? [] : false
                 }
             },
             hsts: isLive ? {
