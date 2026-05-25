@@ -2,27 +2,23 @@ const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// ─── Permanent DB credentials (Hostinger / caltransbizconnect.org) ────────────
-// These are the hard-coded fallback values. Even if the .env files fail to load,
-// the server will always connect to the correct database.
-const DB_DEFAULTS = {
-    host:     '127.0.0.1',           // Use IPv4 explicitly — Hostinger MySQL rejects ::1 (IPv6)
-    user:     'u579331817_caltrans',
-    password: 'ySZSZU=0+B',
-    database: 'u579331817_caltrans',
-    port:     3306
-};
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Load .env (local dev) then .env.production (live server) — both are optional
+// Load env files FIRST before reading any process.env values
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const isLive = !!(process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO || process.env.NODE_ENV === 'production');
 if (isLive) {
     dotenv.config({ path: path.join(__dirname, '../.env.production'), override: true });
 }
 
-console.log('CaltransBizConnect DB: Initializing MySQL Connection Pool...');
+// DB credentials — now process.env values are populated
+const DB_DEFAULTS = {
+    host:     process.env.DB_HOST     || 'localhost',
+    user:     process.env.DB_USER     || 'caltransbizconne_u579331817_caltrans',
+    password: process.env.DB_PASSWORD || 'CaltransDB2026secure',
+    database: process.env.DB_NAME     || 'caltransbizconne_u579331817_caltrans',
+    port:     parseInt(process.env.DB_PORT || '3306', 10),
+};
 
+console.log('CaltransBizConnect DB: Initializing MySQL Connection Pool...');
 let pool;
 
 function createPool() {
