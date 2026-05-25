@@ -1,5 +1,4 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/caltransbizconne/New-Caltrans
-    - /bin/cp -R . $DEPLOYPATH
+    - echo "deployed"
