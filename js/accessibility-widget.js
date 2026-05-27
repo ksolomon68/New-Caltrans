@@ -252,21 +252,29 @@
   /* ── Open / Close ────────────────────────────────────────── */
   function openPanel() {
     open = true;
+    const panel = document.getElementById('a11y-panel');
+    if (panel) panel.style.visibility = 'visible';
     document.getElementById('a11y-panel').classList.add('open');
     document.getElementById('a11y-overlay').classList.add('show');
     document.getElementById('a11y-trigger').setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     setTimeout(() => document.getElementById('aw-close')?.focus(), 50);
     announce('Accessibility menu opened.');
   }
 
   function closePanel() {
     open = false;
+    const panel = document.getElementById('a11y-panel');
     document.getElementById('a11y-panel').classList.remove('open');
     document.getElementById('a11y-overlay').classList.remove('show');
     document.getElementById('a11y-trigger').setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     document.getElementById('a11y-trigger').focus();
+    setTimeout(() => {
+      if (!open && panel) panel.style.visibility = 'hidden';
+    }, 350); // wait for slide-out transition to complete
     announce('Accessibility menu closed.');
   }
 
@@ -338,9 +346,12 @@
     ['a11y-panel','a11y-trigger','a11y-overlay','a11y-guide','a11y-mask','a11y-live']
       .forEach(id => document.getElementById(id)?.remove());
 
-    const wrap = document.createElement('div');
-    wrap.innerHTML = buildHTML();
-    document.body.appendChild(wrap);
+    // Insert accessibility widget components directly into document.body
+    document.body.insertAdjacentHTML('beforeend', buildHTML());
+
+    // Set initial closed state visibility to prevent scrollbars
+    const panel = document.getElementById('a11y-panel');
+    if (panel) panel.style.visibility = 'hidden';
 
     applyAll();
     bindEvents();

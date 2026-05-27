@@ -140,7 +140,7 @@ const Navigation = {
                 <a href="index.html" class="sidebar-footer-link">
                     <span style="font-size: 1.25rem;">🌐</span> Back to Public Site
                 </a>
-                <button onclick="if(typeof logout === 'function') { logout() } else { localStorage.removeItem('caltrans_user'); window.location.href='index.html'; }"
+                <button onclick="if(typeof window.logout === 'function') { window.logout(); } else if(window.Auth && typeof window.Auth.logout === 'function') { window.Auth.logout(); } else { localStorage.removeItem('caltrans_user'); localStorage.removeItem('caltrans_token'); localStorage.removeItem('userId'); localStorage.removeItem('userType'); sessionStorage.clear(); window.location.href='index.html'; }"
                     class="sidebar-footer-link sidebar-signout-btn">
                     <span style="font-size: 1.25rem;">🚪</span> Sign Out
                 </button>
@@ -206,7 +206,7 @@ const Navigation = {
                 <div class="header-avatar">
                     ${userName.charAt(0).toUpperCase()}
                 </div>
-                <button class="mobile-signout-btn" onclick="if(typeof logout === 'function') { logout() } else { localStorage.removeItem('caltrans_user'); window.location.href='index.html'; }" aria-label="Sign Out" title="Sign Out">
+                <button class="mobile-signout-btn" onclick="if(typeof window.logout === 'function') { window.logout(); } else if(window.Auth && typeof window.Auth.logout === 'function') { window.Auth.logout(); } else { localStorage.removeItem('caltrans_user'); localStorage.removeItem('caltrans_token'); localStorage.removeItem('userId'); localStorage.removeItem('userType'); sessionStorage.clear(); window.location.href='index.html'; }" aria-label="Sign Out" title="Sign Out">
                     🚪
                 </button>
             </div>

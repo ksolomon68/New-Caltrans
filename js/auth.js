@@ -121,19 +121,17 @@ async function login(email, password) {
 }
 
 // Logout function - clears session and calls API
-window.handleLogout = async function() {
-    try {
-        // Call server API to clear server-side session
-        await fetch(`${API_URL}/auth/logout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include' // Include cookies if using session auth
-        });
-    } catch (error) {
-        console.warn('CaltransBizConnect: Logout API call failed (continuing anyway):', error);
-    }
+window.handleLogout = function() {
+    // Call server API to clear server-side session (non-blocking)
+    fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include' // Include cookies if using session auth
+    }).catch(error => {
+        console.warn('CaltransBizConnect: Logout API call failed:', error);
+    });
 
-    // Clear all client-side storage
+    // Clear all client-side storage immediately
     localStorage.removeItem('caltrans_user');
     localStorage.removeItem('caltrans_token');
     localStorage.removeItem('userId');
@@ -396,7 +394,7 @@ function syncNavHeader() {
         li.innerHTML = `
             <div style="display: flex; gap: var(--space-sm); align-items: center;">
                 <a href="${dashboardUrl}" class="btn btn-primary btn-small">Dashboard</a>
-                <a href="#" onclick="logout(); return false;" class="btn btn-outline btn-small">Log Out</a>
+                <a href="#" onclick="if(typeof window.logout === 'function') { window.logout(); } else if(window.Auth && typeof window.Auth.logout === 'function') { window.Auth.logout(); } else { localStorage.removeItem('caltrans_user'); localStorage.removeItem('caltrans_token'); localStorage.removeItem('userId'); localStorage.removeItem('userType'); sessionStorage.clear(); window.location.href='login.html'; } return false;" class="btn btn-outline btn-small">Log Out</a>
             </div>
         `;
     }
