@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CaltransBizConnect CMS Admin — manage site content, pages, media, and global settings.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>CMS Admin — CaltransBizConnect</title>
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#005A8C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="BizConnect">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- CMS-specific styles only (no site main.css — isolated admin UI) -->
+  <link rel="stylesheet" href="css/admin-cms.css?v=1774549569000">
+</head>
+
+<body>
+  <!-- Application mount point — content injected by admin-cms.js -->
+  <div id="cms-app" role="application" aria-label="CaltransBizConnect CMS">
+    <!-- Login screen or shell will be rendered here -->
+    <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;
+                background:#003F63;color:#fff;font-family:Arial,sans-serif;">
+      <div style="text-align:center">
+        <div style="width:32px;height:32px;border:4px solid rgba(255,255,255,.3);
+                    border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;
+                    margin:0 auto 1rem"></div>
+        <p>Loading CMS…</p>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+
+  <!-- App config must load first so API_URL is available -->
+  <script src="js/config.js?v=1774549569000"></script>
+  <!-- Sortable.js for drag-and-drop FAQ reordering -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js?v=1774549569000"></script>
+  <!-- CMS admin application -->
+  <script src="js/admin-cms.js?v=1774549569000"></script>
+  <script src="js/pwa.js?v=1774549569000"></script>
+  <script src="https://primereachgov.com/license-gate.js"></script>
+</body>
+
+</html>

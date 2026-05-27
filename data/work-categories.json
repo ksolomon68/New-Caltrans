@@ -1,0 +1,9 @@
+{
+  "categories": [
+    { "id": "construction", "name": "Construction" },
+    { "id": "engineering",  "name": "Engineering" },
+    { "id": "consulting",   "name": "Consulting" },
+    { "id": "supplies",     "name": "Supplies & Materials" },
+    { "id": "services",     "name": "Professional Services" }
+  ]
+}

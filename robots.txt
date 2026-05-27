@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin-cms.html
+Disallow: /admin-users.html
+Disallow: /dashboard-admin.html
+Disallow: /dashboard-caltrans.html
+Disallow: /api/
+
+# Allow assets
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /uploads/
+
+Sitemap: https://caltransbizconnect.org/sitemap.xml

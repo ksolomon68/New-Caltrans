@@ -1,0 +1,153 @@
+{
+  "updatedAt": "2026-03-17T00:00:00.000Z",
+  "site": {
+    "name": "CaltransBizConnect",
+    "tagline": "Connecting Businesses with Opportunities",
+    "logoImage": "images/caltrans-logo.png",
+    "logoAlt": "CaltransBizConnect Logo",
+    "faviconPath": "assets/favicon.ico",
+    "contactEmail": "",
+    "contactPhone": "(916) 324-1700",
+    "contactPhoneHours": "Monday–Friday, 8:00 AM – 5:00 PM PST",
+    "mailingAddress": {
+      "org": "California Department of Transportation",
+      "dept": "Office of Civil Rights Small Business Development Branch",
+      "street": "1120 N Street, MS-79",
+      "cityStateZip": "Sacramento, CA 95814"
+    },
+    "copyrightText": "© 2026 California Department of Transportation. All rights reserved.",
+    "programName": "CaltransBizConnect - Small Business Enterprise Supportive Services Business Development Program"
+  },
+  "navigation": {
+    "items": [
+      { "label": "Home",        "href": "index.html",           "active": true  },
+      { "label": "For Small Businesses", "href": "for-small-businesses.html",     "active": true  },
+      { "label": "For Prime Contractors","href": "for-prime-contractors.html",    "active": true  },
+      { "label": "Opportunities","href": "opportunities.html",  "active": true  },
+      { "label": "How It Works","href": "how-it-works.html",    "active": true  },
+      { "label": "Resources",   "href": "resources.html",       "active": true  },
+      { "label": "FAQ",         "href": "faq.html",             "active": true  },
+      { "label": "Contact",     "href": "contact.html",         "active": true  }
+    ],
+    "loginButton": { "label": "Log In", "href": "login.html" }
+  },
+  "footer": {
+    "columns": [
+      {
+        "heading": "For Small Businesses",
+        "links": [
+          { "label": "Getting Started",  "href": "for-small-businesses.html"     },
+          { "label": "Create Account",   "href": "register-small-business.html" },
+          { "label": "Eligibility",      "href": "eligibility.html"     },
+          { "label": "Resources",        "href": "resources.html"       }
+        ]
+      },
+      {
+        "heading": "For Prime Contractors",
+        "links": [
+          { "label": "Getting Started",  "href": "for-prime-contractors.html"    },
+          { "label": "Create Account",   "href": "register-prime-contractor.html" },
+          { "label": "Post Opportunity", "href": "opportunities.html"   }
+        ]
+      },
+      {
+        "heading": "Information",
+        "links": [
+          { "label": "How It Works",     "href": "how-it-works.html"    },
+          { "label": "Support Services", "href": "support-services.html"},
+          { "label": "FAQ",              "href": "faq.html"             }
+        ]
+      },
+      {
+        "heading": "Contact",
+        "links": [
+          { "label": "Contact Us",       "href": "contact.html"         },
+          { "label": "Report Site Issue","href": "report-issue.html"    }
+        ]
+      },
+      {
+        "heading": "Forms & Services",
+        "links": [
+          {
+            "label": "Service Request Form",
+            "href": "https://app.smartsheet.com/b/form/b0a6941664cd453da6912c4c96d83530",
+            "external": true
+          },
+          {
+            "label": "Text Notifications",
+            "href": "https://app.smartsheet.com/b/form/5a91fd621bf6473cbe2e8dd2a5b1ecdd",
+            "external": true
+          },
+          {
+            "label": "BDP Interest Form",
+            "href": "https://app.smartsheet.com/b/form/d10fcca77e37449abbf81c035b7945f6",
+            "external": true
+          },
+          {
+            "label": "Workforce Development",
+            "href": "https://app.smartsheet.com/b/form/2070c1554666487584e007173d2208ed",
+            "external": true
+          }
+        ]
+      },
+      {
+        "heading": "Caltrans Resources",
+        "links": [
+          { "label": "Caltrans Home",    "href": "https://dot.ca.gov",                                                                          "external": true },
+          { "label": "Civil Rights",     "href": "https://dot.ca.gov/programs/civil-rights",                                                   "external": true },
+          { "label": "SB & Workforce Dev","href":"https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development",          "external": true },
+          { "label": "Contracting Portal","href":"https://ccop.dot.ca.gov/",                                                                   "external": true },
+          { "label": "Mentor-Protege",   "href": "https://dot.ca.gov/programs/construction/construction-mentor-protege-program",               "external": true }
+        ]
+      },
+      {
+        "heading": "External Programs",
+        "links": [
+          { "label": "CA Small Business","href": "https://calosba.ca.gov/",                                       "external": true },
+          { "label": "California UCP",   "href": "https://www.californiaucp.com",                                 "external": true },
+          { "label": "Federal Small Business Regs", "href": "https://www.ecfr.gov/current/title-49/subtitle-A/part-26",     "external": true }
+        ]
+      }
+    ]
+  },
+  "externalPortals": {
+    "ccop":        "https://ccop.dot.ca.gov/",
+    "ucp":         "https://www.californiaucp.com",
+    "caltransHome":"https://dot.ca.gov",
+    "civilRights": "https://dot.ca.gov/programs/civil-rights",
+    "sbWorkforce": "https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development",
+    "mentorProtege":"https://dot.ca.gov/programs/construction/construction-mentor-protege-program",
+    "caOsba":      "https://calosba.ca.gov/",
+    "federalRegs": "https://www.ecfr.gov/current/title-49/subtitle-A/part-26",
+    "districtMap": "https://dot.ca.gov/caltrans-near-me",
+    "eventsCalendar":"https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar"
+  },
+  "smartsheetForms": {
+    "serviceRequest":     "https://app.smartsheet.com/b/form/b0a6941664cd453da6912c4c96d83530",
+    "textNotifications":  "https://app.smartsheet.com/b/form/5a91fd621bf6473cbe2e8dd2a5b1ecdd",
+    "bdpInterest":        "https://app.smartsheet.com/b/form/d10fcca77e37449abbf81c035b7945f6",
+    "workforceDevelopment":"https://app.smartsheet.com/b/form/2070c1554666487584e007173d2208ed"
+  },
+  "announcement": {
+    "enabled": true,
+    "version": "v1",
+    "message": "BizConnect is currently accepting new Small Business registrations. For certification questions, please visit our Contact page.",
+    "linkText": "",
+    "linkUrl": ""
+  },
+  "districtLookahead": [
+    { "label": "All Districts",     "value": "" },
+    { "label": "District 1 — Eureka",        "value": "1" },
+    { "label": "District 2 — Redding",       "value": "2" },
+    { "label": "District 3 — Marysville",    "value": "3" },
+    { "label": "District 4 — Oakland",       "value": "4" },
+    { "label": "District 5 — San Luis Obispo","value":"5" },
+    { "label": "District 6 — Fresno",        "value": "6" },
+    { "label": "District 7 — Los Angeles",   "value": "7" },
+    { "label": "District 8 — San Bernardino","value": "8" },
+    { "label": "District 9 — Bishop",        "value": "9" },
+    { "label": "District 10 — Stockton",     "value": "10" },
+    { "label": "District 11 — San Diego",    "value": "11" },
+    { "label": "District 12 — Orange County","value": "12" }
+  ]
+}

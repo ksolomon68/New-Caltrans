@@ -1,0 +1,172 @@
+{
+  "version": "1.0",
+  "styleGuide": {
+    "allowedFonts": ["Arial", "Calibri"],
+    "bodyTextSizeMin": 12,
+    "bodyTextSizeMax": 14,
+    "requireAltText": true
+  },
+  "componentTypes": [
+    {
+      "type": "hero",
+      "label": "Full Hero (Home page)",
+      "description": "Full-width hero with large title, subtitle, and optional background image. Used on the home page.",
+      "fields": [
+        { "key": "title",            "label": "Heading",           "inputType": "text",     "required": true,  "maxLength": 100 },
+        { "key": "subtitle",         "label": "Subtitle",          "inputType": "textarea", "required": true,  "maxLength": 400 },
+        { "key": "backgroundImage",  "label": "Background Image",  "inputType": "media",    "required": false, "aspectRatio": "16:5", "note": "Recommended 1600×500px" },
+        { "key": "backgroundImageAlt","label": "Background Image Alt Text","inputType": "text","required": false, "maxLength": 200 }
+      ]
+    },
+    {
+      "type": "hero-inner",
+      "label": "Inner Page Hero",
+      "description": "Smaller hero for inner pages with title, subtitle, and optional CTA buttons.",
+      "fields": [
+        { "key": "title",           "label": "Heading",            "inputType": "text",     "required": true,  "maxLength": 100 },
+        { "key": "subtitle",        "label": "Subtitle",           "inputType": "textarea", "required": false, "maxLength": 300 },
+        { "key": "backgroundImage", "label": "Background Image",   "inputType": "media",    "required": false, "aspectRatio": "16:4" },
+        { "key": "primaryButton",   "label": "Primary Button",     "inputType": "button",   "required": false },
+        { "key": "secondaryButton", "label": "Secondary Button",   "inputType": "button",   "required": false }
+      ]
+    },
+    {
+      "type": "text-block",
+      "label": "Text Block",
+      "description": "A heading and rich text body paragraph.",
+      "fields": [
+        { "key": "heading", "label": "Heading", "inputType": "text",     "required": true,  "maxLength": 120 },
+        { "key": "body",    "label": "Body",    "inputType": "textarea", "required": true,  "maxLength": 5000, "richText": true }
+      ]
+    },
+    {
+      "type": "card-grid",
+      "label": "Card Grid",
+      "description": "A responsive grid of cards with optional heading and intro text.",
+      "fields": [
+        { "key": "heading", "label": "Section Heading", "inputType": "text",     "required": false, "maxLength": 120 },
+        { "key": "intro",   "label": "Intro Text",      "inputType": "textarea", "required": false, "maxLength": 400 },
+        { "key": "cards",   "label": "Cards",           "inputType": "card-list","required": true   }
+      ],
+      "cardFields": [
+        { "key": "title",       "label": "Card Title",       "inputType": "text",     "required": true,  "maxLength": 80  },
+        { "key": "body",        "label": "Card Body",        "inputType": "textarea", "required": true,  "maxLength": 300, "richText": true },
+        { "key": "image",       "label": "Card Image",       "inputType": "media",    "required": false, "aspectRatio": "4:3" },
+        { "key": "imageAlt",    "label": "Image Alt Text",   "inputType": "text",     "required": false, "maxLength": 200 },
+        { "key": "buttonLabel", "label": "Button Label",     "inputType": "text",     "required": false, "maxLength": 60  },
+        { "key": "buttonHref",  "label": "Button Link URL",  "inputType": "url",      "required": false  },
+        { "key": "external",    "label": "Opens in new tab", "inputType": "checkbox", "required": false  }
+      ]
+    },
+    {
+      "type": "tiles",
+      "label": "Action Tiles",
+      "description": "Grid of action tiles (icon + heading + description + link). Used on the home page.",
+      "fields": [
+        { "key": "heading", "label": "Section Heading", "inputType": "text",      "required": false, "maxLength": 120 },
+        { "key": "tiles",   "label": "Tiles",           "inputType": "tile-list", "required": true   }
+      ],
+      "tileFields": [
+        { "key": "title",       "label": "Tile Title",      "inputType": "text",     "required": true, "maxLength": 60 },
+        { "key": "description", "label": "Description",     "inputType": "textarea", "required": true, "maxLength": 250, "richText": true },
+        { "key": "href",        "label": "Link URL",        "inputType": "url",      "required": true  },
+        { "key": "linkText",    "label": "Link Text",       "inputType": "text",     "required": true, "maxLength": 40 }
+      ]
+    },
+    {
+      "type": "cta-banner",
+      "label": "CTA Banner",
+      "description": "Full-width call-to-action banner with heading, text, and buttons or columns.",
+      "fields": [
+        { "key": "heading",  "label": "Heading",     "inputType": "text",      "required": true,  "maxLength": 100 },
+        { "key": "text",     "label": "Description", "inputType": "textarea",  "required": false, "maxLength": 300 },
+        { "key": "columns",  "label": "CTA Columns", "inputType": "cta-list",  "required": false  }
+      ],
+      "columnFields": [
+        { "key": "heading",     "label": "Column Heading",     "inputType": "text",     "required": false, "maxLength": 80 },
+        { "key": "text",        "label": "Column Text",        "inputType": "textarea", "required": false, "maxLength": 200, "richText": true },
+        { "key": "buttonLabel", "label": "Button Label",       "inputType": "text",     "required": true,  "maxLength": 60 },
+        { "key": "buttonHref",  "label": "Button Link URL",    "inputType": "url",      "required": true  }
+      ]
+    },
+    {
+      "type": "accordion",
+      "label": "Accordion / FAQ",
+      "description": "Expandable accordion items. Ideal for FAQs and long content.",
+      "fields": [
+        { "key": "heading", "label": "Section Heading", "inputType": "text",         "required": false, "maxLength": 120 },
+        { "key": "items",   "label": "Items",           "inputType": "accordion-list","required": true  }
+      ],
+      "itemFields": [
+        { "key": "question", "label": "Question / Item Title", "inputType": "text",     "required": true, "maxLength": 200 },
+        { "key": "answer",   "label": "Answer / Body",         "inputType": "textarea", "required": true, "maxLength": 1000 }
+      ]
+    },
+    {
+      "type": "iframe-embed",
+      "label": "Embedded iFrame",
+      "description": "Embed an external URL in an iframe (e.g., Events Calendar).",
+      "fields": [
+        { "key": "heading",          "label": "Section Heading",     "inputType": "text", "required": false, "maxLength": 120 },
+        { "key": "iframeSrc",        "label": "iFrame URL",          "inputType": "url",  "required": true   },
+        { "key": "iframeTitle",      "label": "iFrame Accessible Title","inputType":"text","required": true,  "maxLength": 120 },
+        { "key": "externalLinkText", "label": "External Link Text",  "inputType": "text", "required": false, "maxLength": 60  },
+        { "key": "externalLinkHref", "label": "External Link URL",   "inputType": "url",  "required": false  }
+      ]
+    },
+    {
+      "type": "alert",
+      "label": "Alert / Info Box",
+      "description": "Styled alert box with a label and list of items.",
+      "fields": [
+        { "key": "heading",    "label": "Section Heading", "inputType": "text",      "required": false, "maxLength": 120 },
+        { "key": "alertType",  "label": "Alert Type",      "inputType": "select",    "required": true,  "options": ["info","success","warning","error"] },
+        { "key": "alertLabel", "label": "Alert Label",     "inputType": "text",      "required": false, "maxLength": 80 },
+        { "key": "items",      "label": "List Items",      "inputType": "string-list","required": false }
+      ]
+    },
+    {
+      "type": "steps",
+      "label": "Numbered Steps",
+      "description": "A numbered ordered list of steps with label and detail text.",
+      "fields": [
+        { "key": "heading", "label": "Section Heading", "inputType": "text",       "required": false, "maxLength": 120 },
+        { "key": "steps",   "label": "Steps",           "inputType": "steps-list", "required": true  }
+      ],
+      "stepFields": [
+        { "key": "label",  "label": "Step Title",  "inputType": "text",     "required": true, "maxLength": 80  },
+        { "key": "detail", "label": "Step Detail", "inputType": "textarea", "required": true, "maxLength": 300, "richText": true }
+      ]
+    },
+    {
+      "type": "pathway-cards",
+      "label": "Dual Pathway Cards",
+      "description": "Two large pathway cards side by side (Small Business|Prime Contractor and Prime Contractor). Home page only.",
+      "fields": [
+        { "key": "smallBusinessCard", "label": "Small Business|Prime Contractor Pathway Card", "inputType": "pathway-card", "required": true },
+        { "key": "primeContractorCard", "label": "Prime Contractor Pathway Card", "inputType": "pathway-card", "required": true }
+      ],
+      "pathwayCardFields": [
+        { "key": "href",        "label": "Link URL",       "inputType": "url",   "required": true  },
+        { "key": "image",       "label": "Card Image",     "inputType": "media", "required": true,  "aspectRatio": "4:3", "note": "Recommended 400×300px" },
+        { "key": "imageAlt",    "label": "Image Alt Text", "inputType": "text",  "required": true,  "maxLength": 200 },
+        { "key": "title",       "label": "Card Title",     "inputType": "text",  "required": true,  "maxLength": 80 },
+        { "key": "description", "label": "Description",    "inputType": "textarea","required": true, "maxLength": 200 },
+        { "key": "srText",      "label": "Screen-reader extra text", "inputType": "text", "required": false, "maxLength": 100 }
+      ]
+    },
+    {
+      "type": "video-gallery",
+      "label": "Video Gallery",
+      "description": "A grid of embedded YouTube videos.",
+      "fields": [
+        { "key": "heading", "label": "Section Heading", "inputType": "text", "required": false, "maxLength": 120 },
+        { "key": "videos", "label": "Videos", "inputType": "video-list", "required": true }
+      ],
+      "videoFields": [
+        { "key": "title", "label": "Video Title", "inputType": "text", "required": true, "maxLength": 120 },
+        { "key": "src", "label": "YouTube Embed URL", "inputType": "url", "required": true }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -maxdepth 1 -name \"*.html\" -exec sed -i 's/Mentor-Protege/Mentor-Prot\\\\xc3\\\\xa9g\\\\xc3\\\\xa9/g' {} \\\\;)",
+      "Bash(grep -l \"Mentor-Protege\" *.html)",
+      "Bash(grep -c \"Mentor-Protégé\" *.html)",
+      "Bash(grep -n \"1 business day\\\\|within.*day\\\\|response time\\\\|response.*hour\\\\|respond.*within\" \"c:/Users/Keisha/Documents/caltrans/new caltrans/\"*.html -i)",
+      "Bash(ls \"c:/Users/Keisha/Documents/caltrans/new caltrans/dashboards/\"*.html)",
+      "Bash(ls \"c:/Users/Keisha/Documents/caltrans/new caltrans/\"**/*.html)",
+      "Bash(ls \"c:/Users/Keisha/Documents/caltrans/new caltrans/\"*.html)"
+    ]
+  }
+}

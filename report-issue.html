@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team reviews all reports and will follow up as soon as possible.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://caltransbizconnect.org/report-issue.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://caltransbizconnect.org/report-issue.html">
+  <meta property="og:title" content="Report a Site Issue | CaltransBizConnect">
+  <meta property="og:description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team reviews all reports and will follow up as soon as possible.">
+  <meta property="og:image" content="https://caltransbizconnect.org/assets/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://caltransbizconnect.org/report-issue.html">
+  <meta name="twitter:title" content="Report a Site Issue | CaltransBizConnect">
+  <meta name="twitter:description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team reviews all reports and will follow up as soon as possible.">
+  <meta name="twitter:image" content="https://caltransbizconnect.org/assets/og-image.jpg">
+  <title>Report a Site Issue | CaltransBizConnect</title>
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#005A8C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="BizConnect">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/design-system.css?v=1774555160000">
+  <link rel="stylesheet" href="css/main.css?v=1774555160000">
+  <link rel="stylesheet" href="css/accessibility-widget.css?v=1774549569000">
+</head>
+
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="index.html" class="site-logo">
+        <img src="images/caltrans-logo.png" alt="Caltrans">
+      </a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span></button>
+      <nav class="main-nav" role="navigation" aria-label="Main navigation">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="for-small-businesses.html">Small Businesses</a></li>
+          <li><a href="for-prime-contractors.html">Prime Contractors</a></li>
+          <li><a href="opportunities.html">Opportunities</a></li>
+          <li><a href="how-it-works.html">How It Works</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="login.html" class="btn btn-secondary btn-small">Log In</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="container" style="padding: var(--space-2xl) var(--container-padding) var(--space-4xl);">
+      <h1 class="mb-md">Report a Site Issue</h1>
+      <p class="mb-xl text-muted">Help us improve CaltransBizConnect by reporting broken links, display problems,
+        or other technical issues.</p>
+
+      <div class="card">
+        <div class="card-body">
+          <form id="issueForm" novalidate>
+            <div hidden data-form-alert class="alert alert-success" role="alert">Your issue report has been submitted. Thank you!</div>
+            <div hidden data-form-alert-danger class="alert alert-danger" role="alert">Oops — something went wrong. Please try again.</div>
+
+            <div class="form-group">
+              <label for="issueType" class="required">Issue Type</label>
+              <select id="issueType" name="issueType" data-form-field="issueType" required>
+                <option value="">Select issue type</option>
+                <option value="broken-link">Broken Link</option>
+                <option value="display-problem">Display Problem</option>
+                <option value="content-error">Content Error</option>
+                <option value="login-issue">Login or Authentication Issue</option>
+                <option value="upload-issue">File Upload Issue</option>
+                <option value="other">Other Technical Issue</option>
+              </select>
+              <span class="form-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="pageUrl" class="required">Page URL</label>
+              <input type="url" id="pageUrl" name="pageUrl" data-form-field="pageUrl" required aria-describedby="pageUrl-help">
+              <span id="pageUrl-help" class="form-help">The web address where you encountered the
+                issue</span>
+              <span class="form-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="description" class="required">Description</label>
+              <textarea id="description" name="description" data-form-field="description" required rows="6"
+                aria-describedby="description-help"></textarea>
+              <span id="description-help" class="form-help">Please describe the issue in detail, including
+                what you expected to happen and what actually happened</span>
+              <span class="form-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="browser">Browser and Device Information</label>
+              <input type="text" id="browser" name="browser" data-form-field="browser" aria-describedby="browser-help">
+              <span id="browser-help" class="form-help">Example: Chrome on Windows 11, Safari on iPhone
+                14</span>
+            </div>
+
+            <div class="form-group">
+              <label for="contactEmail">Your Email (Optional)</label>
+              <input type="email" id="contactEmail" name="email" data-form-field="email" aria-describedby="contactEmail-help" autocomplete="email">
+              <span id="contactEmail-help" class="form-help">Provide your email if you would like us to
+                follow up with you</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">Submit Issue Report</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>For Small Businesses</h3>
+          <ul>
+            <li><a href="for-small-businesses.html">Getting Started</a></li>
+            <li><a href="register-small-business.html">Create Account</a></li>
+            <li><a href="eligibility.html">Eligibility</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>For Prime Contractors</h3>
+          <ul>
+            <li><a href="for-prime-contractors.html">Getting Started</a></li>
+            <li><a href="register-prime-contractor.html">Create Account</a></li>
+            <li><a href="opportunities.html">Post Opportunity</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Information</h3>
+          <ul>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="support-services.html">Support Services</a></li>
+
+            <li><a href="faq.html">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contact</h3>
+          <ul>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="report-issue.html" aria-current="page">Report Site Issue</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Forms & Services</h3>
+          <ul>
+            <li><a href="https://app.smartsheet.com/b/form/b0a6941664cd453da6912c4c96d83530" target="_blank"
+                rel="noopener noreferrer">Service Request Form <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+            <li><a href="https://app.smartsheet.com/b/form/5a91fd621bf6473cbe2e8dd2a5b1ecdd" target="_blank"
+                rel="noopener noreferrer">Text Notifications <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+            <li><a href="https://app.smartsheet.com/b/form/d10fcca77e37449abbf81c035b7945f6" target="_blank"
+                rel="noopener noreferrer">BDP Interest Form <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+            <li><a href="https://app.smartsheet.com/b/form/2070c1554666487584e007173d2208ed" target="_blank"
+                rel="noopener noreferrer">Workforce Development <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Caltrans Resources</h3>
+          <ul>
+            <li><a href="https://dot.ca.gov" target="_blank" rel="noopener noreferrer">Caltrans Home <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+            <li><a href="https://dot.ca.gov/programs/civil-rights" target="_blank" rel="noopener noreferrer">Civil Rights <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+            <li><a href="https://dot.ca.gov/programs/civil-rights/small-business-and-workforce-development"
+                target="_blank" rel="noopener noreferrer">SB & Workforce Dev <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+            <li><a href="https://ccop.dot.ca.gov/" target="_blank" rel="noopener noreferrer">Contracting Portal <span class="sr-only">(opens in new window)</span>&nearrow;</a>
+            </li>
+            <li><a href="https://dot.ca.gov/programs/construction/construction-mentor-protege-program" target="_blank"
+                rel="noopener noreferrer">Mentor-Protégé <span class="sr-only">(opens in new window)</span>&nearrow;</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>External Programs</h3>
+          <ul>
+            <li><a href="https://calosba.ca.gov/" target="_blank" rel="noopener noreferrer">CA Small Business &nearrow;</a>
+            </li>
+            <li><a href="https://www.californiaucp.com" target="_blank" rel="noopener noreferrer">California UCP &nearrow;</a>
+            </li>
+            <li><a href="https://www.ecfr.gov/current/title-49/subtitle-A/part-26" target="_blank"
+                rel="noopener noreferrer">Federal Small Business Regs &nearrow;</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 California Department of Transportation. All rights reserved.</p>
+        <p>CaltransBizConnect - Small Business Enterprise Supportive Services Program</p>
+                <p><a href="terms-of-service.html">Terms of Service</a> &bull; <a href="privacy-policy.html">Privacy Policy</a> &bull; <a href="accessibility-statement.html">Accessibility</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js?v=1774549569000"></script>
+  <script src="js/main.js?v=1774549569000"></script>
+  <script src="js/accessibility-widget.js?v=1774549569000"></script>
+  <script>
+    // Auto-populate page URL and browser info
+    var referrer = document.referrer;
+    if (referrer) { document.getElementById('pageUrl').value = referrer; }
+    document.getElementById('browser').value = navigator.userAgent;
+
+    (function () {
+      var form      = document.getElementById('issueForm');
+      var submitBtn = form.querySelector('button[type="submit"]');
+      var alertSuccess = form.querySelector('[data-form-alert]');
+      var alertDanger  = form.querySelector('[data-form-alert-danger]');
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        form.querySelectorAll('.form-error').forEach(function (el) { el.textContent = ''; });
+        alertSuccess.hidden = true;
+        alertDanger.hidden  = true;
+
+        var issueType    = document.getElementById('issueType').value;
+        var pageUrl      = document.getElementById('pageUrl').value.trim();
+        var description  = document.getElementById('description').value.trim();
+        var browser      = document.getElementById('browser').value.trim();
+        var contactEmail = document.getElementById('contactEmail').value.trim();
+
+        var valid = true;
+        if (!issueType)   { document.getElementById('issueType').nextElementSibling.textContent   = 'Please select an issue type.'; valid = false; }
+        if (!pageUrl)     { document.getElementById('pageUrl').nextElementSibling.textContent     = 'Page URL is required.'; valid = false; }
+        if (!description) { document.getElementById('description').nextElementSibling.textContent = 'Description is required.'; valid = false; }
+        if (!valid) return;
+
+        submitBtn.disabled    = true;
+        submitBtn.textContent = 'Submitting…';
+
+        var messageBody = [
+          'Issue Type: ' + issueType,
+          'Page URL: ' + pageUrl,
+          '',
+          'Description:',
+          description,
+          '',
+          'Browser/Device: ' + (browser || 'Not provided'),
+          'Contact Email: ' + (contactEmail || 'Not provided')
+        ].join('\n');
+
+        try {
+          var res  = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name:    'Site Issue Report',
+              email:   contactEmail || 'noreply@caltransbizconnect.org',
+              subject: 'Site Issue Report: ' + issueType,
+              message: messageBody
+            })
+          });
+          var data = await res.json();
+          if (data.success) {
+            var refNum    = 'BC-' + Date.now().toString(36).toUpperCase();
+            var isSevere  = ['login-issue', 'upload-issue'].includes(issueType);
+            var severeNote = isSevere
+              ? '<p style="margin-top:1rem;padding:1rem;background:#fff3cd;border:1px solid #ffc107;border-radius:4px;color:#6d4c00;">'
+                + '<strong>For urgent login or account access issues:</strong> Call '
+                + '<a href="tel:9163241700" style="color:#6d4c00;">(916) 324-1700</a>'
+                + ' or email <a href="mailto:CaltransBizSupport@dot.ca.gov" style="color:#6d4c00;">CaltransBizSupport@dot.ca.gov</a>'
+                + ' during business hours (M–F, 8:00 AM – 5:00 PM PST).</p>'
+              : '';
+            alertSuccess.hidden = false;
+            alertSuccess.innerHTML = '<strong>Issue submitted successfully.</strong>'
+              + '<p style="margin-top:.5rem;margin-bottom:0;">Reference number: <strong>' + refNum + '</strong></p>'
+              + '<p style="margin-top:.25rem;margin-bottom:0;">Our team will review this and follow up as soon as possible'
+              + (contactEmail ? ' to <strong>' + contactEmail + '</strong>' : '') + '.</p>'
+              + severeNote;
+            form.querySelectorAll('input,select,textarea,button').forEach(function (el) { el.disabled = true; });
+          } else {
+            alertDanger.hidden = false;
+            alertDanger.textContent = data.message || 'An error occurred. Please try again.';
+            submitBtn.disabled    = false;
+            submitBtn.textContent = 'Submit Issue Report';
+          }
+        } catch {
+          alertDanger.hidden = false;
+          alertDanger.textContent = 'Unable to submit. Please try again later.';
+          submitBtn.disabled    = false;
+          submitBtn.textContent = 'Submit Issue Report';
+        }
+      });
+    }());
+  </script>
+  <script src="js/cms-renderer.js?v=1774549569000"></script>
+  <script src="js/pwa.js?v=1774549569000"></script>
+  <script src="https://primereachgov.com/license-gate.js"></script>
+</body>
+
+</html>
+
+
+

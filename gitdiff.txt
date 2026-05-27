@@ -1,0 +1,3850 @@
+diff --git a/.claude/settings.local.json b/.claude/settings.local.json
+index 9f1c4ac..b941f4b 100644
+--- a/.claude/settings.local.json
++++ b/.claude/settings.local.json
+@@ -12,7 +12,9 @@
+       "Bash(curl -s http://localhost:3002/api/cms/global)",
+       "Bash(node -e \"const d=require\\(''''fs''''\\).readFileSync\\(''''/dev/stdin'''',''''utf8''''\\); const j=JSON.parse\\(d\\); console.log\\(''''Global OK - site:'''', j.site.name\\)\")",
+       "Bash(curl -s http://localhost:3002/api/cms/pages)",
+-      "Bash(curl -s http://localhost:3002/admin-cms.html)"
++      "Bash(curl -s http://localhost:3002/admin-cms.html)",
++      "Bash(node server/index.js)",
++      "Bash(npm install:*)"
+     ]
+   }
+ }
+diff --git a/.env.example b/.env.example
+new file mode 100644
+index 0000000..1a1cc9e
+--- /dev/null
++++ b/.env.example
+@@ -0,0 +1,26 @@
++# Server
++PORT=3001
++NODE_ENV=development
++
++# MySQL Database (Hostinger or local)
++DB_HOST=127.0.0.1
++DB_USER=your_db_username
++DB_PASSWORD=your_db_password
++DB_NAME=your_db_name
++
++# JWT Secret (generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
++JWT_SECRET=your_jwt_secret_here
++
++# CMS Admin Password (for admin-cms.html login)
++CMS_ADMIN_PASSWORD=your_cms_admin_password_here
++
++# Email (Gmail App Password — not your regular Gmail password)
++# Enable 2FA on your Google account, then generate an App Password at myaccount.google.com/apppasswords
++EMAIL_USER=your_gmail_address@gmail.com
++EMAIL_PASSWORD=your_16_char_app_password
++
++# Contact form recipient (defaults to SBEss@dot.ca.gov if not set)
++ADMIN_EMAIL=SBEss@dot.ca.gov
++
++# App URL (used in password reset emails)
++APP_URL=https://caltransbizconnect.org
+diff --git a/.env.production b/.env.production
+deleted file mode 100644
+index a88014c..0000000
+--- a/.env.production
++++ /dev/null
+@@ -1,7 +0,0 @@
+-DB_HOST=127.0.0.1
+-DB_USER=u579331817_caltrans
+-DB_PASSWORD=,_>!5V\VEYP]Nl[W^Fv)
+-DB_NAME=u579331817_caltrans
+-DB_PORT=3306
+-NODE_ENV=production
+-MAINTENANCE_MODE=true
+diff --git a/.gitignore b/.gitignore
+index 2132692..c3b0654 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -5,11 +5,12 @@ build/
+ 
+ # Environment
+ .env
+-.env.example
++.env.*
++!.env.example
+ .env.local
+ .env.development.local
+ .env.test.local
+-!.env.production
++.env.production
+ 
+ # Database
+ *.db
+diff --git a/.htaccess b/.htaccess
+new file mode 100644
+index 0000000..a9d1190
+--- /dev/null
++++ b/.htaccess
+@@ -0,0 +1,51 @@
++# CaltransBizConnect .htaccess
++# HTTPS Redirect
++RewriteEngine On
++RewriteCond %{HTTPS} off
++RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
++
++# Force non-www
++RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
++RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
++
++# Gzip Compression
++<IfModule mod_deflate.c>
++  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml
++</IfModule>
++
++# Browser Caching
++<IfModule mod_expires.c>
++  ExpiresActive On
++
++  # Images
++  ExpiresByType image/jpeg "access plus 1 year"
++  ExpiresByType image/png "access plus 1 year"
++  ExpiresByType image/gif "access plus 1 year"
++  ExpiresByType image/webp "access plus 1 year"
++  ExpiresByType image/svg+xml "access plus 1 year"
++  ExpiresByType image/x-icon "access plus 1 year"
++
++  # CSS and JavaScript
++  ExpiresByType text/css "access plus 6 months"
++  ExpiresByType application/javascript "access plus 6 months"
++  ExpiresByType text/javascript "access plus 6 months"
++
++  # Fonts
++  ExpiresByType font/woff "access plus 1 year"
++  ExpiresByType font/woff2 "access plus 1 year"
++  ExpiresByType application/font-woff "access plus 1 year"
++  ExpiresByType application/font-woff2 "access plus 1 year"
++
++  # HTML
++  ExpiresByType text/html "access plus 1 hour"
++</IfModule>
++
++# Cache-Control Headers
++<IfModule mod_headers.c>
++  <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
++    Header set Cache-Control "public, max-age=31536000, immutable"
++  </FilesMatch>
++  <FilesMatch "\.(css|js)$">
++    Header set Cache-Control "public, max-age=15552000"
++  </FilesMatch>
++</IfModule>
+diff --git a/admin-cms.html b/admin-cms.html
+index 94e1f28..3ac1048 100644
+--- a/admin-cms.html
++++ b/admin-cms.html
+@@ -34,6 +34,8 @@
+ 
+   <!-- App config must load first so API_URL is available -->
+   <script src="js/config.js"></script>
++  <!-- Sortable.js for drag-and-drop FAQ reordering -->
++  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+   <!-- CMS admin application -->
+   <script src="js/admin-cms.js"></script>
+ </body>
+diff --git a/admin-users.html b/admin-users.html
+index 7ab531c..aa35ace 100644
+--- a/admin-users.html
++++ b/admin-users.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>User Management - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/application-details.html b/application-details.html
+index 321050c..7da5468 100644
+--- a/application-details.html
++++ b/application-details.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Application Details - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/capability-statement.html b/capability-statement.html
+index d564537..bab4993 100644
+--- a/capability-statement.html
++++ b/capability-statement.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description" content="Manage your Capability Statement to showcase your business qualifications.">
+     <title>Capability Statement - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+diff --git a/contact.html b/contact.html
+index 5e7539b..7e20b11 100644
+--- a/contact.html
++++ b/contact.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Contact CaltransBizConnect for support, questions, or assistance with the platform.">
+-    <title>Contact Us - CaltransBizConnect</title>
++        content="Contact CaltransBizConnect for support, questions, or assistance. Reach our program team or technical support for help with platform features.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/contact.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/contact.html">
++    <meta property="og:title" content="Contact Us | CaltransBizConnect">
++    <meta property="og:description" content="Contact CaltransBizConnect for support, questions, or assistance. Reach our program team or technical support for help with platform features.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/contact.html">
++    <meta name="twitter:title" content="Contact Us | CaltransBizConnect">
++    <meta name="twitter:description" content="Contact CaltransBizConnect for support, questions, or assistance. Reach our program team or technical support for help with platform features.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>Contact Us | CaltransBizConnect</title>
+   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -248,8 +260,102 @@
+ 
+     <script src="js/config.js"></script>
+   <script src="js/main.js"></script>
+-    <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
++  <script>
++    const contactForm = document.getElementById('contactForm');
++    const submitBtn = contactForm.querySelector('button[type="submit"]');
++
++    contactForm.addEventListener('submit', async (e) => {
++      e.preventDefault();
++      // Clear previous errors
++      contactForm.querySelectorAll('.form-error').forEach(el => el.textContent = '');
++
++      const firstName = document.getElementById('firstName').value.trim();
++      const lastName = document.getElementById('lastName').value.trim();
++      const email = document.getElementById('email').value.trim();
++      const subject = document.getElementById('subject').value.trim();
++      const message = document.getElementById('message').value.trim();
++
++      let valid = true;
++      if (!firstName) { document.getElementById('firstName').nextElementSibling.textContent = 'First name is required.'; valid = false; }
++      if (!lastName) { document.getElementById('lastName').nextElementSibling.textContent = 'Last name is required.'; valid = false; }
++      if (!email) { document.getElementById('email').nextElementSibling.textContent = 'Email address is required.'; valid = false; }
++      if (!subject) { document.getElementById('subject').nextElementSibling.textContent = 'Subject is required.'; valid = false; }
++      if (!message) { document.getElementById('message').nextElementSibling.textContent = 'Message is required.'; valid = false; }
++      if (!valid) return;
++
++      submitBtn.disabled = true;
++      submitBtn.textContent = 'Sending...';
++
++      try {
++        const res = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
++          method: 'POST',
++          headers: { 'Content-Type': 'application/json' },
++          body: JSON.stringify({ name: firstName + ' ' + lastName, email, subject, message })
++        });
++        const data = await res.json();
++        if (data.success) {
++          contactForm.innerHTML = '<div style="padding:var(--space-lg);background:#e8f5e9;border:1px solid #4caf50;border-radius:var(--border-radius-md);color:#1b5e20;" role="alert"><strong>Message sent!</strong> Thank you for reaching out. We\'ll respond within 1 business day.</div>';
++        } else {
++          submitBtn.disabled = false;
++          submitBtn.textContent = 'Send Message';
++          document.getElementById('message').nextElementSibling.textContent = data.message || 'An error occurred. Please try again.';
++        }
++      } catch {
++        submitBtn.disabled = false;
++        submitBtn.textContent = 'Send Message';
++        document.getElementById('message').nextElementSibling.textContent = 'Unable to send. Please email us directly at smallbusinesses@dot.ca.gov';
++      }
++    });
++  </script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "Contact",
++        "item": "https://caltransbizconnect.org/contact.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+diff --git a/content/pages/contact.json b/content/pages/contact.json
+new file mode 100644
+index 0000000..dec6d97
+--- /dev/null
++++ b/content/pages/contact.json
+@@ -0,0 +1,54 @@
++{
++  "slug": "contact",
++  "isSystem": true,
++  "updatedAt": "2026-03-21T00:00:00.000Z",
++  "meta": {
++    "title": "Contact Us - CaltransBizConnect",
++    "description": "Contact CaltransBizConnect for support, questions, or assistance with the platform."
++  },
++  "sections": [
++    {
++      "id": "page-header",
++      "type": "text",
++      "fields": {
++        "heading": "Contact Us",
++        "subheading": "Have questions or need assistance? We are here to help. Choose the best way to reach us below."
++      }
++    },
++    {
++      "id": "program-contact",
++      "type": "text",
++      "fields": {
++        "heading": "Program Contact",
++        "subheading": "Small Business Supportive Services",
++        "phone": "(916) 324-1700",
++        "email": "smallbusinesses@dot.ca.gov",
++        "hours": "Monday - Friday, 8:00 AM - 5:00 PM PST",
++        "body": "For general inquiries about the program, certification, or technical assistance."
++      }
++    },
++    {
++      "id": "technical-support",
++      "type": "text",
++      "fields": {
++        "heading": "Technical Support",
++        "subheading": "Platform Technical Support",
++        "email": "smallbusinesses@dot.ca.gov",
++        "responseTime": "Within 1 business day",
++        "body": "For issues with logging in, uploading documents, or other technical problems."
++      }
++    },
++    {
++      "id": "mailing-address",
++      "type": "text",
++      "fields": {
++        "heading": "Mailing Address",
++        "organization": "California Department of Transportation",
++        "department": "Office of Business and Economic Opportunity",
++        "street": "1120 N Street, MS-79",
++        "city": "Sacramento, CA 95814",
++        "body": "For physical mail and document submissions."
++      }
++    }
++  ]
++}
+diff --git a/content/pages/for-prime-contractors.json b/content/pages/for-prime-contractors.json
+index 0117730..a55e12c 100644
+--- a/content/pages/for-prime-contractors.json
++++ b/content/pages/for-prime-contractors.json
+@@ -1,7 +1,7 @@
+ {
+   "slug": "for-prime-contractors",
+   "isSystem": true,
+-  "updatedAt": "2026-03-17T19:30:31.291Z",
++  "updatedAt": "2026-03-21T20:48:24.247Z",
+   "meta": {
+     "title": "For Prime Contractors - CaltransBizConnect",
+     "description": "Prime Contractors: Post opportunities, find qualified Small Businesses, and manage your contracting needs."
+@@ -87,6 +87,16 @@
+         "backgroundImage": "",
+         "backgroundImageAlt": ""
+       }
++    },
++    {
++      "id": "hero-1774126104234",
++      "type": "hero",
++      "fields": {
++        "title": "",
++        "subtitle": "",
++        "backgroundImage": "",
++        "backgroundImageAlt": ""
++      }
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/css/accessibility-widget.css b/css/accessibility-widget.css
+index 7a6dafa..e3f124e 100644
+--- a/css/accessibility-widget.css
++++ b/css/accessibility-widget.css
+@@ -72,7 +72,7 @@
+   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+   overflow-y: auto;
+   font-family: Arial, Calibri, sans-serif;
+-  font-size: 14px;
++  font-size: 18px;
+   color: #000000;
+   display: none;
+ }
+@@ -107,14 +107,14 @@
+ }
+ 
+ .a11y-panel-title {
+-  font-size: 15px;
++  font-size: 19px;
+   font-weight: 700;
+   margin: 0;
+   color: #ffffff;
+ }
+ 
+ .a11y-panel-shortcut {
+-  font-size: 11px;
++  font-size: 13px;
+   opacity: 0.85;
+   margin-top: 2px;
+   color: #ffffff;
+@@ -161,7 +161,7 @@
+ }
+ 
+ .a11y-section-title {
+-  font-size: 11px;
++  font-size: 15px;
+   font-weight: 700;
+   text-transform: uppercase;
+   letter-spacing: 0.08em;
+@@ -198,7 +198,7 @@
+ }
+ 
+ .a11y-control-label {
+-  font-size: 13px;
++  font-size: 17px;
+   font-weight: 500;
+   color: #000000;
+   flex: 1 1 auto;
+@@ -221,7 +221,7 @@
+   color: #000000;
+   border-radius: 5px;
+   padding: 4px 9px;
+-  font-size: 12px;
++  font-size: 16px;
+   font-weight: 500;
+   cursor: pointer;
+   font-family: Arial, sans-serif;
+diff --git a/css/admin-cms.css b/css/admin-cms.css
+index 5c56f3c..820f0be 100644
+--- a/css/admin-cms.css
++++ b/css/admin-cms.css
+@@ -32,7 +32,7 @@
+     --cms-info-bg:       #e3f0fa;
+ 
+     /* Layout */
+-    --cms-sidebar-w:     260px;
++    --cms-sidebar-w:     280px;
+     --cms-header-h:      56px;
+     --cms-radius:        6px;
+     --cms-radius-lg:     10px;
+@@ -41,9 +41,9 @@
+ 
+     /* Typography (Caltrans style guide) */
+     --cms-font:          Arial, Calibri, sans-serif;
+-    --cms-font-size:     14px;   /* 14pt body per style guide */
+-    --cms-font-size-sm:  12px;
+-    --cms-font-size-lg:  16px;
++    --cms-font-size:     20px;   /* 14pt body per style guide */
++    --cms-font-size-sm:  17px;
++    --cms-font-size-lg:  20px;
+     --cms-line-height:   1.5;
+ }
+ 
+@@ -125,7 +125,7 @@ html, body {
+     display:     flex;
+     align-items: center;
+     gap:         .6rem;
+-    padding:     .55rem 1rem;
++    padding:     .65rem 1rem;
+     color:       rgba(255,255,255,.85);
+     text-decoration: none;
+     font-size:   var(--cms-font-size);
+@@ -659,6 +659,106 @@ html, body {
+ .cms-badge-system  { background: #e3f0fa; color: var(--cms-primary); }
+ .cms-badge-custom  { background: #e8f5e9; color: #1b7a4a; }
+ 
++/* ── FAQ Manager ─────────────────────────────────────────── */
++.cms-faq-module {}
++
++.cms-faq-toolbar {
++    display:         flex;
++    align-items:     center;
++    justify-content: space-between;
++    gap:             .75rem;
++    margin-bottom:   1rem;
++    flex-wrap:       wrap;
++}
++
++.cms-faq-item {
++    display:       flex;
++    align-items:   flex-start;
++    gap:           .75rem;
++    padding:       .75rem .9rem;
++    border-bottom: 1px solid var(--cms-border-light);
++    transition:    background .12s;
++}
++.cms-faq-item:last-child { border-bottom: none; }
++.cms-faq-item:hover      { background: var(--cms-bg); }
++
++.cms-faq-handle {
++    cursor:      grab;
++    color:       var(--cms-text-muted);
++    font-size:   1.1rem;
++    padding-top: .15rem;
++    flex-shrink: 0;
++    user-select: none;
++}
++.cms-faq-handle:active { cursor: grabbing; }
++
++.cms-faq-ghost { opacity: .35; background: var(--cms-info-bg); }
++
++.cms-faq-body { flex: 1; min-width: 0; }
++
++.cms-faq-meta {
++    display:     flex;
++    gap:         .5rem;
++    align-items: center;
++    margin-bottom: .25rem;
++    flex-wrap:   wrap;
++}
++
++.cms-faq-cat-badge {
++    display:       inline-block;
++    padding:       .1rem .55rem;
++    border-radius: 20px;
++    font-size:     var(--cms-font-size-sm);
++    font-weight:   700;
++    background:    var(--cms-info-bg);
++    color:         var(--cms-primary);
++}
++
++.cms-badge-active   { background: var(--cms-success-bg); color: var(--cms-success); }
++.cms-badge-inactive { background: var(--cms-border-light); color: var(--cms-text-muted); }
++
++.cms-faq-question {
++    font-weight:    700;
++    font-size:      var(--cms-font-size);
++    color:          var(--cms-text);
++    margin-bottom:  .2rem;
++    word-break:     break-word;
++}
++
++.cms-faq-answer-preview {
++    font-size:  var(--cms-font-size-sm);
++    color:      var(--cms-text-muted);
++    line-height: 1.4;
++    white-space: nowrap;
++    overflow:    hidden;
++    text-overflow: ellipsis;
++}
++
++.cms-faq-actions {
++    display:    flex;
++    gap:        .35rem;
++    flex-shrink: 0;
++    align-items: flex-start;
++}
++
++.cms-faq-empty {
++    text-align: center;
++    padding:    2.5rem 1rem;
++    color:      var(--cms-text-muted);
++}
++
++/* FAQ modal editor toolbar */
++.cms-faq-editor-toolbar {
++    display:       flex;
++    gap:           .35rem;
++    margin-bottom: .4rem;
++    flex-wrap:     wrap;
++}
++.cms-faq-editor-toolbar .cms-btn {
++    padding:   .25rem .6rem;
++    font-size: var(--cms-font-size-sm);
++}
++
+ /* ── Responsive ─────────────────────────────────────────── */
+ @media (max-width: 768px) {
+     .cms-shell {
+diff --git a/css/design-system.css b/css/design-system.css
+index aa14bdd..2dffd0a 100644
+--- a/css/design-system.css
++++ b/css/design-system.css
+@@ -114,7 +114,7 @@
+   /* 160px - Increased */
+ 
+   /* Layout */
+-  --container-max-width: 1280px;
++  --container-max-width: 1600px;
+   --container-padding: var(--space-lg);
+ 
+   --border-radius-sm: 4px;
+@@ -158,7 +158,7 @@
+ }
+ 
+ html {
+-  font-size: 16px;
++  font-size: 20px;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   scroll-padding-top: 5rem; /* Offset for sticky header (~80px) */
+@@ -279,7 +279,8 @@ li {
+   border-radius: var(--border-radius-md);
+   cursor: pointer;
+   transition: all var(--transition-base);
+-  white-space: nowrap;
++  white-space: normal;
++  word-break: break-word;
+ }
+ 
+ .btn:focus {
+diff --git a/css/main.css b/css/main.css
+index 1a3a6fe..4308dda 100644
+--- a/css/main.css
++++ b/css/main.css
+@@ -114,7 +114,7 @@ body {
+     padding: 0;
+     margin: 0;
+     align-items: center;
+-    flex-wrap: nowrap;
++    flex-wrap: wrap;
+ }
+ 
+ .main-nav a {
+@@ -125,7 +125,7 @@ body {
+     border-radius: var(--border-radius-md);
+     transition: all 0.3s ease;
+     position: relative;
+-    font-size: 0.8rem;
++    font-size: 1rem;
+     letter-spacing: 0.2px;
+     white-space: nowrap;
+ }
+@@ -375,7 +375,7 @@ body {
+     background-color: var(--color-primary-dark);
+     color: var(--color-text-inverse);
+     padding: var(--space-3xl) 0;
+-    min-height: 60vh;
++    min-height: 80vh;
+     display: flex;
+     align-items: center;
+     overflow: hidden;
+@@ -420,7 +420,7 @@ body {
+ .hero .container {
+     position: relative;
+     z-index: 2;
+-    max-width: 900px;
++    max-width: var(--container-max-width);
+ }
+ 
+ .hero-title {
+@@ -438,7 +438,6 @@ body {
+     margin-bottom: var(--space-xl);
+     color: var(--color-text-inverse);
+     line-height: 1.5;
+-    max-width: 700px;
+     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+ }
+ 
+@@ -624,7 +623,7 @@ body {
+ /* Action Tiles (Enhanced for a Robust, Premium Look) */
+ .action-tiles {
+     display: grid;
+-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
++    grid-template-columns: repeat(4, 1fr);
+     gap: var(--space-xl);
+     margin: var(--space-2xl) 0;
+ }
+@@ -1053,6 +1052,12 @@ body {
+     }
+ }
+ 
++@media (max-width: 900px) {
++    .action-tiles {
++        grid-template-columns: repeat(2, 1fr);
++    }
++}
++
+ @media (max-width: 768px) {
+     .hero {
+         padding: var(--space-2xl) 0;
+diff --git a/dashboard-admin.html b/dashboard-admin.html
+index bf5654b..a3990fa 100644
+--- a/dashboard-admin.html
++++ b/dashboard-admin.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Admin Dashboard - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/dashboard-caltrans.html b/dashboard-caltrans.html
+index 54d40c2..042d9a2 100644
+--- a/dashboard-caltrans.html
++++ b/dashboard-caltrans.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Caltrans Staff Dashboard - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/dashboard-prime-contractor.html b/dashboard-prime-contractor.html
+index 478fc11..b52bae4 100644
+--- a/dashboard-prime-contractor.html
++++ b/dashboard-prime-contractor.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Prime Contractor Dashboard - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/dashboard-small-business.html b/dashboard-small-business.html
+index e7079b4..b852dbb 100644
+--- a/dashboard-small-business.html
++++ b/dashboard-small-business.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description" content="Small Business Dashboard - CaltransBizConnect">
+     <title>Dashboard - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+diff --git a/eligibility.html b/eligibility.html
+index 1ef9570..76e8468 100644
+--- a/eligibility.html
++++ b/eligibility.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Learn about Small Business (Small Business) eligibility requirements and certification process for Caltrans contracting opportunities.">
+-    <title>Small Business Eligibility - CaltransBizConnect</title>
++        content="Complete guide to small business certification eligibility requirements for Caltrans contracts in California. Learn DBE, SBE, and DVBE criteria and the application process.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/eligibility.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/eligibility.html">
++    <meta property="og:title" content="Certification Eligibility | California Requirements | CaltransBizConnect">
++    <meta property="og:description" content="Complete guide to small business certification eligibility requirements for Caltrans contracts in California. Learn DBE, SBE, and DVBE criteria and the application process.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/eligibility.html">
++    <meta name="twitter:title" content="Certification Eligibility | California Requirements | CaltransBizConnect">
++    <meta name="twitter:description" content="Complete guide to small business certification eligibility requirements for Caltrans contracts in California. Learn DBE, SBE, and DVBE criteria and the application process.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>Certification Eligibility | California Requirements | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -331,6 +343,54 @@
+     <script src="js/main.js"></script>
+     <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "Eligibility",
++        "item": "https://caltransbizconnect.org/eligibility.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+diff --git a/faq.html b/faq.html
+index 155c206..24b36a1 100644
+--- a/faq.html
++++ b/faq.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Frequently asked questions about CaltransBizConnect, Small Business certification, and contracting opportunities.">
+-    <title>FAQ - CaltransBizConnect</title>
++        content="Frequently asked questions about Caltrans certification, contracting opportunities, the bidding process, and CaltransBizConnect platform features.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/faq.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/faq.html">
++    <meta property="og:title" content="FAQs | Frequently Asked Questions | CaltransBizConnect">
++    <meta property="og:description" content="Frequently asked questions about Caltrans certification, contracting opportunities, the bidding process, and CaltransBizConnect platform features.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/faq.html">
++    <meta name="twitter:title" content="FAQs | Frequently Asked Questions | CaltransBizConnect">
++    <meta name="twitter:description" content="Frequently asked questions about Caltrans certification, contracting opportunities, the bidding process, and CaltransBizConnect platform features.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>FAQs | Frequently Asked Questions | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -651,6 +663,88 @@
+         });
+     </script>
+   <script src="js/accessibility-widget.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "FAQ",
++        "item": "https://caltransbizconnect.org/faq.html"
++      }
++    ]
++  }
++  </script>
++
++  <!-- FAQPage Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "FAQPage",
++    "mainEntity": [
++      {
++        "@type": "Question",
++        "name": "How do I become certified for Caltrans contracts?",
++        "acceptedAnswer": {
++          "@type": "Answer",
++          "text": "To become certified for Caltrans contracts, you must apply through the California Unified Certification Program (UCP). The process includes submitting documentation proving your business meets eligibility criteria for DBE, SBE, or DVBE certification."
++        }
++      },
++      {
++        "@type": "Question",
++        "name": "What types of contracting opportunities are available?",
++        "acceptedAnswer": {
++          "@type": "Answer",
++          "text": "CaltransBizConnect features opportunities in highway construction, bridge maintenance, traffic control, environmental services, engineering, and professional services across all 12 Caltrans districts."
++        }
++      },
++      {
++        "@type": "Question",
++        "name": "Is CaltransBizConnect free to use?",
++        "acceptedAnswer": {
++          "@type": "Answer",
++          "text": "Yes, CaltransBizConnect is completely free for both small businesses and prime contractors. All training resources, opportunity listings, and platform features are provided at no cost."
++        }
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+diff --git a/for-prime-contractors.html b/for-prime-contractors.html
+index 88c46af..62a72ca 100644
+--- a/for-prime-contractors.html
++++ b/for-prime-contractors.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Prime Contractors: Post structured opportunities, find qualified Small Businesses, and manage your contracting needs.">
+-    <title>For Prime Contractors - CaltransBizConnect</title>
++        content="Post subcontracting opportunities and find qualified certified small business partners across California. Streamlined contractor matching for all 12 Caltrans districts.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/for-prime-contractors.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/for-prime-contractors.html">
++    <meta property="og:title" content="For Prime Contractors | Find Qualified Partners | CaltransBizConnect">
++    <meta property="og:description" content="Post subcontracting opportunities and find qualified certified small business partners across California. Streamlined contractor matching for all 12 Caltrans districts.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/for-prime-contractors.html">
++    <meta name="twitter:title" content="For Prime Contractors | Find Qualified Partners | CaltransBizConnect">
++    <meta name="twitter:description" content="Post subcontracting opportunities and find qualified certified small business partners across California. Streamlined contractor matching for all 12 Caltrans districts.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>For Prime Contractors | Find Qualified Partners | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -293,6 +305,54 @@
+     <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
+   <script src="js/cms-renderer.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "For Prime Contractors",
++        "item": "https://caltransbizconnect.org/for-prime-contractors.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+\ No newline at end of file
+diff --git a/for-small-businesses.html b/for-small-businesses.html
+index a00afdb..0e027f2 100644
+--- a/for-small-businesses.html
++++ b/for-small-businesses.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Small Businesses: Find contracting opportunities, upload your capability statement, and connect with Caltrans prime contractors.">
+-    <title>For Small Businesses - CaltransBizConnect</title>
++        content="Small businesses: find Caltrans contracting opportunities, access free bid preparation training, upload your capability statement, and connect with prime contractors across California.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/for-small-businesses.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/for-small-businesses.html">
++    <meta property="og:title" content="For Small Businesses | Find Caltrans Opportunities | CaltransBizConnect">
++    <meta property="og:description" content="Small businesses: find Caltrans contracting opportunities, access free bid preparation training, upload your capability statement, and connect with prime contractors across California.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/for-small-businesses.html">
++    <meta name="twitter:title" content="For Small Businesses | Find Caltrans Opportunities | CaltransBizConnect">
++    <meta name="twitter:description" content="Small businesses: find Caltrans contracting opportunities, access free bid preparation training, upload your capability statement, and connect with prime contractors across California.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>For Small Businesses | Find Caltrans Opportunities | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -275,6 +287,54 @@
+     <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
+   <script src="js/cms-renderer.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "For Small Businesses",
++        "item": "https://caltransbizconnect.org/for-small-businesses.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+\ No newline at end of file
+diff --git a/forgot-password.html b/forgot-password.html
+index baadb8d..dc24240 100644
+--- a/forgot-password.html
++++ b/forgot-password.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description"
+         content="Reset your CaltransBizConnect password to regain access to your dashboard and manage opportunities.">
+     <title>Forgot Password - CaltransBizConnect</title>
+@@ -101,8 +102,47 @@
+ 
+     <script src="js/config.js"></script>
+   <script src="js/main.js"></script>
+-    <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
++  <script>
++    const form = document.getElementById('forgotPasswordForm');
++    const submitBtn = form.querySelector('button[type="submit"]');
++
++    form.addEventListener('submit', async (e) => {
++      e.preventDefault();
++      const emailInput = document.getElementById('email');
++      const errorSpan = emailInput.nextElementSibling;
++      errorSpan.textContent = '';
++
++      const email = emailInput.value.trim();
++      if (!email) {
++        errorSpan.textContent = 'Email address is required.';
++        return;
++      }
++
++      submitBtn.disabled = true;
++      submitBtn.textContent = 'Sending...';
++
++      try {
++        const res = await fetch(window.APP_CONFIG.API_URL + '/password-reset/request-reset', {
++          method: 'POST',
++          headers: { 'Content-Type': 'application/json' },
++          body: JSON.stringify({ email })
++        });
++        const data = await res.json();
++        if (data.success) {
++          form.innerHTML = '<div style="padding:var(--space-lg);background:#e8f5e9;border:1px solid #4caf50;border-radius:var(--border-radius-md);color:#1b5e20;text-align:center;" role="alert"><strong>Check your inbox.</strong><br>If an account with that email exists, a reset link has been sent. Check your spam folder if you don\'t see it.</div><div style="text-align:center;margin-top:var(--space-xl);"><a href="login.html" class="btn btn-primary">Back to Log In</a></div>';
++        } else {
++          errorSpan.textContent = data.message || 'An error occurred. Please try again.';
++          submitBtn.disabled = false;
++          submitBtn.textContent = 'Send Reset Link';
++        }
++      } catch {
++        errorSpan.textContent = 'Unable to connect. Please try again.';
++        submitBtn.disabled = false;
++        submitBtn.textContent = 'Send Reset Link';
++      }
++    });
++  </script>
+ </body>
+ 
+ </html>
+diff --git a/how-it-works.html b/how-it-works.html
+index b027ab1..0d61acc 100644
+--- a/how-it-works.html
++++ b/how-it-works.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Learn how CaltransBizConnect works for small businesses and prime contractors. Step-by-step guide to finding opportunities and posting projects.">
+-    <title>How It Works - CaltransBizConnect</title>
++        content="Learn how CaltransBizConnect connects small businesses with prime contractors and Caltrans opportunities. Step-by-step guide for getting started.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/how-it-works.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/how-it-works.html">
++    <meta property="og:title" content="How It Works | Business-Contractor Matching | CaltransBizConnect">
++    <meta property="og:description" content="Learn how CaltransBizConnect connects small businesses with prime contractors and Caltrans opportunities. Step-by-step guide for getting started.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/how-it-works.html">
++    <meta name="twitter:title" content="How It Works | Business-Contractor Matching | CaltransBizConnect">
++    <meta name="twitter:description" content="Learn how CaltransBizConnect connects small businesses with prime contractors and Caltrans opportunities. Step-by-step guide for getting started.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>How It Works | Business-Contractor Matching | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -310,6 +322,54 @@
+     <script src="js/main.js"></script>
+     <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "How It Works",
++        "item": "https://caltransbizconnect.org/how-it-works.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+diff --git a/index.html b/index.html
+index 733d2f0..3c2b249 100644
+--- a/index.html
++++ b/index.html
+@@ -5,8 +5,20 @@
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="description"
+-    content="CaltransBizConnect connects Small Businesses with contracting opportunities and Prime Contractors with qualified partners. Your central hub for Caltrans business development.">
+-  <title>CaltransBizConnect - Connecting Businesses with Opportunities</title>
++    content="Connect small businesses with Caltrans contracting opportunities. Access training, resources, and prime contractor partnerships across all 12 California districts.">
++  <meta name="robots" content="index, follow">
++  <link rel="canonical" href="https://caltransbizconnect.org/">
++  <meta property="og:type" content="website">
++  <meta property="og:url" content="https://caltransbizconnect.org/">
++  <meta property="og:title" content="CaltransBizConnect | California Transportation Contracting Opportunities">
++  <meta property="og:description" content="Connect small businesses with Caltrans contracting opportunities. Access training, resources, and prime contractor partnerships across all 12 California districts.">
++  <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++  <meta name="twitter:card" content="summary_large_image">
++  <meta name="twitter:url" content="https://caltransbizconnect.org/">
++  <meta name="twitter:title" content="CaltransBizConnect | California Transportation Contracting Opportunities">
++  <meta name="twitter:description" content="Connect small businesses with Caltrans contracting opportunities. Access training, resources, and prime contractor partnerships across all 12 California districts.">
++  <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++  <title>CaltransBizConnect | California Transportation Contracting Opportunities</title>
+   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+   <link rel="stylesheet" href="css/design-system.css">
+   <link rel="stylesheet" href="css/main.css">
+@@ -376,6 +388,32 @@
+         `).join('');
+     }
+   </script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
+ </body>
+ 
+ </html>
+\ No newline at end of file
+diff --git a/js/accessibility-widget.js b/js/accessibility-widget.js
+index 9ba998f..359064f 100644
+--- a/js/accessibility-widget.js
++++ b/js/accessibility-widget.js
+@@ -113,7 +113,11 @@
+   }
+ 
+   function applyTextSize() {
+-    document.documentElement.style.fontSize = (prefs.textSize / 100 * 16) + 'px';
++    if (prefs.textSize === TEXT_SIZE_MIN) {
++      document.documentElement.style.fontSize = '';
++    } else {
++      document.documentElement.style.fontSize = (prefs.textSize / 100 * 16) + 'px';
++    }
+   }
+ 
+   function applyClasses() {
+diff --git a/js/admin-cms.js b/js/admin-cms.js
+index 0097eef..8d7ed78 100644
+--- a/js/admin-cms.js
++++ b/js/admin-cms.js
+@@ -8,7 +8,7 @@
+  *  • Building new pages from component templates
+  *  • Style-guide enforcement (font, font-size, alt-text)
+  *
+- * Authentication: uses existing x-admin-email header pattern.
++ * Authentication: uses JWT bearer token issued by /api/cms/login.
+  * Credentials are stored in sessionStorage (cleared on tab close).
+  *
+  * @module admin-cms
+@@ -93,7 +93,7 @@ async function handleLogin(e) {
+ 
+         if (!res.ok) throw new Error(data.error || 'Login failed');
+ 
+-        currentAdmin = { email };
++        currentAdmin = { email, token: data.token };
+         sessionStorage.setItem('cms_admin', JSON.stringify(currentAdmin));
+         showShell();
+     } catch (err) {
+@@ -116,11 +116,8 @@ async function showShell() {
+           <span>CMS Admin</span>
+         </a>
+         <div class="cms-header-actions">
+-          <button class="cms-btn cms-btn-outline cms-btn-sm" id="sidebar-toggle"
+-                  aria-expanded="false" aria-controls="cms-sidebar"
+-                  style="color:#fff;border-color:rgba(255,255,255,.5)">☰ Menu</button>
+-          <span class="cms-header-user" aria-label="Logged in as ${currentAdmin.email}">
+-            ${currentAdmin.email}
++          <span class="cms-header-user" aria-label="Logged in as ${escHtml(currentAdmin.email)}">
++            ${escHtml(currentAdmin.email)}
+           </span>
+           <button class="cms-btn cms-btn-sm" id="logout-btn"
+                   style="background:rgba(255,255,255,.15);color:#fff;border-color:transparent">
+@@ -142,6 +139,7 @@ async function showShell() {
+         <div class="cms-nav-section">
+           <span class="cms-nav-label">Site</span>
+           <ul class="cms-page-list">
++            <li><a href="#" data-tab="faqs"><span aria-hidden="true">❓</span> FAQ Manager</a></li>
+             <li><a href="#" data-tab="global"><span aria-hidden="true">⚙️</span> Global Settings</a></li>
+             <li><a href="#" data-tab="media"><span aria-hidden="true">🖼️</span> Media Library</a></li>
+             <li><a href="#" data-tab="builder"><span aria-hidden="true">🏗️</span> Page Builder</a></li>
+@@ -171,7 +169,6 @@ async function showShell() {
+ 
+     // Wire up events
+     document.getElementById('logout-btn').addEventListener('click', handleLogout);
+-    document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
+ 
+     document.querySelectorAll('[data-tab]').forEach(link => {
+         link.addEventListener('click', e => {
+@@ -187,13 +184,6 @@ async function showShell() {
+     navigateTab('pages');
+ }
+ 
+-function toggleSidebar() {
+-    const sidebar = document.getElementById('cms-sidebar');
+-    const btn     = document.getElementById('sidebar-toggle');
+-    const open    = sidebar.classList.toggle('open');
+-    btn.setAttribute('aria-expanded', String(open));
+-}
+-
+ function setActiveNavLink(activeLink) {
+     document.querySelectorAll('.cms-sidebar [data-tab]').forEach(l => l.classList.remove('active'));
+     activeLink.classList.add('active');
+@@ -211,6 +201,7 @@ async function navigateTab(tab, extra) {
+     switch (tab) {
+         case 'pages':   await renderPagesList(main);          break;
+         case 'edit':    await renderPageEditor(main, extra);  break;
++        case 'faqs':    await renderFAQManager(main);         break;
+         case 'global':  await renderGlobalSettings(main);     break;
+         case 'media':   await renderMediaLibrary(main);       break;
+         case 'builder': await renderPageBuilder(main);        break;
+@@ -1032,7 +1023,7 @@ async function doUpload(onSelect) {
+     try {
+         const res = await fetch(`${API}/cms/media`, {
+             method:  'POST',
+-            headers: { 'x-admin-email': currentAdmin.email },
++            headers: { 'Authorization': `Bearer ${currentAdmin?.token || ''}` },
+             body:    formData
+         });
+         const data = await res.json();
+@@ -1269,11 +1260,409 @@ async function loadSchema() {
+  * @param {object} [body]
+  * @returns {Promise<any>}
+  */
++// ── FAQ Manager ─────────────────────────────────────────────────────────────
++
++/** State for the FAQ manager */
++let faqData = [];          // all FAQs from server
++let faqCategories = [];    // distinct category names
++let faqFilterCat = 'all';  // current category filter
++let faqSearch = '';        // current search query
++let faqSortable = null;    // Sortable.js instance
++
++async function renderFAQManager(container) {
++    container.innerHTML = `
++    <div class="cms-faq-module">
++      <div class="cms-flex-between cms-mb">
++        <h2 style="margin:0;color:var(--cms-primary)">❓ FAQ Manager</h2>
++        <div class="cms-flex cms-gap-sm">
++          <a href="#" id="faq-export-btn" class="cms-btn cms-btn-outline cms-btn-sm">⬇ Export JSON</a>
++          <button class="cms-btn cms-btn-secondary" id="add-faq-btn">+ Add FAQ</button>
++        </div>
++      </div>
++
++      <!-- Toolbar -->
++      <div class="cms-faq-toolbar">
++        <div class="cms-flex cms-gap-sm" style="flex:1;flex-wrap:wrap">
++          <select id="faq-cat-filter" class="cms-select" style="width:auto;min-width:160px">
++            <option value="all">All Categories</option>
++          </select>
++          <input id="faq-search" class="cms-input" type="search"
++                 placeholder="Search questions…" style="flex:1;min-width:180px"
++                 value="">
++        </div>
++        <div class="cms-flex cms-gap-sm">
++          <span class="cms-text-muted cms-text-sm" id="faq-count"></span>
++        </div>
++      </div>
++
++      <!-- List -->
++      <div class="cms-panel">
++        <div class="cms-panel-body" style="padding:.5rem">
++          <div id="faq-list">
++            <div class="cms-loading-state"><div class="cms-spinner"></div> Loading FAQs…</div>
++          </div>
++        </div>
++      </div>
++    </div>`;
++
++    document.getElementById('add-faq-btn').addEventListener('click', () => openFAQModal(null));
++    document.getElementById('faq-cat-filter').addEventListener('change', e => {
++        faqFilterCat = e.target.value;
++        renderFAQList();
++    });
++    document.getElementById('faq-search').addEventListener('input', e => {
++        faqSearch = e.target.value.toLowerCase().trim();
++        renderFAQList();
++    });
++    document.getElementById('faq-export-btn').addEventListener('click', e => {
++        e.preventDefault();
++        window.open(`${API}/cms/faqs/export`, '_blank');
++    });
++
++    await loadFAQs();
++}
++
++async function loadFAQs() {
++    try {
++        [faqData, faqCategories] = await Promise.all([
++            apiFetch('GET', '/cms/faqs'),
++            apiFetch('GET', '/cms/faq-categories')
++        ]);
++        rebuildCategoryFilter();
++        renderFAQList();
++    } catch (err) {
++        const list = document.getElementById('faq-list');
++        if (list) list.innerHTML = `<div class="cms-alert cms-alert-error">Failed to load FAQs: ${escHtml(err.message)}</div>`;
++    }
++}
++
++function rebuildCategoryFilter() {
++    const sel = document.getElementById('faq-cat-filter');
++    if (!sel) return;
++    const current = sel.value;
++    sel.innerHTML = '<option value="all">All Categories</option>';
++    // Show all distinct categories from data (not just active ones)
++    const allCats = [...new Set(faqData.map(f => f.category))].sort();
++    allCats.forEach(cat => {
++        const opt = document.createElement('option');
++        opt.value = cat;
++        opt.textContent = cat;
++        sel.appendChild(opt);
++    });
++    sel.value = allCats.includes(current) ? current : 'all';
++}
++
++function getFilteredFAQs() {
++    return faqData
++        .filter(f => faqFilterCat === 'all' || f.category === faqFilterCat)
++        .filter(f => {
++            if (!faqSearch) return true;
++            return f.question.toLowerCase().includes(faqSearch) ||
++                   stripHtmlFAQ(f.answer).toLowerCase().includes(faqSearch);
++        })
++        .sort((a, b) => a.sort_order - b.sort_order || a.id - b.id);
++}
++
++function stripHtmlFAQ(html) {
++    const d = document.createElement('div');
++    d.innerHTML = html;
++    return d.textContent || '';
++}
++
++function renderFAQList() {
++    const list    = document.getElementById('faq-list');
++    const countEl = document.getElementById('faq-count');
++    if (!list) return;
++
++    const items = getFilteredFAQs();
++    if (countEl) countEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
++
++    if (items.length === 0) {
++        list.innerHTML = `
++        <div class="cms-faq-empty">
++          <div style="font-size:2.5rem;margin-bottom:.5rem">❓</div>
++          <p class="cms-text-muted">
++            ${faqData.length === 0 ? 'No FAQs yet. Click "+ Add FAQ" to get started.' : 'No FAQs match your filters.'}
++          </p>
++        </div>`;
++        if (faqSortable) { faqSortable.destroy(); faqSortable = null; }
++        return;
++    }
++
++    list.innerHTML = items.map(faq => `
++    <div class="cms-faq-item" data-id="${faq.id}" data-sort="${faq.sort_order}">
++      <span class="cms-faq-handle" title="Drag to reorder" aria-hidden="true">⠿</span>
++      <div class="cms-faq-body">
++        <div class="cms-faq-meta">
++          <span class="cms-faq-cat-badge">${escHtml(faq.category)}</span>
++          <span class="cms-badge ${faq.status === 'active' ? 'cms-badge-active' : 'cms-badge-inactive'}">
++            ${faq.status}
++          </span>
++        </div>
++        <div class="cms-faq-question">${escHtml(faq.question)}</div>
++        <div class="cms-faq-answer-preview">${truncateFAQ(stripHtmlFAQ(faq.answer), 120)}</div>
++      </div>
++      <div class="cms-faq-actions">
++        <button class="cms-btn cms-btn-primary cms-btn-sm" data-faq-edit="${faq.id}">Edit</button>
++        <button class="cms-btn cms-btn-danger cms-btn-sm" data-faq-delete="${faq.id}">Delete</button>
++      </div>
++    </div>`).join('');
++
++    // Wire edit/delete buttons
++    list.querySelectorAll('[data-faq-edit]').forEach(btn => {
++        btn.addEventListener('click', () => {
++            const faq = faqData.find(f => f.id === parseInt(btn.dataset.faqEdit, 10));
++            if (faq) openFAQModal(faq);
++        });
++    });
++    list.querySelectorAll('[data-faq-delete]').forEach(btn => {
++        btn.addEventListener('click', () => deleteFAQ(parseInt(btn.dataset.faqDelete, 10)));
++    });
++
++    // Init/refresh Sortable
++    if (faqSortable) { faqSortable.destroy(); faqSortable = null; }
++    if (window.Sortable && (faqFilterCat !== 'all' || !faqSearch)) {
++        faqSortable = window.Sortable.create(list, {
++            animation: 150,
++            handle: '.cms-faq-handle',
++            ghostClass: 'cms-faq-ghost',
++            onEnd: saveFAQOrder
++        });
++    }
++}
++
++function truncateFAQ(text, max) {
++    return text.length > max ? text.slice(0, max) + '…' : text;
++}
++
++async function saveFAQOrder() {
++    const items  = document.querySelectorAll('#faq-list .cms-faq-item');
++    const updates = Array.from(items).map((el, i) => ({ id: parseInt(el.dataset.id, 10), sort_order: i }));
++    try {
++        await apiFetch('POST', '/cms/faqs/reorder', { updates });
++        // Update local cache
++        updates.forEach(u => {
++            const f = faqData.find(x => x.id === u.id);
++            if (f) f.sort_order = u.sort_order;
++        });
++        showToast('Order saved', 'success');
++    } catch (err) {
++        showToast('Failed to save order: ' + err.message, 'error');
++    }
++}
++
++/** Open add/edit modal */
++function openFAQModal(faq) {
++    const isEdit  = !!faq;
++    const catOpts = [...new Set([...faqCategories, ...faqData.map(f => f.category), 'General', 'Small Businesses', 'Prime Contractors', 'Registration', 'Applications', 'Technical Support'])]
++        .sort()
++        .map(c => `<option value="${escHtml(c)}" ${faq && faq.category === c ? 'selected' : ''}>${escHtml(c)}</option>`)
++        .join('');
++
++    // Remove any existing modal
++    document.querySelectorAll('.cms-modal-backdrop').forEach(el => el.remove());
++
++    const backdrop = document.createElement('div');
++    backdrop.className = 'cms-modal-backdrop';
++    backdrop.innerHTML = `
++    <div class="cms-modal" role="dialog" aria-modal="true"
++         aria-labelledby="faq-modal-title" style="max-width:680px">
++      <div class="cms-modal-header">
++        <h2 class="cms-modal-title" id="faq-modal-title">${isEdit ? 'Edit FAQ' : 'Add FAQ'}</h2>
++        <button class="cms-btn cms-btn-outline cms-btn-sm" id="faq-modal-close"
++                aria-label="Close">✕</button>
++      </div>
++
++      <div class="cms-form-group">
++        <label class="cms-label cms-label-required" for="faq-cat-input">Category</label>
++        <div class="cms-flex cms-gap-sm">
++          <select id="faq-cat-select" class="cms-select" style="flex:1">
++            ${catOpts}
++            <option value="__new__">+ New category…</option>
++          </select>
++          <input id="faq-cat-input" class="cms-input cms-hidden" placeholder="New category name"
++                 style="flex:1" value="${faq ? escHtml(faq.category) : ''}">
++        </div>
++      </div>
++
++      <div class="cms-form-group">
++        <label class="cms-label cms-label-required" for="faq-question-input">Question</label>
++        <textarea id="faq-question-input" class="cms-textarea" rows="2"
++                  placeholder="Enter the FAQ question…">${faq ? escHtml(faq.question) : ''}</textarea>
++      </div>
++
++      <div class="cms-form-group">
++        <label class="cms-label cms-label-required" for="faq-answer-input">Answer</label>
++        <div class="cms-faq-editor-toolbar">
++          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="bold"><b>B</b></button>
++          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="italic"><i>I</i></button>
++          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="ul">• List</button>
++          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm" data-fmt="link">🔗 Link</button>
++        </div>
++        <textarea id="faq-answer-input" class="cms-textarea" rows="8"
++                  placeholder="Enter the FAQ answer (HTML supported)…">${faq ? escHtml(faq.answer) : ''}</textarea>
++        <div class="cms-input-hint">Basic HTML supported: &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a href=""&gt;, &lt;br&gt;</div>
++      </div>
++
++      <div class="cms-form-group">
++        <label class="cms-label" for="faq-status-input">Status</label>
++        <select id="faq-status-input" class="cms-select" style="width:auto">
++          <option value="active"   ${!faq || faq.status === 'active'   ? 'selected' : ''}>Active</option>
++          <option value="inactive" ${faq && faq.status === 'inactive'  ? 'selected' : ''}>Inactive (hidden)</option>
++        </select>
++      </div>
++
++      <div class="cms-flex-between cms-mt">
++        <button class="cms-btn cms-btn-outline" id="faq-modal-cancel">Cancel</button>
++        <button class="cms-btn cms-btn-secondary" id="faq-modal-save">
++          <span id="faq-save-spinner" class="cms-spinner cms-hidden" aria-hidden="true"></span>
++          ${isEdit ? '💾 Update FAQ' : '✔ Create FAQ'}
++        </button>
++      </div>
++    </div>`;
++
++    document.body.appendChild(backdrop);
++
++    // Focus first field
++    setTimeout(() => {
++        const q = document.getElementById('faq-question-input');
++        if (q) q.focus();
++    }, 50);
++
++    // Close handlers
++    const closeFn = () => backdrop.remove();
++    document.getElementById('faq-modal-close').addEventListener('click', closeFn);
++    document.getElementById('faq-modal-cancel').addEventListener('click', closeFn);
++    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeFn(); });
++
++    // Category select → show/hide new input
++    const catSel = document.getElementById('faq-cat-select');
++    const catInp = document.getElementById('faq-cat-input');
++    if (faq) {
++        // If editing, pre-select the existing category
++        const existsInList = Array.from(catSel.options).some(o => o.value === faq.category);
++        if (!existsInList) {
++            catSel.value = '__new__';
++            catInp.classList.remove('cms-hidden');
++        } else {
++            catSel.value = faq.category;
++        }
++    }
++    catSel.addEventListener('change', () => {
++        const isNew = catSel.value === '__new__';
++        catInp.classList.toggle('cms-hidden', !isNew);
++        if (isNew) catInp.focus();
++    });
++
++    // Mini formatting toolbar
++    backdrop.querySelectorAll('[data-fmt]').forEach(btn => {
++        btn.addEventListener('click', () => {
++            const ta = document.getElementById('faq-answer-input');
++            const start = ta.selectionStart;
++            const end   = ta.selectionEnd;
++            const sel   = ta.value.slice(start, end);
++            let insert  = '';
++            switch (btn.dataset.fmt) {
++                case 'bold':   insert = `<strong>${sel || 'bold text'}</strong>`; break;
++                case 'italic': insert = `<em>${sel || 'italic text'}</em>`; break;
++                case 'ul':     insert = `<ul>\n  <li>${sel || 'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`; break;
++                case 'link': {
++                    const href = prompt('Enter URL:', 'https://');
++                    if (!href) return;
++                    insert = `<a href="${escHtml(href)}">${sel || 'link text'}</a>`;
++                    break;
++                }
++            }
++            ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
++            ta.focus();
++        });
++    });
++
++    // Save
++    document.getElementById('faq-modal-save').addEventListener('click', () => saveFAQ(faq?.id || null));
++}
++
++async function saveFAQ(faqId) {
++    const catSel    = document.getElementById('faq-cat-select');
++    const catInp    = document.getElementById('faq-cat-input');
++    const question  = (document.getElementById('faq-question-input').value || '').trim();
++    const answer    = (document.getElementById('faq-answer-input').value  || '').trim();
++    const status    = document.getElementById('faq-status-input').value;
++    const category  = catSel.value === '__new__'
++        ? (catInp.value || '').trim()
++        : catSel.value;
++
++    if (!category) { showToast('Please enter a category name', 'error'); catInp.focus(); return; }
++    if (!question) { showToast('Question is required', 'error'); document.getElementById('faq-question-input').focus(); return; }
++    if (!answer)   { showToast('Answer is required', 'error');   document.getElementById('faq-answer-input').focus(); return; }
++
++    const spinner = document.getElementById('faq-save-spinner');
++    const saveBtn = document.getElementById('faq-modal-save');
++    if (spinner) spinner.classList.remove('cms-hidden');
++    if (saveBtn) saveBtn.disabled = true;
++
++    try {
++        if (faqId) {
++            await apiFetch('PUT', `/cms/faqs/${faqId}`, { category, question, answer, status });
++            showToast('FAQ updated', 'success');
++        } else {
++            await apiFetch('POST', '/cms/faqs', { category, question, answer, status });
++            showToast('FAQ created', 'success');
++        }
++        document.querySelectorAll('.cms-modal-backdrop').forEach(el => el.remove());
++        await loadFAQs();
++    } catch (err) {
++        showToast('Save failed: ' + err.message, 'error');
++        if (spinner) spinner.classList.add('cms-hidden');
++        if (saveBtn) saveBtn.disabled = false;
++    }
++}
++
++async function deleteFAQ(faqId) {
++    const faq = faqData.find(f => f.id === faqId);
++    if (!faq) return;
++
++    // Confirm dialog
++    document.querySelectorAll('.cms-modal-backdrop').forEach(el => el.remove());
++    const backdrop = document.createElement('div');
++    backdrop.className = 'cms-modal-backdrop';
++    backdrop.innerHTML = `
++    <div class="cms-modal" role="dialog" aria-modal="true" style="max-width:440px;text-align:center">
++      <div class="cms-modal-header" style="justify-content:center">
++        <h2 class="cms-modal-title">Delete FAQ?</h2>
++      </div>
++      <p class="cms-text-muted" style="margin:.5rem 0 1.25rem">
++        "<strong>${escHtml(truncateFAQ(faq.question, 80))}</strong>"
++        <br>This cannot be undone.
++      </p>
++      <div class="cms-flex" style="gap:.75rem;justify-content:center">
++        <button class="cms-btn cms-btn-outline" id="del-cancel">Cancel</button>
++        <button class="cms-btn cms-btn-danger" id="del-confirm">🗑 Delete</button>
++      </div>
++    </div>`;
++    document.body.appendChild(backdrop);
++
++    document.getElementById('del-cancel').addEventListener('click', () => backdrop.remove());
++    backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.remove(); });
++
++    document.getElementById('del-confirm').addEventListener('click', async () => {
++        try {
++            await apiFetch('DELETE', `/cms/faqs/${faqId}`);
++            backdrop.remove();
++            showToast('FAQ deleted', 'success');
++            await loadFAQs();
++        } catch (err) {
++            showToast('Delete failed: ' + err.message, 'error');
++        }
++    });
++}
++
++// ── API ─────────────────────────────────────────────────────────────────────
+ async function apiFetch(method, path, body) {
+     const opts = {
+         method,
+         headers: {
+-            'x-admin-email': currentAdmin?.email || '',
++            'Authorization': `Bearer ${currentAdmin?.token || ''}`,
+             ...(body ? { 'Content-Type': 'application/json' } : {})
+         },
+         ...(body ? { body: JSON.stringify(body) } : {})
+diff --git a/login.html b/login.html
+index bf79a24..4026e47 100644
+--- a/login.html
++++ b/login.html
+@@ -4,6 +4,7 @@
+ <head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
++  <meta name="robots" content="noindex, nofollow">
+   <meta name="description"
+     content="Log in to your CaltransBizConnect account to access your dashboard, manage opportunities, and connect with partners.">
+   <title>Log In - CaltransBizConnect</title>
+diff --git a/maintenance.html b/maintenance.html
+index e98705a..4bb2a74 100644
+--- a/maintenance.html
++++ b/maintenance.html
+@@ -3,6 +3,7 @@
+ <head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
++  <meta name="robots" content="noindex, nofollow">
+   <title>Platform Upgrade - CaltransBizConnect</title>
+   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+   <link rel="stylesheet" href="css/maintenance.css">
+diff --git a/manage-opportunities.html b/manage-opportunities.html
+index cefbc25..12913ca 100644
+--- a/manage-opportunities.html
++++ b/manage-opportunities.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Manage Opportunities - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/messages.html b/messages.html
+index 5993f5e..2af2605 100644
+--- a/messages.html
++++ b/messages.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Messages - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/opportunities.html b/opportunities.html
+index 41fdaff..597901d 100644
+--- a/opportunities.html
++++ b/opportunities.html
+@@ -5,8 +5,20 @@
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="description"
+-    content="Browse current contracting opportunities across all Caltrans districts. Filter by region, work category, and due date.">
+-  <title>Opportunities - CaltransBizConnect</title>
++    content="Browse active Caltrans subcontracting opportunities for certified small businesses. Filter by district, category, and timeline. Apply directly through our platform.">
++  <meta name="robots" content="index, follow">
++  <link rel="canonical" href="https://caltransbizconnect.org/opportunities.html">
++  <meta property="og:type" content="website">
++  <meta property="og:url" content="https://caltransbizconnect.org/opportunities.html">
++  <meta property="og:title" content="Current Opportunities | California Transportation Contracts | CaltransBizConnect">
++  <meta property="og:description" content="Browse active Caltrans subcontracting opportunities for certified small businesses. Filter by district, category, and timeline. Apply directly through our platform.">
++  <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++  <meta name="twitter:card" content="summary_large_image">
++  <meta name="twitter:url" content="https://caltransbizconnect.org/opportunities.html">
++  <meta name="twitter:title" content="Current Opportunities | California Transportation Contracts | CaltransBizConnect">
++  <meta name="twitter:description" content="Browse active Caltrans subcontracting opportunities for certified small businesses. Filter by district, category, and timeline. Apply directly through our platform.">
++  <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++  <title>Current Opportunities | California Transportation Contracts | CaltransBizConnect</title>
+   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+   <link rel="stylesheet" href="css/design-system.css">
+   <link rel="stylesheet" href="css/main.css">
+@@ -412,6 +424,54 @@
+     }
+   </script>
+   <script src="js/accessibility-widget.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "Opportunities",
++        "item": "https://caltransbizconnect.org/opportunities.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+\ No newline at end of file
+diff --git a/opportunity-details.html b/opportunity-details.html
+index 354248f..b7fbadb 100644
+--- a/opportunity-details.html
++++ b/opportunity-details.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description" content="Detailed view of contracting opportunity.">
+     <title>Opportunity Details - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+diff --git a/package-lock.json b/package-lock.json
+index 2201beb..26e9577 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15,11 +15,13 @@
+         "dotenv": "^16.4.5",
+         "express": "^4.21.0",
+         "express-rate-limit": "^7.4.0",
++        "helmet": "^8.1.0",
++        "jsonwebtoken": "^9.0.3",
+         "multer": "^1.4.5-lts.1",
+         "mysql2": "^3.11.5",
++        "nodemailer": "^8.0.3",
+         "playwright": "^1.58.1"
+-      },
+-      "devDependencies": {}
++      }
+     },
+     "node_modules/@supabase/auth-js": {
+       "version": "2.95.3",
+@@ -190,6 +192,12 @@
+         "npm": "1.2.8000 || >= 1.4.16"
+       }
+     },
++    "node_modules/buffer-equal-constant-time": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/buffer-equal-constant-time/-/buffer-equal-constant-time-1.0.1.tgz",
++      "integrity": "sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==",
++      "license": "BSD-3-Clause"
++    },
+     "node_modules/buffer-from": {
+       "version": "1.1.2",
+       "resolved": "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.2.tgz",
+@@ -412,6 +420,15 @@
+         "node": ">= 0.4"
+       }
+     },
++    "node_modules/ecdsa-sig-formatter": {
++      "version": "1.0.11",
++      "resolved": "https://registry.npmjs.org/ecdsa-sig-formatter/-/ecdsa-sig-formatter-1.0.11.tgz",
++      "integrity": "sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==",
++      "license": "Apache-2.0",
++      "dependencies": {
++        "safe-buffer": "^5.0.1"
++      }
++    },
+     "node_modules/ee-first": {
+       "version": "1.1.1",
+       "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz",
+@@ -675,6 +692,15 @@
+         "node": ">= 0.4"
+       }
+     },
++    "node_modules/helmet": {
++      "version": "8.1.0",
++      "resolved": "https://registry.npmjs.org/helmet/-/helmet-8.1.0.tgz",
++      "integrity": "sha512-jOiHyAZsmnr8LqoPGmCjYAaiuWwjAPLgY8ZX2XrmHawt99/u1y6RgrZMTeoPfpUbV96HOalYgz1qzkRbw54Pmg==",
++      "license": "MIT",
++      "engines": {
++        "node": ">=18.0.0"
++      }
++    },
+     "node_modules/http-errors": {
+       "version": "2.0.1",
+       "resolved": "https://registry.npmjs.org/http-errors/-/http-errors-2.0.1.tgz",
+@@ -743,6 +769,97 @@
+       "integrity": "sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==",
+       "license": "MIT"
+     },
++    "node_modules/jsonwebtoken": {
++      "version": "9.0.3",
++      "resolved": "https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-9.0.3.tgz",
++      "integrity": "sha512-MT/xP0CrubFRNLNKvxJ2BYfy53Zkm++5bX9dtuPbqAeQpTVe0MQTFhao8+Cp//EmJp244xt6Drw/GVEGCUj40g==",
++      "license": "MIT",
++      "dependencies": {
++        "jws": "^4.0.1",
++        "lodash.includes": "^4.3.0",
++        "lodash.isboolean": "^3.0.3",
++        "lodash.isinteger": "^4.0.4",
++        "lodash.isnumber": "^3.0.3",
++        "lodash.isplainobject": "^4.0.6",
++        "lodash.isstring": "^4.0.1",
++        "lodash.once": "^4.0.0",
++        "ms": "^2.1.1",
++        "semver": "^7.5.4"
++      },
++      "engines": {
++        "node": ">=12",
++        "npm": ">=6"
++      }
++    },
++    "node_modules/jsonwebtoken/node_modules/ms": {
++      "version": "2.1.3",
++      "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz",
++      "integrity": "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
++      "license": "MIT"
++    },
++    "node_modules/jwa": {
++      "version": "2.0.1",
++      "resolved": "https://registry.npmjs.org/jwa/-/jwa-2.0.1.tgz",
++      "integrity": "sha512-hRF04fqJIP8Abbkq5NKGN0Bbr3JxlQ+qhZufXVr0DvujKy93ZCbXZMHDL4EOtodSbCWxOqR8MS1tXA5hwqCXDg==",
++      "license": "MIT",
++      "dependencies": {
++        "buffer-equal-constant-time": "^1.0.1",
++        "ecdsa-sig-formatter": "1.0.11",
++        "safe-buffer": "^5.0.1"
++      }
++    },
++    "node_modules/jws": {
++      "version": "4.0.1",
++      "resolved": "https://registry.npmjs.org/jws/-/jws-4.0.1.tgz",
++      "integrity": "sha512-EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==",
++      "license": "MIT",
++      "dependencies": {
++        "jwa": "^2.0.1",
++        "safe-buffer": "^5.0.1"
++      }
++    },
++    "node_modules/lodash.includes": {
++      "version": "4.3.0",
++      "resolved": "https://registry.npmjs.org/lodash.includes/-/lodash.includes-4.3.0.tgz",
++      "integrity": "sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==",
++      "license": "MIT"
++    },
++    "node_modules/lodash.isboolean": {
++      "version": "3.0.3",
++      "resolved": "https://registry.npmjs.org/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz",
++      "integrity": "sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==",
++      "license": "MIT"
++    },
++    "node_modules/lodash.isinteger": {
++      "version": "4.0.4",
++      "resolved": "https://registry.npmjs.org/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz",
++      "integrity": "sha512-DBwtEWN2caHQ9/imiNeEA5ys1JoRtRfY3d7V9wkqtbycnAmTvRRmbHKDV4a0EYc678/dia0jrte4tjYwVBaZUA==",
++      "license": "MIT"
++    },
++    "node_modules/lodash.isnumber": {
++      "version": "3.0.3",
++      "resolved": "https://registry.npmjs.org/lodash.isnumber/-/lodash.isnumber-3.0.3.tgz",
++      "integrity": "sha512-QYqzpfwO3/CWf3XP+Z+tkQsfaLL/EnUlXWVkIk5FUPc4sBdTehEqZONuyRt2P67PXAk+NXmTBcc97zw9t1FQrw==",
++      "license": "MIT"
++    },
++    "node_modules/lodash.isplainobject": {
++      "version": "4.0.6",
++      "resolved": "https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz",
++      "integrity": "sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==",
++      "license": "MIT"
++    },
++    "node_modules/lodash.isstring": {
++      "version": "4.0.1",
++      "resolved": "https://registry.npmjs.org/lodash.isstring/-/lodash.isstring-4.0.1.tgz",
++      "integrity": "sha512-0wJxfxH1wgO3GrbuP+dTTk7op+6L41QCXbGINEmD+ny/G/eCqGzxyCsh7159S+mgDDcoarnBw6PC1PS5+wUGgw==",
++      "license": "MIT"
++    },
++    "node_modules/lodash.once": {
++      "version": "4.1.1",
++      "resolved": "https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz",
++      "integrity": "sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==",
++      "license": "MIT"
++    },
+     "node_modules/long": {
+       "version": "5.3.2",
+       "resolved": "https://registry.npmjs.org/long/-/long-5.3.2.tgz",
+@@ -938,6 +1055,15 @@
+         "node": ">= 0.6"
+       }
+     },
++    "node_modules/nodemailer": {
++      "version": "8.0.3",
++      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.3.tgz",
++      "integrity": "sha512-JQNBqvK+bj3NMhUFR3wmCl3SYcOeMotDiwDBvIoCuQdF0PvlIY0BH+FJ2CG7u4cXKPChplE78oowlH/Otsc4ZQ==",
++      "license": "MIT-0",
++      "engines": {
++        "node": ">=6.0.0"
++      }
++    },
+     "node_modules/object-assign": {
+       "version": "4.1.1",
+       "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz",
+@@ -1100,6 +1226,18 @@
+       "integrity": "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==",
+       "license": "MIT"
+     },
++    "node_modules/semver": {
++      "version": "7.7.4",
++      "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
++      "integrity": "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==",
++      "license": "ISC",
++      "bin": {
++        "semver": "bin/semver.js"
++      },
++      "engines": {
++        "node": ">=10"
++      }
++    },
+     "node_modules/send": {
+       "version": "0.19.2",
+       "resolved": "https://registry.npmjs.org/send/-/send-0.19.2.tgz",
+diff --git a/package.json b/package.json
+index 4e9d33f..0ad2364 100644
+--- a/package.json
++++ b/package.json
+@@ -25,9 +25,11 @@
+     "dotenv": "^16.4.5",
+     "express": "^4.21.0",
+     "express-rate-limit": "^7.4.0",
++    "helmet": "^8.1.0",
++    "jsonwebtoken": "^9.0.3",
+     "multer": "^1.4.5-lts.1",
+     "mysql2": "^3.11.5",
++    "nodemailer": "^8.0.3",
+     "playwright": "^1.58.1"
+-  },
+-  "devDependencies": {}
+-}
+\ No newline at end of file
++  }
++}
+diff --git a/post-opportunity.html b/post-opportunity.html
+index d17e231..8a60a2f 100644
+--- a/post-opportunity.html
++++ b/post-opportunity.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Post Opportunity - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/prime-contractor-analytics.html b/prime-contractor-analytics.html
+index fddca9a..47bffd4 100644
+--- a/prime-contractor-analytics.html
++++ b/prime-contractor-analytics.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Prime Contractor Analytics - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/prime-contractor-profile.html b/prime-contractor-profile.html
+index a3268aa..b2928c0 100644
+--- a/prime-contractor-profile.html
++++ b/prime-contractor-profile.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description" content="Prime Contractor Profile - View details about the contracting primeContractor.">
+     <title>Prime Contractor Profile - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+diff --git a/prime-contractor-settings.html b/prime-contractor-settings.html
+index 935cfa6..3ab0ccd 100644
+--- a/prime-contractor-settings.html
++++ b/prime-contractor-settings.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Prime Contractor Settings - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/register-prime-contractor.html b/register-prime-contractor.html
+index 49a1fae..66a37e6 100644
+--- a/register-prime-contractor.html
++++ b/register-prime-contractor.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Create your prime contractor account on CaltransBizConnect to post opportunities and find qualified small businesses.">
+-    <title>Prime Contractor Registration - CaltransBizConnect</title>
++        content="Create your free CaltransBizConnect account as a prime contractor to post opportunities and find qualified certified small business partners.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/register-prime-contractor.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/register-prime-contractor.html">
++    <meta property="og:title" content="Register as a Prime Contractor | CaltransBizConnect">
++    <meta property="og:description" content="Create your free CaltransBizConnect account as a prime contractor to post opportunities and find qualified certified small business partners.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/register-prime-contractor.html">
++    <meta name="twitter:title" content="Register as a Prime Contractor | CaltransBizConnect">
++    <meta name="twitter:description" content="Create your free CaltransBizConnect account as a prime contractor to post opportunities and find qualified certified small business partners.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>Register as a Prime Contractor | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css?v=2.0.4">
+     <link rel="stylesheet" href="css/main.css?v=2.0.4">
+diff --git a/register-small-business.html b/register-small-business.html
+index 1e33543..b018a98 100644
+--- a/register-small-business.html
++++ b/register-small-business.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Create your small business account on CaltransBizConnect to access contracting opportunities.">
+-    <title>Small Business Registration - CaltransBizConnect</title>
++        content="Create your free CaltransBizConnect account as a small business to access Caltrans contracting opportunities and connect with prime contractors.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/register-small-business.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/register-small-business.html">
++    <meta property="og:title" content="Register as a Small Business | CaltransBizConnect">
++    <meta property="og:description" content="Create your free CaltransBizConnect account as a small business to access Caltrans contracting opportunities and connect with prime contractors.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/register-small-business.html">
++    <meta name="twitter:title" content="Register as a Small Business | CaltransBizConnect">
++    <meta name="twitter:description" content="Create your free CaltransBizConnect account as a small business to access Caltrans contracting opportunities and connect with prime contractors.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>Register as a Small Business | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css?v=2.0.4">
+     <link rel="stylesheet" href="css/main.css?v=2.0.4">
+diff --git a/report-issue.html b/report-issue.html
+index 9a46ba5..ad3c143 100644
+--- a/report-issue.html
++++ b/report-issue.html
+@@ -4,8 +4,20 @@
+ <head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-  <meta name="description" content="Report a technical issue or broken link on CaltransBizConnect.">
+-  <title>Report Site Issue - CaltransBizConnect</title>
++  <meta name="description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team will respond within one business day.">
++  <meta name="robots" content="index, follow">
++  <link rel="canonical" href="https://caltransbizconnect.org/report-issue.html">
++  <meta property="og:type" content="website">
++  <meta property="og:url" content="https://caltransbizconnect.org/report-issue.html">
++  <meta property="og:title" content="Report a Site Issue | CaltransBizConnect">
++  <meta property="og:description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team will respond within one business day.">
++  <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++  <meta name="twitter:card" content="summary_large_image">
++  <meta name="twitter:url" content="https://caltransbizconnect.org/report-issue.html">
++  <meta name="twitter:title" content="Report a Site Issue | CaltransBizConnect">
++  <meta name="twitter:description" content="Report technical issues or bugs with the CaltransBizConnect platform. Our team will respond within one business day.">
++  <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++  <title>Report a Site Issue | CaltransBizConnect</title>
+   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+   <link rel="stylesheet" href="css/design-system.css">
+   <link rel="stylesheet" href="css/main.css">
+@@ -196,7 +208,7 @@
+ 
+   <script src="js/config.js"></script>
+   <script src="js/main.js"></script>
+-  <script src="js/auth.js"></script>
++  <script src="js/accessibility-widget.js"></script>
+   <script>
+     // Auto-populate page URL
+     const referrer = document.referrer;
+@@ -205,10 +217,67 @@
+     }
+ 
+     // Auto-detect browser info
+-    const browserInfo = navigator.userAgent;
+-    document.getElementById('browser').value = browserInfo;
++    document.getElementById('browser').value = navigator.userAgent;
++
++    const issueForm = document.getElementById('issueForm');
++    const submitBtn = issueForm.querySelector('button[type="submit"]');
++
++    issueForm.addEventListener('submit', async (e) => {
++      e.preventDefault();
++      issueForm.querySelectorAll('.form-error').forEach(el => el.textContent = '');
++
++      const issueType = document.getElementById('issueType').value;
++      const pageUrl = document.getElementById('pageUrl').value.trim();
++      const description = document.getElementById('description').value.trim();
++      const browser = document.getElementById('browser').value.trim();
++      const contactEmail = document.getElementById('contactEmail').value.trim();
++
++      let valid = true;
++      if (!issueType) { document.getElementById('issueType').nextElementSibling.textContent = 'Please select an issue type.'; valid = false; }
++      if (!pageUrl) { document.getElementById('pageUrl').nextElementSibling.textContent = 'Page URL is required.'; valid = false; }
++      if (!description) { document.getElementById('description').nextElementSibling.textContent = 'Description is required.'; valid = false; }
++      if (!valid) return;
++
++      submitBtn.disabled = true;
++      submitBtn.textContent = 'Submitting...';
++
++      const messageBody = [
++        'Issue Type: ' + issueType,
++        'Page URL: ' + pageUrl,
++        '',
++        'Description:',
++        description,
++        '',
++        'Browser/Device: ' + (browser || 'Not provided'),
++        'Contact Email: ' + (contactEmail || 'Not provided')
++      ].join('\n');
++
++      try {
++        const res = await fetch(window.APP_CONFIG.API_URL + '/contact/submit', {
++          method: 'POST',
++          headers: { 'Content-Type': 'application/json' },
++          body: JSON.stringify({
++            name: 'Site Issue Report',
++            email: contactEmail || 'noreply@caltransbizconnect.org',
++            subject: 'Site Issue Report: ' + issueType,
++            message: messageBody
++          })
++        });
++        const data = await res.json();
++        if (data.success) {
++          issueForm.innerHTML = '<div style="padding:var(--space-lg);background:#e8f5e9;border:1px solid #4caf50;border-radius:var(--border-radius-md);color:#1b5e20;" role="alert"><strong>Issue reported!</strong> Thank you. Our team will review it and respond within 1 business day' + (contactEmail ? ' to ' + contactEmail : '') + '.</div>';
++        } else {
++          submitBtn.disabled = false;
++          submitBtn.textContent = 'Submit Issue Report';
++          document.getElementById('description').nextElementSibling.textContent = data.message || 'An error occurred. Please try again.';
++        }
++      } catch {
++        submitBtn.disabled = false;
++        submitBtn.textContent = 'Submit Issue Report';
++        document.getElementById('description').nextElementSibling.textContent = 'Unable to submit. Please email us directly at smallbusinesses@dot.ca.gov';
++      }
++    });
+   </script>
+-  <script src="js/accessibility-widget.js"></script>
+ </body>
+ 
+ </html>
+diff --git a/reset-password.html b/reset-password.html
+index ef7f1c5..e91df30 100644
+--- a/reset-password.html
++++ b/reset-password.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description"
+         content="Set a new password for your CaltransBizConnect account to regain access to your dashboard.">
+     <title>Reset Password - CaltransBizConnect</title>
+@@ -104,8 +105,80 @@
+ 
+     <script src="js/config.js"></script>
+   <script src="js/main.js"></script>
+-    <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
++  <script>
++    const box = document.querySelector('.login-box');
++    const params = new URLSearchParams(window.location.search);
++    const token = params.get('token');
++
++    // Verify token on page load
++    async function verifyToken() {
++      if (!token) {
++        box.innerHTML = '<div style="text-align:center;padding:var(--space-xl);"><p style="color:var(--color-error);">Invalid or missing reset link.</p><a href="forgot-password.html" class="btn btn-primary" style="margin-top:var(--space-md);">Request New Link</a></div>';
++        return;
++      }
++      try {
++        const res = await fetch(window.APP_CONFIG.API_URL + '/password-reset/verify-token?token=' + encodeURIComponent(token));
++        const data = await res.json();
++        if (!data.valid) {
++          box.innerHTML = '<div style="text-align:center;padding:var(--space-xl);"><p style="color:var(--color-error);">' + (data.message || 'This reset link is invalid or has expired.') + '</p><a href="forgot-password.html" class="btn btn-primary" style="margin-top:var(--space-md);">Request New Link</a></div>';
++        }
++      } catch {
++        box.innerHTML = '<div style="text-align:center;padding:var(--space-xl);"><p style="color:var(--color-error);">Unable to verify your reset link. Please try again.</p><a href="forgot-password.html" class="btn btn-primary" style="margin-top:var(--space-md);">Request New Link</a></div>';
++      }
++    }
++
++    // Handle form submission
++    const form = document.getElementById('resetPasswordForm');
++    const submitBtn = form.querySelector('button[type="submit"]');
++
++    form.addEventListener('submit', async (e) => {
++      e.preventDefault();
++      const pwInput = document.getElementById('password');
++      const confirmInput = document.getElementById('confirmPassword');
++      const pwError = pwInput.nextElementSibling;
++      const confirmError = confirmInput.nextElementSibling;
++      pwError.textContent = '';
++      confirmError.textContent = '';
++
++      const newPassword = pwInput.value;
++      const confirm = confirmInput.value;
++
++      if (newPassword.length < 8) {
++        pwError.textContent = 'Password must be at least 8 characters.';
++        return;
++      }
++      if (newPassword !== confirm) {
++        confirmError.textContent = 'Passwords do not match.';
++        return;
++      }
++
++      submitBtn.disabled = true;
++      submitBtn.textContent = 'Resetting...';
++
++      try {
++        const res = await fetch(window.APP_CONFIG.API_URL + '/password-reset/reset-password', {
++          method: 'POST',
++          headers: { 'Content-Type': 'application/json' },
++          body: JSON.stringify({ token, newPassword })
++        });
++        const data = await res.json();
++        if (data.success) {
++          box.innerHTML = '<div style="text-align:center;padding:var(--space-xl);"><div style="padding:var(--space-md);background:#e8f5e9;border:1px solid #4caf50;border-radius:var(--border-radius-md);color:#1b5e20;margin-bottom:var(--space-lg);" role="alert"><strong>Password updated!</strong><br>You can now log in with your new password.</div><a href="login.html" class="btn btn-primary">Log In</a></div>';
++        } else {
++          pwError.textContent = data.message || 'An error occurred. Please request a new reset link.';
++          submitBtn.disabled = false;
++          submitBtn.textContent = 'Reset Password';
++        }
++      } catch {
++        pwError.textContent = 'Unable to connect. Please try again.';
++        submitBtn.disabled = false;
++        submitBtn.textContent = 'Reset Password';
++      }
++    });
++
++    verifyToken();
++  </script>
+ </body>
+ 
+ </html>
+diff --git a/resources.html b/resources.html
+index 8b75bf1..e2923b5 100644
+--- a/resources.html
++++ b/resources.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Access templates, guides, and resources for Small Businesses and prime contractors using CaltransBizConnect.">
+-    <title>Resources - CaltransBizConnect</title>
++        content="Access free templates, checklists, and guidance materials for California small businesses and contractors. Bid preparation tools, capability statement templates, and more.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/resources.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/resources.html">
++    <meta property="og:title" content="Resources &amp; Tools | Templates &amp; Guides | CaltransBizConnect">
++    <meta property="og:description" content="Access free templates, checklists, and guidance materials for California small businesses and contractors. Bid preparation tools, capability statement templates, and more.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/resources.html">
++    <meta name="twitter:title" content="Resources &amp; Tools | Templates &amp; Guides | CaltransBizConnect">
++    <meta name="twitter:description" content="Access free templates, checklists, and guidance materials for California small businesses and contractors. Bid preparation tools, capability statement templates, and more.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>Resources &amp; Tools | Templates &amp; Guides | CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -200,6 +212,54 @@
+     <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
+   <script src="js/cms-renderer.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "Resources",
++        "item": "https://caltransbizconnect.org/resources.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+\ No newline at end of file
+diff --git a/robots.txt b/robots.txt
+new file mode 100644
+index 0000000..1ef349f
+--- /dev/null
++++ b/robots.txt
+@@ -0,0 +1,17 @@
++User-agent: *
++Allow: /
++
++# Disallow admin and private areas
++Disallow: /admin-cms.html
++Disallow: /admin-users.html
++Disallow: /dashboard-admin.html
++Disallow: /dashboard-caltrans.html
++Disallow: /api/
++
++# Allow assets
++Allow: /css/
++Allow: /js/
++Allow: /images/
++Allow: /uploads/
++
++Sitemap: https://caltransbizconnect.org/sitemap.xml
+diff --git a/saved-opportunities.html b/saved-opportunities.html
+index 21da532..742d6aa 100644
+--- a/saved-opportunities.html
++++ b/saved-opportunities.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description" content="View your saved contracting opportunities.">
+     <title>Saved Opportunities - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+diff --git a/search-opportunities.html b/search-opportunities.html
+index 8fad1fa..92b9af8 100644
+--- a/search-opportunities.html
++++ b/search-opportunities.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description"
+         content="Search and filter contracting opportunities tailored to your business capabilities and regions.">
+     <title>Search Opportunities - CaltransBizConnect</title>
+diff --git a/search-small-businesses.html b/search-small-businesses.html
+index 0b8ebe6..c47341c 100644
+--- a/search-small-businesses.html
++++ b/search-small-businesses.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description"
+         content="Search for qualified Small Businesses (Small Businesses) to partner on your contracting opportunities.">
+     <title>Search Small Businesses - CaltransBizConnect</title>
+diff --git a/server/config/email.js b/server/config/email.js
+new file mode 100644
+index 0000000..38763e4
+--- /dev/null
++++ b/server/config/email.js
+@@ -0,0 +1,142 @@
++'use strict';
++
++const nodemailer = require('nodemailer');
++
++// ── Transporter ──────────────────────────────────────────────────────────────
++const transporter = nodemailer.createTransport({
++    service: 'gmail',
++    auth: {
++        user: process.env.EMAIL_USER,
++        pass: process.env.EMAIL_PASSWORD
++    }
++});
++
++/**
++ * Send an email.
++ * @param {{ to: string, subject: string, html: string, text: string }} opts
++ */
++async function sendEmail({ to, subject, html, text }) {
++    const mailOptions = {
++        from: `"CaltransBizConnect" <${process.env.EMAIL_USER}>`,
++        to,
++        subject,
++        html,
++        text
++    };
++    const info = await transporter.sendMail(mailOptions);
++    console.log(`CaltransBizConnect Email: Sent to ${to} — ${info.messageId}`);
++    return info;
++}
++
++// ── Shared email wrapper ─────────────────────────────────────────────────────
++function emailWrapper(bodyContent) {
++    return `<!DOCTYPE html>
++<html lang="en">
++<head>
++  <meta charset="UTF-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1.0">
++</head>
++<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Calibri,sans-serif;">
++  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:32px 0;">
++    <tr><td align="center">
++      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);max-width:600px;width:100%;">
++        <!-- Header -->
++        <tr>
++          <td style="background:#003D5B;padding:28px 32px;">
++            <h1 style="margin:0;color:#FDB714;font-size:22px;font-weight:700;letter-spacing:-0.5px;">CaltransBizConnect</h1>
++            <p style="margin:4px 0 0;color:rgba(255,255,255,0.75);font-size:13px;">Small Business Supportive Services</p>
++          </td>
++        </tr>
++        <!-- Body -->
++        <tr>
++          <td style="padding:32px;">
++            ${bodyContent}
++          </td>
++        </tr>
++        <!-- Footer -->
++        <tr>
++          <td style="background:#f4f6f8;padding:20px 32px;border-top:1px solid #e0e0e0;text-align:center;">
++            <p style="margin:0;color:#666;font-size:12px;">© 2026 California Department of Transportation. All rights reserved.</p>
++            <p style="margin:6px 0 0;color:#888;font-size:11px;">
++              <a href="https://caltransbizconnect.org" style="color:#046B99;text-decoration:none;">caltransbizconnect.org</a>
++            </p>
++          </td>
++        </tr>
++      </table>
++    </td></tr>
++  </table>
++</body>
++</html>`;
++}
++
++function btn(href, label) {
++    return `<a href="${href}" style="display:inline-block;background:#FDB714;color:#003D5B;font-weight:700;font-size:15px;padding:12px 28px;border-radius:6px;text-decoration:none;margin:20px 0;">${label}</a>`;
++}
++
++// ── Email Templates ──────────────────────────────────────────────────────────
++
++/**
++ * Password reset email.
++ * @param {string} resetLink
++ * @param {string} userName
++ */
++function getPasswordResetEmail(resetLink, userName) {
++    const html = emailWrapper(`
++        <h2 style="margin:0 0 8px;color:#003D5B;font-size:20px;">Reset Your Password</h2>
++        <p style="color:#444;line-height:1.6;">Hi ${userName},</p>
++        <p style="color:#444;line-height:1.6;">We received a request to reset the password for your CaltransBizConnect account. Click the button below to choose a new password.</p>
++        ${btn(resetLink, 'Reset My Password')}
++        <p style="color:#666;font-size:13px;line-height:1.6;margin-top:8px;">This link will expire in <strong>1 hour</strong>. If you did not request a password reset, you can safely ignore this email — your account remains secure.</p>
++        <p style="color:#888;font-size:12px;margin-top:16px;">If the button above doesn't work, copy and paste this URL into your browser:<br>
++        <a href="${resetLink}" style="color:#046B99;word-break:break-all;">${resetLink}</a></p>
++    `);
++
++    const text = `Reset Your Password\n\nHi ${userName},\n\nWe received a request to reset your CaltransBizConnect password.\n\nReset link (expires in 1 hour):\n${resetLink}\n\nIf you did not request this, please ignore this email.\n\n© 2026 California Department of Transportation`;
++
++    return { html, text };
++}
++
++/**
++ * Welcome email sent after registration.
++ * @param {string} userName
++ * @param {'small_business'|'prime_contractor'} userType
++ */
++function getWelcomeEmail(userName, userType) {
++    const typeLabel = userType === 'prime_contractor' ? 'Prime Contractor' : 'Small Business';
++    const dashboardHref = `${process.env.APP_URL || 'https://caltransbizconnect.org'}/login.html`;
++
++    const html = emailWrapper(`
++        <h2 style="margin:0 0 8px;color:#003D5B;font-size:20px;">Welcome to CaltransBizConnect!</h2>
++        <p style="color:#444;line-height:1.6;">Hi ${userName},</p>
++        <p style="color:#444;line-height:1.6;">Your <strong>${typeLabel}</strong> account has been created. You can now access the platform to ${userType === 'prime_contractor' ? 'post opportunities and find qualified small businesses' : 'browse contracting opportunities, upload your capability statement, and connect with prime contractors'}.</p>
++        ${btn(dashboardHref, 'Go to Dashboard')}
++        <p style="color:#666;font-size:13px;line-height:1.6;">If you have questions, contact us at <a href="mailto:smallbusinesses@dot.ca.gov" style="color:#046B99;">smallbusinesses@dot.ca.gov</a> or call (916) 324-1700.</p>
++    `);
++
++    const text = `Welcome to CaltransBizConnect!\n\nHi ${userName},\n\nYour ${typeLabel} account has been created successfully.\n\nLog in at: ${dashboardHref}\n\nQuestions? Email smallbusinesses@dot.ca.gov or call (916) 324-1700.\n\n© 2026 California Department of Transportation`;
++
++    return { html, text };
++}
++
++/**
++ * Contact form confirmation email sent to the user.
++ * @param {string} userName
++ * @param {string} message
++ */
++function getContactConfirmationEmail(userName, message) {
++    const html = emailWrapper(`
++        <h2 style="margin:0 0 8px;color:#003D5B;font-size:20px;">We Received Your Message</h2>
++        <p style="color:#444;line-height:1.6;">Hi ${userName},</p>
++        <p style="color:#444;line-height:1.6;">Thank you for contacting CaltransBizConnect. Our team will respond within <strong>1–2 business days</strong>.</p>
++        <div style="background:#f8f9fa;border-left:4px solid #FDB714;padding:16px;border-radius:0 6px 6px 0;margin:20px 0;">
++          <p style="margin:0;color:#555;font-size:13px;font-style:italic;">"${message}"</p>
++        </div>
++        <p style="color:#666;font-size:13px;">For urgent matters, call <strong>(916) 324-1700</strong> Monday–Friday, 8:00 AM–5:00 PM PST.</p>
++    `);
++
++    const text = `We Received Your Message\n\nHi ${userName},\n\nThank you for contacting CaltransBizConnect. We'll respond within 1–2 business days.\n\nYour message:\n"${message}"\n\nFor urgent matters: (916) 324-1700, Mon–Fri 8AM–5PM PST.\n\n© 2026 California Department of Transportation`;
++
++    return { html, text };
++}
++
++module.exports = { sendEmail, getPasswordResetEmail, getWelcomeEmail, getContactConfirmationEmail };
+diff --git a/server/database.js b/server/database.js
+index eb3f750..a9f3bda 100644
+--- a/server/database.js
++++ b/server/database.js
+@@ -7,9 +7,6 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.production'), override: t
+ dotenv.config({ path: path.resolve(__dirname, '../.env') });
+ 
+ console.log('CaltransBizConnect DB: Initializing MySQL Connection Pool...');
+-console.log('DB Host:', process.env.DB_HOST || 'localhost');
+-console.log('DB User:', process.env.DB_USER);
+-console.log('DB Name:', process.env.DB_NAME);
+ 
+ let pool;
+ 
+@@ -198,6 +195,24 @@ async function initDatabase() {
+             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+         `);
+ 
++        // 9. CMS FAQs Table
++        console.log('CaltransBizConnect DB: Ensuring "cms_faqs" table exists...');
++        await db.execute(`
++            CREATE TABLE IF NOT EXISTS cms_faqs (
++                id INT AUTO_INCREMENT PRIMARY KEY,
++                category VARCHAR(100) NOT NULL DEFAULT 'General',
++                question TEXT NOT NULL,
++                answer LONGTEXT NOT NULL,
++                sort_order INT DEFAULT 0,
++                status ENUM('active', 'inactive') DEFAULT 'active',
++                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
++                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
++                INDEX idx_faq_category (category),
++                INDEX idx_faq_status (status),
++                INDEX idx_faq_sort (sort_order)
++            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
++        `);
++
+         // Terminlogy Migrations for existing live databases
+         console.log('CaltransBizConnect DB: Running terminology data migrations...');
+         try {
+@@ -244,7 +259,38 @@ async function initDatabase() {
+         }
+         console.log('CaltransBizConnect DB: Migrations complete.');
+ 
++        // Password Reset Tokens Table
++        await db.execute(`
++            CREATE TABLE IF NOT EXISTS password_reset_tokens (
++                id INT AUTO_INCREMENT PRIMARY KEY,
++                user_id INT NOT NULL,
++                token VARCHAR(255) NOT NULL UNIQUE,
++                expires_at DATETIME NOT NULL,
++                used BOOLEAN DEFAULT FALSE,
++                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
++                INDEX idx_token (token),
++                INDEX idx_user_id (user_id),
++                INDEX idx_expires_at (expires_at),
++                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
++            )
++        `);
++
+         console.log('CaltransBizConnect DB: All MySQL tables initialized successfully.');
++
++        // Cleanup expired tokens every hour
++        setInterval(async () => {
++            try {
++                const db = getDb();
++                const [result] = await db.execute(
++                    'DELETE FROM password_reset_tokens WHERE expires_at < NOW() OR used = TRUE'
++                );
++                if (result.affectedRows > 0) {
++                    console.log(`CaltransBizConnect DB: Cleaned up ${result.affectedRows} expired/used reset tokens.`);
++                }
++            } catch (e) {
++                console.error('CaltransBizConnect DB: Token cleanup error:', e.message);
++            }
++        }, 60 * 60 * 1000);
+     } catch (err) {
+         console.error('CaltransBizConnect DB CRITICAL ERROR: Database initialization failed.');
+         console.error(err);
+diff --git a/server/index.js b/server/index.js
+index 627ca2b..786e49a 100644
+--- a/server/index.js
++++ b/server/index.js
+@@ -4,6 +4,8 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+ 
+ const express = require('express');
+ const cors = require('cors');
++const helmet = require('helmet');
++const rateLimit = require('express-rate-limit');
+ const path = require('path');
+ const fs = require('fs');
+ const { initDatabase, getDb } = require('./database');
+@@ -16,19 +18,43 @@ const PORT = process.env.PORT || 3001;
+ 
+ const startServer = async () => {
+     try {
+-        // Basic Middleware
+-        app.use(cors());
+-        app.use(express.json());
++        // Security Headers
++        app.use(helmet({
++            contentSecurityPolicy: false // disabled to allow inline scripts in HTML pages
++        }));
++
++        // CORS — restrict to production domain and localhost
++        const allowedOrigins = [
++            'https://caltransbizconnect.org',
++            'https://www.caltransbizconnect.org',
++            'http://localhost:3001',
++            'http://127.0.0.1:3001'
++        ];
++        app.use(cors({
++            origin: (origin, callback) => {
++                if (!origin || allowedOrigins.includes(origin)) {
++                    callback(null, true);
++                } else {
++                    callback(new Error('Not allowed by CORS'));
++                }
++            },
++            credentials: true
++        }));
++
++        // Rate limiting on auth endpoints
++        const authLimiter = rateLimit({
++            windowMs: 15 * 60 * 1000, // 15 minutes
++            max: 20,                   // 20 attempts per window
++            standardHeaders: true,
++            legacyHeaders: false,
++            message: { error: 'Too many requests, please try again later.' }
++        });
++
++        app.use(express.json({ limit: '1mb' }));
+ 
+         // Maintenance Mode Middleware
+         app.use((req, res, next) => {
+-            // Check for admin bypass query param
+-            if (req.query.admin === 'true') {
+-                res.cookie('admin_bypass', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+-                return res.redirect(req.path);
+-            }
+-            
+-            // Check bypass mechanisms
++            // Check bypass mechanisms (localhost only — no query param bypass)
+             const hasBypassCookie = req.headers.cookie && req.headers.cookie.includes('admin_bypass=true');
+             const isAllowedIP = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip);
+             
+@@ -65,10 +91,11 @@ const startServer = async () => {
+         // Serve Static Files
+         const publicPath = path.join(__dirname, '../');
+         console.log('CaltransBizConnect: Serving static files from:', publicPath);
+-        app.use(express.static(publicPath));
++        app.use(express.static(publicPath, { etag: false, lastModified: false, setHeaders(res) { res.setHeader('Cache-Control', 'no-cache'); } }));
+ 
+         // Routes
+-        app.use('/api/auth', require('./routes/auth'));
++        app.use('/api/auth', authLimiter, require('./routes/auth'));
++        app.use('/api/cms/login', authLimiter);
+         app.use('/api/opportunities', require('./routes/opportunities'));
+         app.use('/api/users', require('./routes/users'));
+         app.use('/api/messages', require('./routes/messages'));
+@@ -79,17 +106,17 @@ const startServer = async () => {
+         app.use('/api/small-businesses', require('./routes/small-businesses'));
+         app.use('/api/cms', require('./routes/cms'));
+         app.use('/api/filters', require('./routes/filters'));
++        app.use('/api/password-reset', require('./routes/password-reset'));
++        app.use('/api/contact', require('./routes/contact'));
+ 
+         // Health Check
+         app.get('/api/health', async (req, res) => {
+             let dbStatus = 'ok';
+-            let dbError = null;
+             try {
+                 const db = getDb();
+                 await db.execute('SELECT 1');
+             } catch (e) {
+                 dbStatus = 'error';
+-                dbError = e.message;
+             }
+             const uploadsDir = path.join(__dirname, '../uploads');
+             let uploadsWritable = false;
+@@ -102,12 +129,9 @@ const startServer = async () => {
+                 // not writable
+             }
+             res.json({
+-                status: 'ok',
+-                version: VERSION,
+-                database: { status: dbStatus, error: dbError },
+-                uploads: { path: uploadsDir, exists: fs.existsSync(uploadsDir), writable: uploadsWritable },
+-                env: process.env.NODE_ENV || 'production',
+-                passenger: !!(process.env.PHUSION_PASSENGER || process.env.PASSENGER_NODE_CONTROL_REPO)
++                status: dbStatus === 'ok' && uploadsWritable ? 'ok' : 'degraded',
++                database: dbStatus,
++                uploads: uploadsWritable ? 'ok' : 'error'
+             });
+         });
+ 
+diff --git a/server/middleware/auth.js b/server/middleware/auth.js
+index cd97467..474494a 100644
+--- a/server/middleware/auth.js
++++ b/server/middleware/auth.js
+@@ -1,47 +1,56 @@
+-const { db } = require('../database');
++const jwt = require('jsonwebtoken');
++
++const JWT_SECRET = process.env.JWT_SECRET || 'caltrans-fallback-secret-change-in-production';
+ 
+ /**
+- * Middleware to require a specific role.
+- * Extracts user ID from headers (x-user-id), or body/query (userId, senderId)
++ * Middleware to require authentication via JWT bearer token.
++ * allowedRole: 'small_business' | 'prime_contractor' | 'admin' | 'caltrans_admin' | 'any'
+  */
+ function requireRole(allowedRole) {
+-    return async (req, res, next) => {
+-        // Find user ID from various possible locations in request
+-        const userId = req.headers['x-user-id'] || 
+-                       req.body.userId || 
+-                       req.body.senderId || 
+-                       req.body.smallBusinessId ||
+-                       req.query.userId || 
+-                       req.params.userId;
+-
+-        if (!userId) {
+-            return res.status(401).json({ error: 'Unauthorized: User ID not provided' });
++    return (req, res, next) => {
++        const authHeader = req.headers['authorization'];
++        const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
++
++        if (!token) {
++            return res.status(401).json({ error: 'Unauthorized: No token provided' });
+         }
+ 
+         try {
+-            const [rows] = await db.execute('SELECT id, type, business_name FROM users WHERE id = ?', [userId]);
+-            const user = rows[0];
+-
+-            if (!user) {
+-                return res.status(401).json({ error: 'Unauthorized: Invalid user' });
+-            }
++            const decoded = jwt.verify(token, JWT_SECRET);
++            req.user = decoded; // { id, email, type }
+ 
+-            if (user.type !== allowedRole && allowedRole !== 'any') {
+-                return res.status(403).json({ 
+-                    error: `Forbidden: Requires ${allowedRole} role` 
+-                });
++            if (allowedRole !== 'any' && decoded.type !== allowedRole) {
++                return res.status(403).json({ error: `Forbidden: Requires ${allowedRole} role` });
+             }
+ 
+-            // Attach user to request for downstream use
+-            req.user = user;
+             next();
+-        } catch (error) {
+-            console.error('Role validation error:', error);
+-            res.status(500).json({ error: 'Internal server error during role validation' });
++        } catch (err) {
++            return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
+         }
+     };
+ }
+ 
+-module.exports = {
+-    requireRole
+-};
++/**
++ * Middleware to require admin role via JWT.
++ */
++function requireAdmin(req, res, next) {
++    const authHeader = req.headers['authorization'];
++    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
++
++    if (!token) {
++        return res.status(401).json({ error: 'Unauthorized: No token provided' });
++    }
++
++    try {
++        const decoded = jwt.verify(token, JWT_SECRET);
++        if (decoded.type !== 'admin' && decoded.type !== 'caltrans_admin') {
++            return res.status(403).json({ error: 'Forbidden: Admin access required' });
++        }
++        req.user = decoded;
++        next();
++    } catch (err) {
++        return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
++    }
++}
++
++module.exports = { requireRole, requireAdmin, JWT_SECRET };
+diff --git a/server/routes/admin.js b/server/routes/admin.js
+index 83c52f7..e499228 100644
+--- a/server/routes/admin.js
++++ b/server/routes/admin.js
+@@ -1,6 +1,7 @@
+ const express = require('express');
+ const { db } = require('../database');
+ const bcrypt = require('bcryptjs');
++const { requireAdmin } = require('../middleware/auth');
+ const router = express.Router();
+ 
+ // Root admin endpoint
+@@ -8,20 +9,6 @@ router.get('/', (req, res) => {
+     res.json({ message: 'Admin API is working' });
+ });
+ 
+-// Middleware to check if user is admin
+-const requireAdmin = (req, res, next) => {
+-    const adminEmail = req.headers['x-admin-email'];
+-    console.log(`Admin middleware: ${req.method} ${req.originalUrl}`);
+-
+-    const isAdminEmail = adminEmail && (adminEmail.toLowerCase().includes('admin') || adminEmail === 'ks@evobrand.net');
+-
+-    if (!isAdminEmail) {
+-        console.log('Admin access denied');
+-        return res.status(403).json({ error: 'Admin access required' });
+-    }
+-    console.log('Admin access granted');
+-    next();
+-};
+ 
+ // Get admin dashboard data
+ router.get('/dashboard', requireAdmin, async (req, res) => {
+diff --git a/server/routes/auth.js b/server/routes/auth.js
+index d475601..27726cf 100644
+--- a/server/routes/auth.js
++++ b/server/routes/auth.js
+@@ -1,6 +1,9 @@
+ const express = require('express');
+ const bcrypt = require('bcryptjs');
++const jwt = require('jsonwebtoken');
+ const { db } = require('../database');
++const { JWT_SECRET } = require('../middleware/auth');
++const { sendEmail, getWelcomeEmail } = require('../config/email');
+ const router = express.Router();
+ 
+ // Register user
+@@ -58,13 +61,26 @@ router.post('/register', async (req, res) => {
+         ]);
+ 
+         console.log(`CaltransBizConnect Auth: Registration successful for ${email}, ID: ${result.insertId}`);
++
++        // Send welcome email (non-blocking)
++        const userName = profileData.contactName || profileData.contact_name || profileData.businessName || profileData.business_name || 'there';
++        const { html: welcomeHtml, text: welcomeText } = getWelcomeEmail(userName, type);
++        sendEmail({ to: email, subject: 'Welcome to CaltransBizConnect!', html: welcomeHtml, text: welcomeText })
++            .catch(err => console.error('CaltransBizConnect Auth: Welcome email failed:', err.message));
+         const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
+         const newUser = rows[0];
+         const { password_hash: _, ...userWithoutPassword } = newUser;
+ 
++        const token = jwt.sign(
++            { id: newUser.id, email: newUser.email, type: newUser.type },
++            JWT_SECRET,
++            { expiresIn: '7d' }
++        );
++
+         res.status(201).json({
+             success: true,
+             message: 'User registered successfully',
++            token,
+             user: userWithoutPassword
+         });
+     } catch (error) {
+@@ -112,9 +128,17 @@ router.post('/login', async (req, res) => {
+ 
+         console.log(`CaltransBizConnect Auth: Login successful for ${email}`);
+         const { password_hash, ...userWithoutPassword } = user;
++
++        const token = jwt.sign(
++            { id: user.id, email: user.email, type: user.type },
++            JWT_SECRET,
++            { expiresIn: '7d' }
++        );
++
+         res.json({
+             success: true,
+             message: 'Login successful',
++            token,
+             user: userWithoutPassword
+         });
+     } catch (error) {
+diff --git a/server/routes/cms.js b/server/routes/cms.js
+index 190dbe9..4454d88 100644
+--- a/server/routes/cms.js
++++ b/server/routes/cms.js
+@@ -23,9 +23,13 @@ const express = require('express');
+ const path    = require('path');
+ const fs      = require('fs');
+ const multer  = require('multer');
++const jwt     = require('jsonwebtoken');
++const { db }  = require('../database');
+ 
+ const router = express.Router();
+ 
++const CMS_JWT_SECRET = process.env.JWT_SECRET || 'caltrans-fallback-secret-change-in-production';
++
+ // ─── Directory paths ────────────────────────────────────────────────────────
+ const ROOT_DIR    = path.join(__dirname, '../../');
+ const CONTENT_DIR = path.join(ROOT_DIR, 'content');
+@@ -84,42 +88,42 @@ router.post('/login', (req, res) => {
+         return res.status(400).json({ error: 'Email and password are required' });
+     }
+ 
+-    const isAdminEmail = (
+-        email.toLowerCase().includes('admin') ||
+-        email === 'ks@evobrand.net'
+-    );
++    const requiredPassword = process.env.CMS_ADMIN_PASSWORD;
+ 
+-    if (!isAdminEmail) {
+-        return res.status(403).json({ error: 'This account does not have CMS admin access' });
++    if (!requiredPassword) {
++        return res.status(500).json({ error: 'CMS_ADMIN_PASSWORD is not configured on the server' });
+     }
+ 
+-    const requiredPassword = process.env.CMS_ADMIN_PASSWORD;
+-
+-    if (requiredPassword && password !== requiredPassword) {
+-        return res.status(401).json({ error: 'Invalid password' });
++    if (password !== requiredPassword) {
++        return res.status(401).json({ error: 'Invalid credentials' });
+     }
+ 
+-    // No CMS_ADMIN_PASSWORD set → local dev mode, accept any password
+-    res.json({ success: true, email, message: 'CMS login successful' });
++    const token = jwt.sign(
++        { email, type: 'caltrans_admin' },
++        CMS_JWT_SECRET,
++        { expiresIn: '8h' }
++    );
++
++    res.json({ success: true, token, email, message: 'CMS login successful' });
+ });
+ 
+ // ─── Admin auth middleware ────────────────────────────────────────────────────
+-/**
+- * Reuses the same admin-email pattern as server/routes/admin.js
+- * @param {import('express').Request}  req
+- * @param {import('express').Response} res
+- * @param {import('express').NextFunction} next
+- */
+ function requireAdmin(req, res, next) {
+-    const email = req.headers['x-admin-email'];
+-    const isAdmin = email && (
+-        email.toLowerCase().includes('admin') ||
+-        email === 'ks@evobrand.net'
+-    );
+-    if (!isAdmin) {
+-        return res.status(403).json({ error: 'Admin access required' });
++    const authHeader = req.headers['authorization'];
++    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
++    if (!token) {
++        return res.status(401).json({ error: 'Unauthorized: No token provided' });
++    }
++    try {
++        const decoded = jwt.verify(token, CMS_JWT_SECRET);
++        if (decoded.type !== 'caltrans_admin' && decoded.type !== 'admin') {
++            return res.status(403).json({ error: 'Admin access required' });
++        }
++        req.user = decoded;
++        next();
++    } catch (err) {
++        return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
+     }
+-    next();
+ }
+ 
+ // ─── File helpers ─────────────────────────────────────────────────────────────
+@@ -381,6 +385,150 @@ router.delete('/media/:filename', requireAdmin, (req, res) => {
+     res.json({ success: true, message: `"${filename}" deleted` });
+ });
+ 
++// ─── FAQ MANAGER ─────────────────────────────────────────────────────────────
++
++/** GET /api/cms/faqs — list all FAQs ordered by category + sort_order */
++router.get('/faqs', requireAdmin, async (_req, res) => {
++    try {
++        const [rows] = await db.execute(
++            'SELECT * FROM cms_faqs ORDER BY category, sort_order, id'
++        );
++        res.json(rows);
++    } catch (err) {
++        console.error('CMS FAQs GET error:', err);
++        res.status(500).json({ error: 'Failed to fetch FAQs' });
++    }
++});
++
++/** GET /api/cms/faq-categories — distinct active categories */
++router.get('/faq-categories', requireAdmin, async (_req, res) => {
++    try {
++        const [rows] = await db.execute(
++            "SELECT DISTINCT category FROM cms_faqs WHERE status = 'active' ORDER BY category"
++        );
++        res.json(rows.map(r => r.category));
++    } catch (err) {
++        console.error('CMS FAQ categories GET error:', err);
++        res.status(500).json({ error: 'Failed to fetch categories' });
++    }
++});
++
++/** POST /api/cms/faqs — create a new FAQ */
++router.post('/faqs', requireAdmin, async (req, res) => {
++    const { category, question, answer, status } = req.body || {};
++
++    if (!category || !question || !answer) {
++        return res.status(400).json({ error: 'category, question, and answer are required' });
++    }
++
++    try {
++        // Place new FAQ at the end of its category
++        const [[{ next_order }]] = await db.execute(
++            'SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_order FROM cms_faqs WHERE category = ?',
++            [category]
++        );
++        const [result] = await db.execute(
++            `INSERT INTO cms_faqs (category, question, answer, status, sort_order)
++             VALUES (?, ?, ?, ?, ?)`,
++            [category.trim(), question.trim(), answer, status || 'active', next_order]
++        );
++        res.status(201).json({ id: result.insertId, message: 'FAQ created' });
++    } catch (err) {
++        console.error('CMS FAQ POST error:', err);
++        res.status(500).json({ error: 'Failed to create FAQ' });
++    }
++});
++
++/** PUT /api/cms/faqs/:id — update an existing FAQ */
++router.put('/faqs/:id', requireAdmin, async (req, res) => {
++    const { id } = req.params;
++    const { category, question, answer, status } = req.body || {};
++
++    if (!category || !question || !answer) {
++        return res.status(400).json({ error: 'category, question, and answer are required' });
++    }
++
++    try {
++        const [result] = await db.execute(
++            `UPDATE cms_faqs SET category = ?, question = ?, answer = ?, status = ? WHERE id = ?`,
++            [category.trim(), question.trim(), answer, status || 'active', id]
++        );
++        if (result.affectedRows === 0) return res.status(404).json({ error: 'FAQ not found' });
++        res.json({ message: 'FAQ updated' });
++    } catch (err) {
++        console.error('CMS FAQ PUT error:', err);
++        res.status(500).json({ error: 'Failed to update FAQ' });
++    }
++});
++
++/** DELETE /api/cms/faqs/:id — delete a FAQ */
++router.delete('/faqs/:id', requireAdmin, async (req, res) => {
++    const { id } = req.params;
++    try {
++        const [result] = await db.execute('DELETE FROM cms_faqs WHERE id = ?', [id]);
++        if (result.affectedRows === 0) return res.status(404).json({ error: 'FAQ not found' });
++        res.json({ message: 'FAQ deleted' });
++    } catch (err) {
++        console.error('CMS FAQ DELETE error:', err);
++        res.status(500).json({ error: 'Failed to delete FAQ' });
++    }
++});
++
++/** POST /api/cms/faqs/reorder — bulk update sort_order */
++router.post('/faqs/reorder', requireAdmin, async (req, res) => {
++    const { updates } = req.body || {};
++    if (!Array.isArray(updates)) {
++        return res.status(400).json({ error: 'updates array required' });
++    }
++    try {
++        for (const { id, sort_order } of updates) {
++            await db.execute('UPDATE cms_faqs SET sort_order = ? WHERE id = ?', [sort_order, id]);
++        }
++        res.json({ message: 'Order saved' });
++    } catch (err) {
++        console.error('CMS FAQ reorder error:', err);
++        res.status(500).json({ error: 'Failed to reorder FAQs' });
++    }
++});
++
++/** GET /api/cms/faqs/export — download FAQs as JSON (public for faq.html renderer) */
++router.get('/faqs/export', async (_req, res) => {
++    try {
++        const [rows] = await db.execute(
++            "SELECT id, category, question, answer, sort_order FROM cms_faqs WHERE status = 'active' ORDER BY category, sort_order"
++        );
++        res.setHeader('Content-Type', 'application/json');
++        res.setHeader('Content-Disposition', 'attachment; filename=faqs-export.json');
++        res.json(rows);
++    } catch (err) {
++        console.error('CMS FAQ export error:', err);
++        res.status(500).json({ error: 'Failed to export FAQs' });
++    }
++});
++
++/** GET /api/cms/stats — dashboard stats */
++router.get('/stats', requireAdmin, async (_req, res) => {
++    try {
++        const [[{ pages }]]  = await db.execute(
++            "SELECT COUNT(*) AS pages FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'cms_faqs'"
++        );
++        // Count JSON page files
++        const pageFiles = fs.existsSync(PAGES_DIR)
++            ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.json')).length
++            : 0;
++        const [[{ faqs }]]   = await db.execute("SELECT COUNT(*) AS faqs FROM cms_faqs WHERE status = 'active'");
++        const [[{ users }]]  = await db.execute("SELECT COUNT(*) AS users FROM users WHERE status = 'active'");
++        const mediaFiles = fs.existsSync(MEDIA_DIR)
++            ? fs.readdirSync(MEDIA_DIR).filter(f => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(f)).length
++            : 0;
++
++        res.json({ pages: pageFiles, faqs, media: mediaFiles, users });
++    } catch (err) {
++        console.error('CMS stats error:', err);
++        res.status(500).json({ error: 'Failed to fetch stats' });
++    }
++});
++
+ // ─── Utility ──────────────────────────────────────────────────────────────────
+ /**
+  * Deep-merge source into target (one level of object merging for sub-objects).
+diff --git a/server/routes/contact.js b/server/routes/contact.js
+new file mode 100644
+index 0000000..07b66ac
+--- /dev/null
++++ b/server/routes/contact.js
+@@ -0,0 +1,64 @@
++'use strict';
++
++const express = require('express');
++const { sendEmail, getContactConfirmationEmail } = require('../config/email');
++
++const router = express.Router();
++const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'SBEss@dot.ca.gov';
++
++// ── POST /api/contact/submit ─────────────────────────────────────────────────
++router.post('/submit', async (req, res) => {
++    const { name, email, subject, message } = req.body || {};
++
++    if (!name || !email || !message) {
++        return res.status(400).json({ success: false, message: 'Name, email, and message are required.' });
++    }
++
++    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
++    if (!emailRegex.test(email)) {
++        return res.status(400).json({ success: false, message: 'Invalid email address.' });
++    }
++
++    const msgSubject = subject ? subject.trim() : 'General Inquiry';
++
++    try {
++        // Notify admin
++        await sendEmail({
++            to: ADMIN_EMAIL,
++            subject: `CaltransBizConnect Contact Form: ${msgSubject}`,
++            html: `
++                <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
++                    <h2 style="color:#003D5B;border-bottom:3px solid #FDB714;padding-bottom:12px;">New Contact Form Submission</h2>
++                    <table style="width:100%;border-collapse:collapse;margin-top:16px;">
++                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;width:120px;">Name:</td><td style="padding:8px 0;">${name}</td></tr>
++                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;">Email:</td><td style="padding:8px 0;"><a href="mailto:${email}" style="color:#046B99;">${email}</a></td></tr>
++                        <tr><td style="padding:8px 0;font-weight:bold;color:#003D5B;">Subject:</td><td style="padding:8px 0;">${msgSubject}</td></tr>
++                    </table>
++                    <div style="margin-top:16px;padding:16px;background:#f5f5f5;border-radius:4px;">
++                        <p style="font-weight:bold;color:#003D5B;margin:0 0 8px;">Message:</p>
++                        <p style="margin:0;white-space:pre-wrap;">${message}</p>
++                    </div>
++                    <p style="margin-top:24px;font-size:12px;color:#666;">Sent via CaltransBizConnect contact form at ${new Date().toISOString()}</p>
++                </div>
++            `,
++            text: `New Contact Form Submission\n\nName: ${name}\nEmail: ${email}\nSubject: ${msgSubject}\n\nMessage:\n${message}\n\nSent at ${new Date().toISOString()}`
++        });
++
++        // Confirmation to sender
++        const { html, text } = getContactConfirmationEmail(name, message);
++        await sendEmail({
++            to: email,
++            subject: 'We received your message — CaltransBizConnect',
++            html,
++            text
++        });
++
++        console.log(`CaltransBizConnect: Contact form submitted by ${email}`);
++        res.json({ success: true, message: 'Your message has been sent. We\'ll be in touch shortly.' });
++    } catch (err) {
++        console.error('Contact form error:', err);
++        res.status(500).json({ success: false, message: 'Server error. Please try again or email us directly.' });
++    }
++});
++
++module.exports = router;
+diff --git a/server/routes/password-reset.js b/server/routes/password-reset.js
+new file mode 100644
+index 0000000..24efc3c
+--- /dev/null
++++ b/server/routes/password-reset.js
+@@ -0,0 +1,144 @@
++'use strict';
++
++const express = require('express');
++const crypto = require('crypto');
++const bcrypt = require('bcryptjs');
++const { db } = require('../database');
++const { sendEmail, getPasswordResetEmail } = require('../config/email');
++
++const router = express.Router();
++const APP_URL = process.env.APP_URL || 'https://caltransbizconnect.org';
++
++function hashToken(token) {
++    return crypto.createHash('sha256').update(token).digest('hex');
++}
++
++// ── POST /api/password-reset/request-reset ───────────────────────────────────
++router.post('/request-reset', async (req, res) => {
++    const { email } = req.body || {};
++
++    if (!email) {
++        return res.status(400).json({ success: false, message: 'Email is required.' });
++    }
++
++    // Always return the same message to prevent email enumeration
++    const successMessage = 'If an account with that email exists, a reset link has been sent.';
++
++    try {
++        const [rows] = await db.execute('SELECT id, contact_name, business_name FROM users WHERE email = ?', [email.trim().toLowerCase()]);
++        const user = rows[0];
++
++        if (user) {
++            // Generate a secure random token
++            const rawToken = crypto.randomBytes(32).toString('hex');
++            const hashedToken = hashToken(rawToken);
++            const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
++
++            // Invalidate any existing tokens for this user
++            await db.execute('DELETE FROM password_reset_tokens WHERE user_id = ?', [user.id]);
++
++            // Store hashed token
++            await db.execute(
++                'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
++                [user.id, hashedToken, expiresAt]
++            );
++
++            const resetLink = `${APP_URL}/reset-password.html?token=${rawToken}`;
++            const userName = user.contact_name || user.business_name || 'there';
++            const { html, text } = getPasswordResetEmail(resetLink, userName);
++
++            await sendEmail({
++                to: email,
++                subject: 'Reset Your CaltransBizConnect Password',
++                html,
++                text
++            });
++
++            console.log(`CaltransBizConnect: Password reset requested for ${email}`);
++        }
++
++        res.json({ success: true, message: successMessage });
++    } catch (err) {
++        console.error('Password reset request error:', err);
++        res.status(500).json({ success: false, message: 'Server error. Please try again.' });
++    }
++});
++
++// ── GET /api/password-reset/verify-token ────────────────────────────────────
++router.get('/verify-token', async (req, res) => {
++    const { token } = req.query;
++
++    if (!token) {
++        return res.status(400).json({ valid: false, message: 'Token is required.' });
++    }
++
++    try {
++        const hashedToken = hashToken(token);
++
++        const [rows] = await db.execute(`
++            SELECT prt.id, prt.expires_at, prt.used, u.email
++            FROM password_reset_tokens prt
++            JOIN users u ON prt.user_id = u.id
++            WHERE prt.token = ?
++        `, [hashedToken]);
++
++        const record = rows[0];
++
++        if (!record) {
++            return res.json({ valid: false, message: 'Invalid or expired reset link.' });
++        }
++        if (record.used) {
++            return res.json({ valid: false, message: 'This reset link has already been used.' });
++        }
++        if (new Date(record.expires_at) < new Date()) {
++            return res.json({ valid: false, message: 'This reset link has expired. Please request a new one.' });
++        }
++
++        res.json({ valid: true, email: record.email });
++    } catch (err) {
++        console.error('Token verification error:', err);
++        res.status(500).json({ valid: false, message: 'Server error verifying token.' });
++    }
++});
++
++// ── POST /api/password-reset/reset-password ──────────────────────────────────
++router.post('/reset-password', async (req, res) => {
++    const { token, newPassword } = req.body || {};
++
++    if (!token || !newPassword) {
++        return res.status(400).json({ success: false, message: 'Token and new password are required.' });
++    }
++    if (newPassword.length < 8) {
++        return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
++    }
++
++    try {
++        const hashedToken = hashToken(token);
++
++        const [rows] = await db.execute(`
++            SELECT prt.id, prt.expires_at, prt.used, prt.user_id, u.email
++            FROM password_reset_tokens prt
++            JOIN users u ON prt.user_id = u.id
++            WHERE prt.token = ?
++        `, [hashedToken]);
++
++        const record = rows[0];
++
++        if (!record || record.used || new Date(record.expires_at) < new Date()) {
++            return res.status(400).json({ success: false, message: 'Invalid or expired reset link. Please request a new one.' });
++        }
++
++        const password_hash = await bcrypt.hash(newPassword, 10);
++
++        await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash, record.user_id]);
++        await db.execute('UPDATE password_reset_tokens SET used = TRUE WHERE id = ?', [record.id]);
++
++        console.log(`CaltransBizConnect: Password reset completed for user ${record.user_id}`);
++        res.json({ success: true, message: 'Password updated successfully. You can now log in.' });
++    } catch (err) {
++        console.error('Password reset error:', err);
++        res.status(500).json({ success: false, message: 'Server error. Please try again.' });
++    }
++});
++
++module.exports = router;
+diff --git a/sitemap.xml b/sitemap.xml
+new file mode 100644
+index 0000000..db8b270
+--- /dev/null
++++ b/sitemap.xml
+@@ -0,0 +1,75 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
++  <url>
++    <loc>https://caltransbizconnect.org/</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>weekly</changefreq>
++    <priority>1.0</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/opportunities.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>daily</changefreq>
++    <priority>0.9</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/for-small-businesses.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.8</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/for-prime-contractors.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.8</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/how-it-works.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.7</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/eligibility.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>quarterly</changefreq>
++    <priority>0.7</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/resources.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.7</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/support-services.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.7</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/faq.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.6</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/contact.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.6</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/register-small-business.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.5</priority>
++  </url>
++  <url>
++    <loc>https://caltransbizconnect.org/register-prime-contractor.html</loc>
++    <lastmod>2026-03-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.5</priority>
++  </url>
++</urlset>
+diff --git a/small-business-applications.html b/small-business-applications.html
+index 39f9c49..b50cc6b 100644
+--- a/small-business-applications.html
++++ b/small-business-applications.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>My Applications - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/small-business-preferences.html b/small-business-preferences.html
+index 01b017b..c98e4e0 100644
+--- a/small-business-preferences.html
++++ b/small-business-preferences.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Small Business Preferences - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/small-business-profile.html b/small-business-profile.html
+index b5684d5..0c8051a 100644
+--- a/small-business-profile.html
++++ b/small-business-profile.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <meta name="description" content="Manage your business profile on CaltransBizConnect.">
+     <title>Small Business Profile - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+diff --git a/small-business-settings.html b/small-business-settings.html
+index 21d994b..755d23b 100644
+--- a/small-business-settings.html
++++ b/small-business-settings.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>Small Business Settings - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+diff --git a/support-services.html b/support-services.html
+index 6f66794..550027f 100644
+--- a/support-services.html
++++ b/support-services.html
+@@ -5,8 +5,20 @@
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description"
+-        content="Learn about support services, training programs, and business development resources available through CaltransBizConnect.">
+-    <title>Support Services - CaltransBizConnect</title>
++        content="Free supportive services for California small businesses: bid preparation, estimating, capability statement development, and one-on-one technical assistance.">
++    <meta name="robots" content="index, follow">
++    <link rel="canonical" href="https://caltransbizconnect.org/support-services.html">
++    <meta property="og:type" content="website">
++    <meta property="og:url" content="https://caltransbizconnect.org/support-services.html">
++    <meta property="og:title" content="Support Services | Free Training &amp; Assistance | CaltransBizConnect">
++    <meta property="og:description" content="Free supportive services for California small businesses: bid preparation, estimating, capability statement development, and one-on-one technical assistance.">
++    <meta property="og:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <meta name="twitter:card" content="summary_large_image">
++    <meta name="twitter:url" content="https://caltransbizconnect.org/support-services.html">
++    <meta name="twitter:title" content="Support Services | Free Training &amp; Assistance | CaltransBizConnect">
++    <meta name="twitter:description" content="Free supportive services for California small businesses: bid preparation, estimating, capability statement development, and one-on-one technical assistance.">
++    <meta name="twitter:image" content="https://caltransbizconnect.org/images/og-image.jpg">
++    <title>Support Services | Free Training &amp; Assistance | CaltransBizConnect</title>
+   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">
+     <link rel="stylesheet" href="css/main.css">
+@@ -330,6 +342,54 @@
+   <script src="js/main.js"></script>
+     <script src="js/auth.js"></script>
+   <script src="js/accessibility-widget.js"></script>
++
++  <!-- Organization Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "GovernmentOrganization",
++    "name": "CaltransBizConnect",
++    "url": "https://caltransbizconnect.org",
++    "logo": "https://caltransbizconnect.org/images/caltrans-logo.png",
++    "description": "Official platform connecting certified small businesses with California transportation contracting opportunities",
++    "address": {
++      "@type": "PostalAddress",
++      "streetAddress": "1120 N Street, MS-79",
++      "addressLocality": "Sacramento",
++      "addressRegion": "CA",
++      "postalCode": "95814",
++      "addressCountry": "US"
++    },
++    "contactPoint": {
++      "@type": "ContactPoint",
++      "contactType": "customer service",
++      "email": "smallbusinesses@dot.ca.gov",
++      "telephone": "+1-916-324-1700"
++    }
++  }
++  </script>
++
++  <!-- BreadcrumbList Schema -->
++  <script type="application/ld+json">
++  {
++    "@context": "https://schema.org",
++    "@type": "BreadcrumbList",
++    "itemListElement": [
++      {
++        "@type": "ListItem",
++        "position": 1,
++        "name": "Home",
++        "item": "https://caltransbizconnect.org/"
++      },
++      {
++        "@type": "ListItem",
++        "position": 2,
++        "name": "Support Services",
++        "item": "https://caltransbizconnect.org/support-services.html"
++      }
++    ]
++  }
++  </script>
+ </body>
+ 
+ </html>
+diff --git a/view-applications.html b/view-applications.html
+index cc001f1..ce066e6 100644
+--- a/view-applications.html
++++ b/view-applications.html
+@@ -4,6 +4,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <meta name="robots" content="noindex, nofollow">
+     <title>View Applications - CaltransBizConnect</title>
+     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+     <link rel="stylesheet" href="css/design-system.css">

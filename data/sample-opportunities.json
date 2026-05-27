@@ -1,0 +1,129 @@
+{
+    "opportunities": [
+        {
+            "id": "OPP-2026-001",
+            "title": "Highway 101 Pavement Rehabilitation - District 4",
+            "district": "d04",
+            "districtName": "District 4 - Oakland",
+            "category": "roadway",
+            "categoryName": "Roadway Construction",
+            "subcategory": "Paving",
+            "scopeSummary": "The project involves cold plane removal of existing asphalt concrete pavement, placement of new asphalt concrete overlay, and traffic control on Highway 101 between Millbrae Avenue and Broadway in Burlingame. Work must be performed during nighttime hours to minimize traffic impact.",
+            "estimatedValue": "$750,000 - $1,000,000",
+            "dueDate": "2026-02-15",
+            "dueTime": "14:00",
+            "submissionMethod": "Electronic submission via email",
+            "contactName": "Maria Rodriguez",
+            "contactEmail": "maria.rodriguez@dot.ca.gov",
+            "contactPhone": "(510) 555-0123",
+            "requirements": [
+                "Valid California Contractor License (Class A)",
+                "Current Small Business certification",
+                "Minimum $1M bonding capacity",
+                "Traffic control plan approval"
+            ],
+            "postedDate": "2026-01-20",
+            "status": "active"
+        },
+        {
+            "id": "OPP-2026-002",
+            "title": "Bridge Inspection Services - District 7",
+            "district": "d07",
+            "districtName": "District 7 - Los Angeles",
+            "category": "professional",
+            "categoryName": "Professional Services",
+            "subcategory": "Inspection Services",
+            "scopeSummary": "Provide comprehensive bridge inspection services for 25 structures in Los Angeles County. Services include visual inspection, documentation, condition assessment, and preparation of inspection reports in accordance with Caltrans Bridge Inspection Standards.",
+            "estimatedValue": "$250,000 - $350,000",
+            "dueDate": "2026-02-20",
+            "dueTime": "16:00",
+            "submissionMethod": "Portal submission",
+            "contactName": "James Chen",
+            "contactEmail": "james.chen@dot.ca.gov",
+            "contactPhone": "(213) 555-0456",
+            "requirements": [
+                "Professional Engineer (PE) license in California",
+                "NBIS certified bridge inspector",
+                "Minimum 5 years bridge inspection experience",
+                "Professional liability insurance ($2M minimum)"
+            ],
+            "postedDate": "2026-01-22",
+            "status": "active"
+        },
+        {
+            "id": "OPP-2026-003",
+            "title": "Traffic Signal Upgrade - District 11",
+            "district": "d11",
+            "districtName": "District 11 - San Diego",
+            "category": "electrical",
+            "categoryName": "Electrical & Lighting",
+            "subcategory": "Traffic Signals",
+            "scopeSummary": "Upgrade existing traffic signal systems at five intersections along State Route 163. Work includes removal of existing equipment, installation of new LED signal heads, controller cabinets, vehicle detection systems, and integration with existing traffic management systems.",
+            "estimatedValue": "$400,000 - $550,000",
+            "dueDate": "2026-02-28",
+            "dueTime": "15:00",
+            "submissionMethod": "Physical submission to district office",
+            "contactName": "Sarah Williams",
+            "contactEmail": "sarah.williams@dot.ca.gov",
+            "contactPhone": "(619) 555-0789",
+            "requirements": [
+                "C-10 Electrical Contractor License",
+                "IMSA Level II Traffic Signal Technician certification",
+                "Small Business certification preferred",
+                "Workers compensation insurance"
+            ],
+            "postedDate": "2026-01-25",
+            "status": "active"
+        },
+        {
+            "id": "OPP-2026-004",
+            "title": "Erosion Control and Landscaping - District 3",
+            "district": "d03",
+            "districtName": "District 3 - Marysville",
+            "category": "landscaping",
+            "categoryName": "Landscaping & Environmental",
+            "subcategory": "Erosion Control",
+            "scopeSummary": "Install erosion control measures and native plant landscaping along Interstate 80 corridor in Placer County. Project includes installation of erosion control blankets, hydroseeding, planting of native species, and installation of irrigation system. All work must comply with environmental permits and specifications.",
+            "estimatedValue": "$150,000 - $200,000",
+            "dueDate": "2026-03-05",
+            "dueTime": "13:00",
+            "submissionMethod": "Email submission",
+            "contactName": "Robert Martinez",
+            "contactEmail": "robert.martinez@dot.ca.gov",
+            "contactPhone": "(530) 555-0234",
+            "requirements": [
+                "C-27 Landscaping Contractor License",
+                "Qualified Applicator Certificate (QAC) for pesticides",
+                "Environmental compliance training",
+                "Small Business certification"
+            ],
+            "postedDate": "2026-01-27",
+            "status": "active"
+        },
+        {
+            "id": "OPP-2026-005",
+            "title": "Concrete Barrier Replacement - District 12",
+            "district": "d12",
+            "districtName": "District 12 - Orange County",
+            "category": "roadway",
+            "categoryName": "Roadway Construction",
+            "subcategory": "Concrete Structures",
+            "scopeSummary": "Remove and replace damaged concrete median barriers on Interstate 5 in Orange County. Work includes sawcutting, removal of existing barriers, placement of new Type 60 concrete barriers, and restoration of roadway surface. Traffic control and lane closures will be required.",
+            "estimatedValue": "$300,000 - $400,000",
+            "dueDate": "2026-03-10",
+            "dueTime": "14:00",
+            "submissionMethod": "Electronic portal",
+            "contactName": "Jennifer Lee",
+            "contactEmail": "jennifer.lee@dot.ca.gov",
+            "contactPhone": "(657) 555-0567",
+            "requirements": [
+                "Class A General Engineering Contractor License",
+                "Small Business certification required",
+                "Traffic control plan certification",
+                "Minimum $500K bonding capacity"
+            ],
+            "postedDate": "2026-01-28",
+            "status": "active"
+        }
+    ]
+}

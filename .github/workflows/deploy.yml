@@ -1,0 +1,29 @@
+name: Deploy CaltransBizConnect
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    # Placeholder for actual deployment steps. 
+    # If using Hostinger's "Git Deployment" feature, this workflow just serves as a CI check.
+    # If SCP/FTP is needed, we would add it here with secrets.
+    
+    - name: Deployment Info
+      run: |
+        echo "Push to main detected. Code is in sync with GitHub."
+        echo "Deployment to Hostinger should be triggered via Hostinger Git Integration."

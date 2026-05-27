@@ -1,0 +1,43 @@
+CaltransBizConnect DB: Initializing MySQL Connection Pool...
+DB Host: 127.0.0.1
+DB User: u579331817_caltrans
+DB Name: u579331817_caltrans
+CaltransBizConnect DB: MySQL Pool Created.
+CaltransBizConnect: Starting server initialization (v2.1.1-mysql-ipv4-fix)...
+CaltransBizConnect: Initializing database connection and schema...
+CaltransBizConnect DB: Running initDatabase()...
+CaltransBizConnect DB: Verifying connection...
+CaltransBizConnect DB CRITICAL ERROR: Database initialization failed.
+Error: connect ECONNREFUSED 127.0.0.1:3306
+    at PromisePool.execute (C:\Users\Keisha\Documents\caltrans\new caltrans\node_modules\mysql2\lib\promise\pool.js:54:22)
+    at initDatabase (C:\Users\Keisha\Documents\caltrans\new caltrans\server\database.js:46:18)
+    at startServer (C:\Users\Keisha\Documents\caltrans\new caltrans\server\index.js:63:15)
+    at Object.<anonymous> (C:\Users\Keisha\Documents\caltrans\new caltrans\server\index.js:138:1)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24) {
+  code: 'ECONNREFUSED',
+  errno: -4078,
+  sql: undefined,
+  sqlState: undefined,
+  sqlMessage: undefined
+}
+CaltransBizConnect: Serving static files from: C:\Users\Keisha\Documents\caltrans\new caltrans\
+CaltransBizConnect CRITICAL STARTUP ERROR: C:\Users\Keisha\Documents\caltrans\new caltrans\server\routes\applications.js:29
+    const { smallBusinessId, prime contractorContractorId } = req.query;
+                                   ^^^^^^^^^^^^^^^^^^^^^^
+
+SyntaxError: Unexpected identifier 'contractorContractorId'
+    at wrapSafe (node:internal/modules/cjs/loader:1692:18)
+    at Module._compile (node:internal/modules/cjs/loader:1735:20)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1504:12)
+    at require (node:internal/modules/helpers:152:16)
+    at startServer (C:\Users\Keisha\Documents\caltrans\new caltrans\server\index.js:75:38)

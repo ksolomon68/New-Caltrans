@@ -1,0 +1,123 @@
+{
+  "slug": "index",
+  "isSystem": true,
+  "updatedAt": "2026-03-17T00:00:00.000Z",
+  "meta": {
+    "title": "CaltransBizConnect - Connecting Businesses with Opportunities",
+    "description": "CaltransBizConnect connects Small Businesses with contracting opportunities and Prime Contractors with qualified partners. Your central hub for Caltrans business development."
+  },
+  "header": {
+    "backgroundImage": "",
+    "logoImage": "images/caltrans-logo.png",
+    "logoAlt": "CaltransBizConnect Logo"
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "fields": {
+        "title": "Build. Compete. Win.",
+        "subtitle": "Caltrans delivers statewide supportive services to help Small Businesses strengthen readiness for transportation contracting opportunities through structured training, technical assistance, and resource navigation.",
+        "backgroundImage": "",
+        "backgroundImageAlt": ""
+      }
+    },
+    {
+      "id": "pathway-cards",
+      "type": "pathway-cards",
+      "fields": {
+        "smallBusinessCard": {
+          "href": "for-small-businesses.html",
+          "image": "images/small-business-pathway.jpg",
+          "imageAlt": "Construction professionals reviewing plans on site",
+          "title": "For Small Businesses",
+          "description": "Find contracting opportunities, upload your capability statement, and connect with Prime Contractors seeking your expertise.",
+          "srText": "Learn more about small business services"
+        },
+        "primeContractorCard": {
+          "href": "for-prime-contractors.html",
+          "image": "images/prime-contractor-pathway.jpg",
+          "imageAlt": "Construction professional reviewing blueprints",
+          "title": "For Prime Contractors",
+          "description": "Post structured opportunities, find qualified Small Businesses, and manage your contracting needs efficiently.",
+          "srText": "Learn more about agency services"
+        }
+      }
+    },
+    {
+      "id": "value-tiles",
+      "type": "tiles",
+      "fields": {
+        "heading": "Why Choose CaltransBizConnect?",
+        "tiles": [
+          {
+            "id": "bid-readiness",
+            "href": "support-services.html",
+            "title": "Bid Readiness",
+            "description": "Expert guidance through bid packages, requirement identification, and submission timeline planning to strengthen your competitive position.",
+            "linkText": "Get Support"
+          },
+          {
+            "id": "capacity-building",
+            "href": "#events",
+            "title": "Capacity Building",
+            "description": "Strengthen your estimating, compliance, and project readiness capabilities through structured training and one-on-one technical assistance.",
+            "linkText": "View Training"
+          },
+          {
+            "id": "partnership-connections",
+            "href": "opportunities.html",
+            "title": "Partnership Connections",
+            "description": "Connect with prime contractors and explore upcoming subcontracting opportunities across all Caltrans districts.",
+            "linkText": "Explore Roles"
+          },
+          {
+            "id": "resource-navigation",
+            "href": "resources.html",
+            "title": "Resource Navigation",
+            "description": "Access templates, checklists, and guidance materials designed to streamline your business operations and contracting processes.",
+            "linkText": "Access Tools"
+          }
+        ]
+      }
+    },
+    {
+      "id": "events",
+      "type": "iframe-embed",
+      "fields": {
+        "heading": "Upcoming Events",
+        "iframeSrc": "https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar",
+        "iframeTitle": "Caltrans Events Calendar",
+        "externalLinkText": "View Full Calendar",
+        "externalLinkHref": "https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar"
+      }
+    },
+    {
+      "id": "get-started",
+      "type": "cta-banner",
+      "fields": {
+        "heading": "Get Started Today",
+        "columns": [
+          {
+            "heading": "New to the Platform?",
+            "text": "Learn how CaltransBizConnect works and what you need to get started.",
+            "buttonLabel": "How It Works",
+            "buttonHref": "how-it-works.html"
+          },
+          {
+            "heading": "Check Eligibility",
+            "text": "Review the eligibility criteria for Small Business certification.",
+            "buttonLabel": "View Requirements",
+            "buttonHref": "eligibility.html"
+          },
+          {
+            "heading": "Browse Opportunities",
+            "text": "Explore current contracting opportunities across all Caltrans districts.",
+            "buttonLabel": "View Opportunities",
+            "buttonHref": "opportunities.html"
+          }
+        ]
+      }
+    }
+  ]
+}

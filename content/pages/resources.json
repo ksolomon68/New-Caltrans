@@ -1,0 +1,114 @@
+{
+  "slug": "resources",
+  "isSystem": true,
+  "updatedAt": "2026-03-17T00:00:00.000Z",
+  "meta": {
+    "title": "Resources - CaltransBizConnect",
+    "description": "Access templates, guides, and resources for Small Businesses and prime contractors using CaltransBizConnect."
+  },
+  "header": {
+    "backgroundImage": "",
+    "logoImage": "images/caltrans-logo.png",
+    "logoAlt": "Caltrans"
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero-inner",
+      "fields": {
+        "title": "Resources & Tools",
+        "subtitle": "Templates, guides, and resources to help you succeed"
+      }
+    },
+    {
+      "id": "small-business-resources",
+      "type": "card-grid",
+      "fields": {
+        "heading": "For Small Businesses",
+        "cards": [
+          {
+            "id": "capability-guide",
+            "title": "Capability Statement Guide",
+            "body": "Step-by-step guide to building a compelling capability statement that gets noticed by agencies.",
+            "buttonLabel": "View Guide",
+            "buttonHref": "for-small-businesses.html#get-started"
+          },
+          {
+            "id": "eligibility-checklist",
+            "title": "Small Business Eligibility Checklist",
+            "body": "Review all eligibility requirements for Small Business certification with Caltrans.",
+            "buttonLabel": "View Checklist",
+            "buttonHref": "eligibility.html"
+          },
+          {
+            "id": "bid-toolkit",
+            "title": "Bid Readiness Toolkit",
+            "body": "Templates, checklists, and guides designed to prepare your business for the bidding process.",
+            "buttonLabel": "Get Support",
+            "buttonHref": "support-services.html"
+          }
+        ]
+      }
+    },
+    {
+      "id": "prime-contractor-resources",
+      "type": "card-grid",
+      "fields": {
+        "heading": "For Prime Contractors",
+        "cards": [
+          {
+            "id": "posting-guidelines",
+            "title": "Opportunity Posting Guidelines",
+            "body": "Best practices for creating clear, complete opportunity postings that attract qualified small businesses.",
+            "buttonLabel": "View Guidelines",
+            "buttonHref": "for-prime-contractors.html#posting-requirements"
+          },
+          {
+            "id": "small-business-checklist",
+            "title": "Small Business Evaluation Checklist",
+            "body": "Use this checklist to evaluate small business qualifications and capability statements.",
+            "buttonLabel": "View Checklist",
+            "buttonHref": "for-small-businesses.html#get-started"
+          },
+          {
+            "id": "small business-overview",
+            "title": "Small Business Program Overview",
+            "body": "Learn about the Small Business program goals, requirements, and benefits.",
+            "buttonLabel": "View Overview",
+            "buttonHref": "index.html#why-choose"
+          }
+        ]
+      }
+    },
+    {
+      "id": "general-resources",
+      "type": "card-grid",
+      "fields": {
+        "heading": "General Resources",
+        "cards": [
+          {
+            "id": "district-map",
+            "title": "Caltrans District Map",
+            "body": "View the map of all 12 Caltrans districts and their coverage areas.",
+            "buttonLabel": "View Map",
+            "buttonHref": "https://dot.ca.gov/caltrans-near-me",
+            "external": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "additional-support",
+      "type": "cta-banner",
+      "fields": {
+        "heading": "Need Additional Support?",
+        "text": "Our team offers training sessions, workshops, and one-on-one consultations to help you succeed.",
+        "columns": [
+          { "buttonLabel": "View Support Services", "buttonHref": "support-services.html" },
+          { "buttonLabel": "Upcoming Events",       "buttonHref": "index.html#events"     },
+          { "buttonLabel": "Contact Us",            "buttonHref": "contact.html"          }
+        ]
+      }
+    }
+  ]
+}

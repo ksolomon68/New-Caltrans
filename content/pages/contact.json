@@ -1,0 +1,43 @@
+{
+  "slug": "contact",
+  "isSystem": true,
+  "updatedAt": "2026-03-21T00:00:00.000Z",
+  "meta": {
+    "title": "Contact Us - CaltransBizConnect",
+    "description": "Contact CaltransBizConnect for support, questions, or assistance with the platform."
+  },
+  "sections": [
+    {
+      "id": "page-header",
+      "type": "text-block",
+      "fields": {
+        "heading": "Contact Us",
+        "body": "Have questions or need assistance? We are here to help. Choose the best way to reach us below."
+      }
+    },
+    {
+      "id": "program-contact",
+      "type": "text-block",
+      "fields": {
+        "heading": "Program Contact",
+        "body": "Small Business Supportive Services\n\nPhone: (916) 324-1700\nHours: Monday - Friday, 8:00 AM - 5:00 PM PST\n\nFor general inquiries about the program, certification, or technical assistance."
+      }
+    },
+    {
+      "id": "technical-support",
+      "type": "text-block",
+      "fields": {
+        "heading": "Technical Support",
+        "body": "Platform Technical Support\n\nResponse Time: Within 1 business day\n\nFor issues with logging in, uploading documents, or other technical problems."
+      }
+    },
+    {
+      "id": "mailing-address",
+      "type": "text-block",
+      "fields": {
+        "heading": "Mailing Address",
+        "body": "California Department of Transportation\nOffice of Business and Economic Opportunity\n1120 N Street, MS-79\nSacramento, CA 95814\n\nFor physical mail and document submissions."
+      }
+    }
+  ]
+}

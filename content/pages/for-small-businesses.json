@@ -1,0 +1,108 @@
+{
+  "slug": "for-small-businesses",
+  "isSystem": true,
+  "updatedAt": "2026-03-17T00:00:00.000Z",
+  "meta": {
+    "title": "For Small Businesses - CaltransBizConnect",
+    "description": "Small Businesses: Find contracting opportunities, upload your capability statement, and connect with Caltrans and Prime Contractors."
+  },
+  "header": {
+    "backgroundImage": "",
+    "logoImage": "images/caltrans-logo.png",
+    "logoAlt": "Caltrans"
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero-inner",
+      "fields": {
+        "title": "For Small Businesses",
+        "subtitle": "Connect with Caltrans contracting opportunities, showcase your capabilities, and grow your business through our streamlined platform.",
+        "primaryButton": { "label": "Create Your Account", "href": "register-small-business.html" },
+        "secondaryButton": { "label": "Browse Opportunities", "href": "opportunities.html" }
+      }
+    },
+    {
+      "id": "how-we-help",
+      "type": "card-grid",
+      "fields": {
+        "heading": "How CaltransBizConnect Helps You Succeed",
+        "cards": [
+          {
+            "id": "find-opportunities",
+            "title": "Find Opportunities",
+            "body": "Search and filter contracting opportunities across all Caltrans districts. Receive notifications for opportunities matching your expertise and service areas."
+          },
+          {
+            "id": "showcase-capabilities",
+            "title": "Showcase Your Capabilities",
+            "body": "Upload your capability statement and profile to demonstrate your core competencies, past performance, and qualifications to prime contractors seeking partners."
+          },
+          {
+            "id": "streamlined-process",
+            "title": "Streamlined Process",
+            "body": "Our platform guides you through every step, from account creation to opportunity application, eliminating confusion and decision fatigue."
+          }
+        ]
+      }
+    },
+    {
+      "id": "journey",
+      "type": "steps",
+      "fields": {
+        "heading": "Your Journey to Success",
+        "steps": [
+          { "label": "Create Your Account",            "detail": "Register as a Small Business with your business information and contact details." },
+          { "label": "Complete Your Profile",           "detail": "Add your business details, certifications, and service areas to help prime contractors find you." },
+          { "label": "Upload Capability Statement",     "detail": "Showcase your core competencies, past performance, key personnel, and qualifications." },
+          { "label": "Select Districts and Categories", "detail": "Choose the Caltrans districts and work categories that match your expertise." },
+          { "label": "Search and Apply",                "detail": "Browse opportunities, filter by your preferences, and submit proposals directly through the platform." }
+        ]
+      }
+    },
+    {
+      "id": "requirements",
+      "type": "alert",
+      "fields": {
+        "heading": "What You Need to Get Started",
+        "alertType": "info",
+        "alertLabel": "Required Information:",
+        "items": [
+          "Business name and legal structure",
+          "Federal Tax ID (EIN)",
+          "Business address and contact information",
+          "Small Business certification number (if applicable)",
+          "Capability statement (PDF format, maximum 10MB)"
+        ]
+      }
+    },
+    {
+      "id": "capability-cards",
+      "type": "card-grid",
+      "fields": {
+        "heading": "Capability Statement Requirements",
+        "intro": "Your capability statement must include the following information to help prime contractors evaluate your qualifications:",
+        "cards": [
+          { "id": "core-competencies", "title": "Core Competencies",    "body": "Detailed description of your primary services and areas of expertise" },
+          { "id": "past-performance",  "title": "Past Performance",     "body": "Examples of completed projects with scope, value, and outcomes" },
+          { "id": "key-personnel",     "title": "Key Personnel",        "body": "Qualifications and experience of your leadership team" },
+          { "id": "equipment",         "title": "Equipment & Facilities","body": "Resources available to complete contract work" },
+          { "id": "financial",         "title": "Financial Capacity",   "body": "Bonding capacity and financial stability indicators" },
+          { "id": "certifications",    "title": "Certifications",       "body": "Current certifications, licenses, and insurance coverage" }
+        ]
+      }
+    },
+    {
+      "id": "cta",
+      "type": "cta-banner",
+      "fields": {
+        "heading": "Ready to Get Started?",
+        "text": "Create your account today and start connecting with opportunities.",
+        "columns": [
+          { "buttonLabel": "Create Account",    "buttonHref": "register-small-business.html" },
+          { "buttonLabel": "Check Eligibility", "buttonHref": "eligibility.html"     }
+        ]
+      }
+    }
+  ]
+}
