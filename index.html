@@ -366,13 +366,15 @@
   <script src="js/cms-renderer.js?v=1774549569000"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function () {
+      const container = document.getElementById('latest-opportunities-container');
+      if (!container) return;
       // Fetch latest opportunities
       try {
         const opportunities = await DataService.fetch('/opportunities');
         renderLatestOpportunities(opportunities);
       } catch (error) {
         console.error('Error fetching latest opportunities:', error);
-        document.getElementById('latest-opportunities-container').innerHTML = `
+        container.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">
                     Unable to load opportunities at this time.
                 </div>
@@ -382,6 +384,7 @@
 
     function renderLatestOpportunities(opportunities) {
       const container = document.getElementById('latest-opportunities-container');
+      if (!container) return;
       if (!opportunities || opportunities.length === 0) {
         container.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">
