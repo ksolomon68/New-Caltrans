@@ -387,7 +387,7 @@
 
           const isSaved = savedOpps.includes(id);
 
-          actionBtn = `<button id="saveOppBtn" class="btn ${isSaved ? 'btn-success' : 'btn-primary'}" ${isSaved ? 'disabled' : ''} onclick="window.saveOpportunity('${id}')">${isSaved ? 'Saved' : 'Save Opportunity'}</button>`;
+          actionBtn = `<button id="saveOppBtn" class="btn ${isSaved ? 'btn-success' : 'btn-primary'}" ${isSaved ? 'disabled' : ''} data-action="save-opportunity" data-opp-id="${id}">${isSaved ? 'Saved' : 'Save Opportunity'}</button>`;
         } else if (user && user.type === 'agency' && (opp.posted_by == user.id || opp.postedBy == user.id)) {
           actionBtn = `<a href="post-opportunity.html?id=${id}" class="btn btn-outline">Edit Opportunity</a>`;
         }
@@ -424,6 +424,11 @@
                       <a href="contact.html" class="btn btn-outline">Contact Officer</a>
                   </div>
               `;
+
+        contentDiv.addEventListener('click', function(e) {
+          const saveBtn = e.target.closest('[data-action="save-opportunity"]');
+          if (saveBtn) window.saveOpportunity(saveBtn.dataset.oppId);
+        });
 
       } catch (e) {
         console.error(e);

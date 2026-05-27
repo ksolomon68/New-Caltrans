@@ -526,11 +526,11 @@
                         </div>
                         <div style="display: flex; gap: var(--space-sm); justify-content: flex-end;">
                             ${Auth.getUser()?.type === 'small_business' ? `
-                                <button class="btn btn-outline btn-small save-btn" onclick="event.stopPropagation(); window.toggleSave('${opp.id}', this)">
+                                <button class="btn btn-outline btn-small save-btn" data-action="toggle-save" data-opp-id="${opp.id}">
                                     ${window.savedOpportunityIds && window.savedOpportunityIds.has(opp.id) ? 'Unsave' : 'Save'}
                                 </button>
                             ` : ''}
-                            <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); window.loadDetail('${opp.id}')">View Details</button>
+                            <button class="btn btn-primary btn-small" data-action="view-detail" data-opp-id="${opp.id}">View Details</button>
                         </div>
                     `;
 
@@ -547,6 +547,13 @@
                     });
 
                     listEl.appendChild(card);
+                });
+
+                listEl.addEventListener('click', function(e) {
+                    const saveBtn = e.target.closest('[data-action="toggle-save"]');
+                    if (saveBtn) { e.stopPropagation(); window.toggleSave(saveBtn.dataset.oppId, saveBtn); return; }
+                    const viewBtn = e.target.closest('[data-action="view-detail"]');
+                    if (viewBtn) { e.stopPropagation(); window.loadDetail(viewBtn.dataset.oppId); }
                 });
             };
 

@@ -180,9 +180,9 @@
                     style="display: flex; flex-wrap: wrap; gap: var(--space-md); justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
                     <h3 style="font-size: 1.5rem; color: var(--color-primary); font-weight: 700;">All Users</h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
-                        <input type="text" placeholder="Search users..." onkeyup="filterUsers(this.value)"
+                        <input type="text" id="userSearchInput" placeholder="Search users..."
                             style="padding: var(--space-sm) var(--space-md); border-radius: var(--border-radius-md); border: 1px solid var(--color-border-light); width: 220px; max-width: 100%;">
-                        <button class="btn btn-primary" onclick="openAddModal()">+ Add New User</button>
+                        <button class="btn btn-primary" id="addUserBtn">+ Add New User</button>
                     </div>
                 </div>
 
@@ -216,7 +216,7 @@
         <div class="modal-container">
             <div class="modal-header">
                 <h3 class="modal-title" style="margin: 0; color: var(--color-primary);">Manage User</h3>
-                <button class="close-modal" onclick="closeModal()"
+                <button class="close-modal" id="closeModalBtn"
                     style="border: none; background: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
             </div>
             <div class="modal-body">
@@ -288,10 +288,10 @@
                 </div>
             </div> <!-- End modal-body -->
             <div class="modal-footer">
-                <button class="btn btn-outline-error" id="btnDeleteUser" onclick="deleteUser()"
+                <button class="btn btn-outline-error" id="btnDeleteUser"
                     style="display: none;">Delete User</button>
                 <div style="display: flex; gap: 1rem; margin-left: auto;">
-                    <button class="btn btn-primary" id="btnSaveUser" onclick="saveUser()">Save Changes</button>
+                    <button class="btn btn-primary" id="btnSaveUser">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -309,6 +309,12 @@
                 window.location.href = 'index.html';
                 return;
             }
+
+            document.getElementById('userSearchInput').addEventListener('input', function(e) { filterUsers(e.target.value); });
+            document.getElementById('addUserBtn').addEventListener('click', openAddModal);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('btnDeleteUser').addEventListener('click', deleteUser);
+            document.getElementById('btnSaveUser').addEventListener('click', saveUser);
 
             setTimeout(() => {
                 Navigation.init('admin');
@@ -382,13 +388,20 @@
                     <td><span style="color: ${statusColor};">● ${statusLabel}</span></td>
                     <td>${new Date(u.created_at || Date.now()).toLocaleDateString()}</td>
                     <td style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
-                        <button class="btn btn-small btn-outline" onclick="openManageModal(${u.id})">Manage</button>
+                        <button class="btn btn-small btn-outline" data-action="manage" data-user-id="${u.id}">Manage</button>
                         ${profileLink !== '#' ? `<a href="${profileLink}" target="_blank" class="btn btn-small btn-outline" style="text-decoration: none;">View Profile</a>` : ''}
-                        ${!isActive ? `<button class="btn btn-small btn-outline" style="color:var(--color-success);border-color:var(--color-success);" onclick="setUserStatus(${u.id},'active',this)">Approve</button>` : ''}
-                        ${!isSuspended ? `<button class="btn btn-small btn-outline" style="color:var(--color-error);border-color:var(--color-error);" onclick="setUserStatus(${u.id},'suspended',this)">Deactivate</button>` : ''}
+                        ${!isActive ? `<button class="btn btn-small btn-outline" style="color:var(--color-success);border-color:var(--color-success);" data-action="set-status" data-user-id="${u.id}" data-status="active">Approve</button>` : ''}
+                        ${!isSuspended ? `<button class="btn btn-small btn-outline" style="color:var(--color-error);border-color:var(--color-error);" data-action="set-status" data-user-id="${u.id}" data-status="suspended">Deactivate</button>` : ''}
                     </td>
                 `;
                 userTableBody.appendChild(row);
+            });
+
+            document.getElementById('userTableBody').addEventListener('click', function(e) {
+                const manageBtn = e.target.closest('[data-action="manage"]');
+                if (manageBtn) { openManageModal(parseInt(manageBtn.dataset.userId, 10)); return; }
+                const statusBtn = e.target.closest('[data-action="set-status"]');
+                if (statusBtn) { setUserStatus(parseInt(statusBtn.dataset.userId, 10), statusBtn.dataset.status, statusBtn); }
             });
         }
 

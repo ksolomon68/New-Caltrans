@@ -145,29 +145,29 @@
                 if (isAdmin) {
                     actionButtons = `
                         <div style="display: flex; gap: 0.5rem;">
-                             <select class="form-control" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.8rem;" onchange="updateOpportunityStatus('${opp.id}', this.value)">
+                             <select class="form-control js-status-select" data-opp-id="${opp.id}" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
                                 <option value="pending" ${opp.status === 'pending' ? 'selected' : ''}>Pending Review</option>
                                 <option value="published" ${opp.status === 'published' ? 'selected' : ''}>Published</option>
                                 <option value="rejected" ${opp.status === 'rejected' ? 'selected' : ''}>Rejected</option>
                                 <option value="closed" ${opp.status === 'closed' ? 'selected' : ''}>Closed</option>
                             </select>
-                            <button class="btn btn-small btn-primary" onclick="viewOpportunity('${opp.id}')">View</button>
-                            <button class="btn btn-small btn-primary" onclick="approveOpportunity('${opp.id}')">Approve</button>
-                             <button class="btn btn-small btn-outline" onclick="editOpportunity('${opp.id}')">Edit</button>
-                            <button class="btn btn-small btn-danger" onclick="deleteOpportunity('${opp.id}')">Delete</button>
+                            <button class="btn btn-small btn-primary js-view-opp-btn" data-opp-id="${opp.id}">View</button>
+                            <button class="btn btn-small btn-primary js-approve-opp-btn" data-opp-id="${opp.id}">Approve</button>
+                             <button class="btn btn-small btn-outline js-edit-opp-btn" data-opp-id="${opp.id}">Edit</button>
+                            <button class="btn btn-small btn-danger js-delete-opp-btn" data-opp-id="${opp.id}">Delete</button>
                         </div>
                     `;
                 } else {
                     actionButtons = `
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-                            <select class="form-control" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.8rem;" onchange="updateOpportunityStatus('${opp.id}', this.value)">
+                            <select class="form-control js-status-select" data-opp-id="${opp.id}" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
                                 <option value="published" ${opp.status === 'published' ? 'selected' : ''}>Active / Published</option>
                                 <option value="closed" ${opp.status === 'closed' ? 'selected' : ''}>Closed</option>
                                 <option value="awarded" ${opp.status === 'awarded' ? 'selected' : ''}>Awarded</option>
                             </select>
-                            <button class="btn btn-small btn-primary" onclick="viewOpportunity('${opp.id}')">View</button>
-                            <button class="btn btn-small btn-outline" onclick="editOpportunity('${opp.id}')">Edit</button>
-                            <button class="btn btn-small" style="background:var(--color-primary);color:white;" onclick="toggleApplications('${opp.id}', this)">Applications <span id="appCount-${opp.id}">...</span></button>
+                            <button class="btn btn-small btn-primary js-view-opp-btn" data-opp-id="${opp.id}">View</button>
+                            <button class="btn btn-small btn-outline js-edit-opp-btn" data-opp-id="${opp.id}">Edit</button>
+                            <button class="btn btn-small js-toggle-apps-btn" data-opp-id="${opp.id}" style="background:var(--color-primary);color:white;">Applications <span id="appCount-${opp.id}">...</span></button>
                         </div>
                     `;
                 }
@@ -332,10 +332,10 @@
                             <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;margin-left:1rem;">
                                 <span style="padding:0.2rem 0.6rem;border-radius:9999px;font-size:0.75rem;font-weight:700;background:${color}22;color:${color};text-transform:uppercase;">${status.replace('_',' ')}</span>
                                 ${isPending ? `
-                                    <button class="btn btn-small" style="background:#10b981;color:white;" onclick="setAppStatus('${app.application_id}','approved','${app.small_business_id}','${oppId}',this)">Approve</button>
-                                    <button class="btn btn-small" style="background:#ef4444;color:white;" onclick="setAppStatus('${app.application_id}','declined','${app.small_business_id}','${oppId}',this)">Decline</button>
+                                    <button class="btn btn-small js-set-app-status-btn" style="background:#10b981;color:white;" data-app-id="${app.application_id}" data-new-status="approved" data-sb-id="${app.small_business_id}" data-opp-id="${oppId}">Approve</button>
+                                    <button class="btn btn-small js-set-app-status-btn" style="background:#ef4444;color:white;" data-app-id="${app.application_id}" data-new-status="declined" data-sb-id="${app.small_business_id}" data-opp-id="${oppId}">Decline</button>
                                 ` : ''}
-                                <button class="btn btn-small btn-outline" onclick="messageApplicant('${app.small_business_id}','${oppId}')">Message</button>
+                                <button class="btn btn-small btn-outline js-message-applicant-btn" data-sb-id="${app.small_business_id}" data-opp-id="${oppId}">Message</button>
                                 <a href="small-business-profile.html?id=${app.small_business_id}" class="btn btn-small btn-outline" target="_blank">Profile</a>
                             </div>
                         </div>`;
@@ -386,6 +386,49 @@
         window.messageApplicant = function (sbId, oppId) {
             window.location.href = `messages.html?recipient=${sbId}&ref_type=opportunity&ref_id=${oppId}`;
         };
+
+        // ── Event delegation on #opportunitiesList ──────────────────────────
+        // Wired once; handles all dynamic buttons and selects rendered via innerHTML.
+        document.addEventListener('DOMContentLoaded', function () {
+            const listEl = document.getElementById('opportunitiesList');
+
+            listEl.addEventListener('click', function (e) {
+                const viewBtn = e.target.closest('.js-view-opp-btn');
+                if (viewBtn) { viewOpportunity(viewBtn.dataset.oppId); return; }
+
+                const approveBtn = e.target.closest('.js-approve-opp-btn');
+                if (approveBtn) { approveOpportunity(approveBtn.dataset.oppId); return; }
+
+                const editBtn = e.target.closest('.js-edit-opp-btn');
+                if (editBtn) { editOpportunity(editBtn.dataset.oppId); return; }
+
+                const deleteBtn = e.target.closest('.js-delete-opp-btn');
+                if (deleteBtn) { deleteOpportunity(deleteBtn.dataset.oppId); return; }
+
+                const toggleBtn = e.target.closest('.js-toggle-apps-btn');
+                if (toggleBtn) { toggleApplications(toggleBtn.dataset.oppId, toggleBtn); return; }
+
+                const appStatusBtn = e.target.closest('.js-set-app-status-btn');
+                if (appStatusBtn) {
+                    setAppStatus(
+                        appStatusBtn.dataset.appId,
+                        appStatusBtn.dataset.newStatus,
+                        appStatusBtn.dataset.sbId,
+                        appStatusBtn.dataset.oppId,
+                        appStatusBtn
+                    );
+                    return;
+                }
+
+                const msgBtn = e.target.closest('.js-message-applicant-btn');
+                if (msgBtn) { messageApplicant(msgBtn.dataset.sbId, msgBtn.dataset.oppId); return; }
+            });
+
+            listEl.addEventListener('change', function (e) {
+                const sel = e.target.closest('.js-status-select');
+                if (sel) updateOpportunityStatus(sel.dataset.oppId, sel.value);
+            });
+        });
     </script>
   <script src="js/accessibility-widget.js?v=1774549569000"></script>
   <script src="js/cms-renderer.js?v=1774549569000"></script>

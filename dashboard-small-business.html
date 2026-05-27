@@ -218,7 +218,7 @@
             <div id="notificationBanner" style="display:none;margin-bottom:var(--space-lg);border-radius:var(--border-radius-lg);padding:var(--space-md) var(--space-lg);background:linear-gradient(135deg,#e8f4fd,#f0f9ff);border-left:4px solid var(--color-primary);display:flex;align-items:center;gap:var(--space-md);">
                 <span style="font-size:1.5rem;">👋</span>
                 <div id="notificationText" style="flex:1;font-weight:500;color:var(--color-text-primary);"></div>
-                <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.2rem;padding:0 0.25rem;" aria-label="Dismiss">&times;</button>
+                <button class="js-dismiss-banner" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.2rem;padding:0 0.25rem;" aria-label="Dismiss">&times;</button>
             </div>
 
             <!-- Quick Stats -->
@@ -259,12 +259,12 @@
                     </div>
                     <div class="action-grid"
                         style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-lg); margin-top: var(--space-lg);">
-                        <div class="action-card" onclick="location.href='search-opportunities.html'">
+                        <a href="search-opportunities.html" class="action-card" style="text-decoration:none;color:inherit;">
                             <div class="action-icon">🏢</div>
                             <div class="action-title">Search Opportunities</div>
                             <div class="action-description">Find and filter contracting opportunities that match your
                                 profile</div>
-                        </div>
+                        </a>
 
                         <a href="saved-opportunities.html" class="enhanced-action-card">
                             <div class="action-icon">⭐</div>
@@ -312,6 +312,9 @@
     <script>
         // Initialize Small Business dashboard
         document.addEventListener('DOMContentLoaded', async function () {
+            document.querySelectorAll('.js-dismiss-banner').forEach(btn => {
+                btn.addEventListener('click', () => { btn.parentElement.style.display = 'none'; });
+            });
             setTimeout(() => {
                 Navigation.init('small_business');
                 initDashboardData();

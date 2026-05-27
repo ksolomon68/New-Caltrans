@@ -165,11 +165,11 @@
                     </div>
 
                     <div class="action-bar" style="flex-wrap: wrap;">
-                        <button id="saveBtn" class="btn btn-outline" onclick="toggleSave()" style="display:none;">Save Opportunity</button>
-                        <button id="applyBtn" class="btn btn-primary" onclick="applyForOpportunity()" style="display:none;">Apply for This Opportunity</button>
-                        <button id="viewPrimeContractorBtn" class="btn btn-outline" onclick="viewPrimeContractorProfile()" style="display:none;">View Prime Contractor Profile</button>
-                        <button id="contactPrimeContractorBtn" class="btn btn-secondary" onclick="contactPrimeContractor()" style="display:none;">Contact Prime Contractor</button>
-                        <button id="inviteBtn" class="btn btn-secondary" style="display:none;" onclick="showInviteModal()">Invite Small Business to Apply</button>
+                        <button id="saveBtn" class="btn btn-outline" style="display:none;">Save Opportunity</button>
+                        <button id="applyBtn" class="btn btn-primary" style="display:none;">Apply for This Opportunity</button>
+                        <button id="viewPrimeContractorBtn" class="btn btn-outline" style="display:none;">View Prime Contractor Profile</button>
+                        <button id="contactPrimeContractorBtn" class="btn btn-secondary" style="display:none;">Contact Prime Contractor</button>
+                        <button id="inviteBtn" class="btn btn-secondary" style="display:none;">Invite Small Business to Apply</button>
                     </div>
 
                     <div id="recommendedSbSection" style="display: none; margin-top: var(--space-2xl); border-top: 1px solid var(--color-border-light); padding-top: var(--space-xl);">
@@ -191,7 +191,7 @@
                     <div class="modal-content" style="background: var(--card-bg); width: 90%; max-width: 500px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl); overflow: hidden; position: relative;">
                         
                         <div style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); padding: var(--space-xl); color: white; position: relative;">
-                            <button type="button" onclick="ModalTrap.close('inviteModal')" aria-label="Close dialog" style="position: absolute; top: var(--space-md); right: var(--space-md); border: none; background: rgba(255,255,255,0.2); color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">&times;</button>
+                            <button type="button" id="btnCloseInviteOppModal" aria-label="Close dialog" style="position: absolute; top: var(--space-md); right: var(--space-md); border: none; background: rgba(255,255,255,0.2); color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">&times;</button>
                             <h3 id="inviteModalHeading" style="margin: 0; font-size: 1.5rem; font-weight: 700;">Invite Small Business</h3>
                             <p style="margin: var(--space-xs) 0 0 0; opacity: 0.9; font-size: 0.95rem;">Select a small business to send an invitation to apply.</p>
                         </div>
@@ -205,8 +205,8 @@
                             </div>
                             
                             <div style="display: flex; gap: var(--space-md); justify-content: flex-end; border-top: 1px solid var(--color-border-light); padding-top: var(--space-lg);">
-                                <button type="button" class="btn btn-outline" onclick="ModalTrap.close('inviteModal')" style="padding: 0.75rem 1.5rem;">Cancel</button>
-                                <button type="button" class="btn btn-primary" onclick="sendInvite()" style="padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,93,170,0.3);">Send Invitation</button>
+                                <button type="button" id="btnCancelInviteOpp" class="btn btn-outline" style="padding: 0.75rem 1.5rem;">Cancel</button>
+                                <button type="button" id="btnSendInviteOpp" class="btn btn-primary" style="padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,93,170,0.3);">Send Invitation</button>
                             </div>
                         </div>
                     </div>
@@ -246,6 +246,24 @@
             }
 
             await loadOpportunityDetails(oppId);
+
+            // Static action-bar buttons
+            document.getElementById('saveBtn').addEventListener('click', toggleSave);
+            document.getElementById('applyBtn').addEventListener('click', applyForOpportunity);
+            document.getElementById('viewPrimeContractorBtn').addEventListener('click', viewPrimeContractorProfile);
+            document.getElementById('contactPrimeContractorBtn').addEventListener('click', contactPrimeContractor);
+            document.getElementById('inviteBtn').addEventListener('click', showInviteModal);
+
+            // Modal buttons
+            document.getElementById('btnCloseInviteOppModal').addEventListener('click', () => ModalTrap.close('inviteModal'));
+            document.getElementById('btnCancelInviteOpp').addEventListener('click', () => ModalTrap.close('inviteModal'));
+            document.getElementById('btnSendInviteOpp').addEventListener('click', sendInvite);
+
+            // Delegated listener for dynamically-rendered "Invite to Apply" buttons
+            document.getElementById('recommendedSbList').addEventListener('click', (e) => {
+                const btn = e.target.closest('.js-invite-single-btn');
+                if (btn) inviteSingleSb(btn.dataset.sbId);
+            });
         });
 
         async function loadOpportunityDetails(id) {
@@ -312,7 +330,7 @@
                                 <div style="margin-bottom: 8px;">${matchedTags}</div>
                                 <p class="text-muted" style="margin: 0; font-size: 0.9rem;">${sb.city || 'Location N/A'}</p>
                             </div>
-                            <button class="btn btn-sm btn-outline" style="margin-top: 12px; align-self: flex-start;" onclick="inviteSingleSb('${sb.id}')">Invite to Apply</button>
+                            <button class="btn btn-sm btn-outline js-invite-single-btn" data-sb-id="${sb.id}" style="margin-top: 12px; align-self: flex-start;">Invite to Apply</button>
                         </div>
                     `;
                 }).join('');

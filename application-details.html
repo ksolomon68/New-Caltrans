@@ -57,6 +57,13 @@
 
             Navigation.init(user.type);
             loadApplicationDetails(appId);
+
+            document.getElementById('detailsContainer').addEventListener('click', function(e) {
+                if (e.target.closest('[data-action="go-back"]')) { history.back(); return; }
+                const viewBtn = e.target.closest('[data-action="view-opportunity"]');
+                if (viewBtn) { window.location.href = 'opportunity-details.html?id=' + viewBtn.dataset.oppId; return; }
+                if (e.target.closest('[data-action="back-to-dashboard"]')) { window.location.href = 'saved-opportunities.html'; }
+            });
         });
 
         async function loadApplicationDetails(id) {
@@ -68,7 +75,7 @@
                     <div class="standard-card" style="text-align: center; border-top: 4px solid var(--color-error);">
                         <h3>Error Loading Details</h3>
                         <p>${error.message}</p>
-                        <button class="btn btn-primary" onclick="history.back()">Go Back</button>
+                        <button class="btn btn-primary" data-action="go-back">Go Back</button>
                     </div>
                 `;
             }
@@ -88,7 +95,7 @@
                             <p style="color: var(--text-muted);">Submitted on ${new Date(app.applied_date || Date.now()).toLocaleDateString()}</p>
                         </div>
                         <div style="text-align: right;">
-                            <button class="btn btn-outline" onclick="window.location.href='opportunity-details.html?id=${app.opportunity_id}'">View Original Posting</button>
+                            <button class="btn btn-outline" data-action="view-opportunity" data-opp-id="${app.opportunity_id}">View Original Posting</button>
                         </div>
                     </div>
 
@@ -115,7 +122,7 @@
                     </div>
 
                     <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-md);">
-                         <button class="btn btn-primary" onclick="window.location.href='saved-opportunities.html'">Back to Dashboard</button>
+                         <button class="btn btn-primary" data-action="back-to-dashboard">Back to Dashboard</button>
                     </div>
                 </div>
             `;

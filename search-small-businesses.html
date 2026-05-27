@@ -305,7 +305,7 @@
             <!-- Invite Modal -->
             <div id="inviteModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
                 <div style="background:white;border-radius:var(--border-radius-lg);padding:var(--space-xl);max-width:500px;width:90%;max-height:80vh;overflow-y:auto;position:relative;">
-                    <button onclick="closeInviteModal()" style="position:absolute;top:var(--space-md);right:var(--space-md);border:none;background:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+                    <button id="closeInviteModalTopBtn" style="position:absolute;top:var(--space-md);right:var(--space-md);border:none;background:none;font-size:1.5rem;cursor:pointer;">&times;</button>
                     <h2 style="color:var(--color-primary);margin-bottom:var(--space-md);">Invite to Apply</h2>
                     <p style="color:var(--text-muted);margin-bottom:var(--space-lg);">Inviting: <strong id="inviteBusinessName"></strong></p>
                     <div class="form-group" style="margin-bottom:var(--space-lg);">
@@ -319,8 +319,8 @@
                         <textarea id="inviteNote" rows="3" style="width:100%;padding:var(--space-sm);border:1px solid var(--color-border-dark);border-radius:var(--border-radius-sm);" placeholder="Hi! We'd love for you to apply to our opportunity — your qualifications are a great fit."></textarea>
                     </div>
                     <div style="display:flex;gap:var(--space-md);justify-content:flex-end;">
-                        <button class="btn btn-outline" onclick="closeInviteModal()">Cancel</button>
-                        <button class="btn btn-primary" onclick="sendInvite()" id="sendInviteBtn">Send Invitation</button>
+                        <button class="btn btn-outline" id="cancelInviteModalBtn">Cancel</button>
+                        <button class="btn btn-primary" id="sendInviteBtn">Send Invitation</button>
                     </div>
                 </div>
             </div>
@@ -349,7 +349,7 @@
                             </div>
                         </div>
                         <div class="search-actions">
-                            <button class="btn btn-primary btn-large" onclick="searchSmallBusinesses()"
+                            <button class="btn btn-primary btn-large" id="searchSmallBusinessesBtn"
                                 style="display: flex; align-items: center; gap: var(--space-sm);">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2.5">
@@ -360,7 +360,7 @@
                                 </svg>
                                 Search Database
                             </button>
-                            <button class="btn btn-outline btn-large" onclick="clearSearch()"
+                            <button class="btn btn-outline btn-large" id="clearSearchBtn"
                                 style="display: flex; align-items: center; gap: var(--space-sm);">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2.5">
@@ -570,6 +570,38 @@
                     if (e.key === 'Enter') searchSmallBusinesses();
                 });
             }
+
+            // Wire static search/clear buttons
+            const searchBtn = document.getElementById('searchSmallBusinessesBtn');
+            if (searchBtn) searchBtn.addEventListener('click', searchSmallBusinesses);
+
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) clearBtn.addEventListener('click', clearSearch);
+
+            // Wire invite modal static buttons
+            const closeTopBtn = document.getElementById('closeInviteModalTopBtn');
+            if (closeTopBtn) closeTopBtn.addEventListener('click', closeInviteModal);
+
+            const cancelBtn = document.getElementById('cancelInviteModalBtn');
+            if (cancelBtn) cancelBtn.addEventListener('click', closeInviteModal);
+
+            const sendBtn = document.getElementById('sendInviteBtn');
+            if (sendBtn) sendBtn.addEventListener('click', sendInvite);
+
+            // Event delegation on #smallBusinessGrid for dynamic cards and retry button
+            const gridEl = document.getElementById('smallBusinessGrid');
+            if (gridEl) {
+                gridEl.addEventListener('click', function (e) {
+                    const retryBtn = e.target.closest('.js-retry-load-btn');
+                    if (retryBtn) { loadSmallBusinesses(); return; }
+
+                    const viewBtn = e.target.closest('.js-view-sb-profile-btn');
+                    if (viewBtn) { e.stopPropagation(); viewSmallBusinessProfile(viewBtn.dataset.sbId); return; }
+
+                    const inviteBtn = e.target.closest('.js-open-invite-modal-btn');
+                    if (inviteBtn) { e.stopPropagation(); openInviteModal(inviteBtn.dataset.sbId, inviteBtn.dataset.sbName); return; }
+                });
+            }
         });
 
         // Load small businesses from MySQL via API
@@ -588,7 +620,7 @@
                 gridEl.innerHTML = `
                     <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--color-error);">
                         <p>Error loading small businesses. Please try again.</p>
-                        <button class="btn btn-primary" onclick="loadSmallBusinesses()" style="margin-top:1rem;">Retry</button>
+                        <button class="btn btn-primary js-retry-load-btn" style="margin-top:1rem;">Retry</button>
                     </div>`;
                 resultsEl.innerHTML = '<strong>Error</strong> loading results';
             }
@@ -655,10 +687,10 @@
                             </div>
                         </div>
                         <div class="small-business-actions" style="margin-top:var(--space-md);">
-                            <button class="profile-btn" onclick="viewSmallBusinessProfile('${sb.id}', event)">
+                            <button class="profile-btn js-view-sb-profile-btn" data-sb-id="${sb.id}">
                                 View Full Profile &rarr;
                             </button>
-                            ${window._inviteMode ? `<button class="profile-btn" style="background:var(--color-secondary);color:#000;" onclick="openInviteModal('${sb.id}', '${name.replace(/'/g, "\\'")}', event)">✉️ Invite to Apply</button>` : ''}
+                            ${window._inviteMode ? `<button class="profile-btn js-open-invite-modal-btn" style="background:var(--color-secondary);color:#000;" data-sb-id="${sb.id}" data-sb-name="${name.replace(/"/g, '&quot;')}">✉️ Invite to Apply</button>` : ''}
                         </div>
                     </div>
                 `;

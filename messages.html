@@ -196,7 +196,7 @@
                     btn.id = 'newMessageBtn';
                     btn.className = 'btn btn-primary btn-small';
                     btn.textContent = 'New Message';
-                    btn.onclick = () => composeMessage();
+                    btn.addEventListener('click', () => composeMessage());
                     btn.style.marginLeft = 'auto'; // Push to right if in flex container
                     const title = document.querySelector('.page-title');
                     if (title) {
@@ -209,6 +209,24 @@
             }
 
             await loadInbox();
+
+            // Delegated listeners for dynamically-rendered inbox items and message view buttons
+            document.getElementById('inboxList').addEventListener('click', e => {
+                const item = e.target.closest('.message-item[data-msg-id]');
+                if (item) viewMessage(item.dataset.msgId);
+            });
+
+            document.getElementById('messageView').addEventListener('click', e => {
+                if (e.target.closest('.js-cancel-compose')) {
+                    loadInbox();
+                    document.getElementById('messageView').innerHTML = '<div class=\'empty-state\'><h3>Select a message</h3></div>';
+                    return;
+                }
+                const sendBtn = e.target.closest('.js-send-message');
+                if (sendBtn) { propagateMessage(sendBtn.dataset.oppId); return; }
+                const replyBtn = e.target.closest('.js-send-reply');
+                if (replyBtn) { sendReply(replyBtn.dataset.senderId, replyBtn.dataset.oppId, replyBtn.dataset.subject); return; }
+            });
 
             // Check URL Params for direct messaging
             const params = new URLSearchParams(window.location.search);
@@ -251,7 +269,7 @@
             }
 
             listEl.innerHTML = allMessages.map(msg => `
-                <div class="message-item ${msg.is_read ? '' : 'unread'}" onclick="viewMessage('${msg.id}')">
+                <div class="message-item ${msg.is_read ? '' : 'unread'}" data-msg-id="${msg.id}">
                     <div class="message-item-header">
                         <span class="message-sender">${msg.sender_business_name || 'System User'}</span>
                         <span class="badge-type badge-${msg.message_type || 'reply'}">${msg.message_type || 'message'}</span>
@@ -309,8 +327,8 @@
                 </div>
 
                 <div style="text-align: right; margin-top: auto;">
-                    <button class="btn btn-outline" onclick="loadInbox(); document.getElementById('messageView').innerHTML = '<div class=\\'empty-state\\'><h3>Select a message</h3></div>';">Cancel</button>
-                    <button class="btn btn-primary" onclick="propagateMessage('${oppId}')">Send Message</button>
+                    <button class="btn btn-outline js-cancel-compose">Cancel</button>
+                    <button class="btn btn-primary js-send-message" data-opp-id="${oppId}">Send Message</button>
                 </div>
             `;
         }
@@ -397,7 +415,7 @@
                     <h4 style="margin-bottom: var(--space-md);">Reply</h4>
                     <textarea id="replyBody" class="form-control" style="width: 100%; height: 120px; margin-bottom: var(--space-md);" placeholder="Type your reply here..."></textarea>
                     <div style="text-align: right;">
-                        <button class="btn btn-primary" onclick="sendReply('${msg.sender_id}', '${msg.opportunity_id}', '${msg.subject}')">Send Reply</button>
+                        <button class="btn btn-primary js-send-reply" data-sender-id="${msg.sender_id}" data-opp-id="${msg.opportunity_id || ''}" data-subject="${(msg.subject || '').replace(/"/g, '&quot;')}">Send Reply</button>
                     </div>
                 </div>
             `;

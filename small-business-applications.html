@@ -67,7 +67,7 @@
             style="background: var(--card-bg); max-width: 600px; width: 90%; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl); overflow: hidden; position: relative;">
             
             <div style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); padding: var(--space-xl); color: white; position: relative;">
-                <button type="button" onclick="closeApplicationModal()"
+                <button type="button" id="closeApplicationModalBtn"
                     aria-label="Close application dialog"
                     style="position: absolute; top: var(--space-md); right: var(--space-md); border: none; background: rgba(255,255,255,0.2); color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">&times;</button>
                 <h2 id="modalTitle" style="margin: 0; font-size: 1.5rem; font-weight: 700;">Submit Application</h2>
@@ -80,7 +80,7 @@
                     <p style="margin-top: var(--space-md); color: var(--text-muted); font-weight: 500;">Loading details...</p>
                 </div>
 
-                <form id="applicationForm" onsubmit="handleApplicationSubmit(event)" novalidate aria-label="Submit application form">
+                <form id="applicationForm" novalidate aria-label="Submit application form">
                     <input type="hidden" id="opportunityId" name="opportunityId">
 
                     <div class="form-group" style="margin-bottom: var(--space-lg);">
@@ -108,7 +108,7 @@
                     </div>
 
                     <div class="form-actions" style="display: flex; gap: var(--space-md); justify-content: flex-end; border-top: 1px solid var(--color-border-light); padding-top: var(--space-lg);">
-                        <button type="button" class="btn btn-outline" onclick="closeApplicationModal()" style="padding: 0.75rem 1.5rem;">Cancel</button>
+                        <button type="button" id="cancelApplicationModalBtn" class="btn btn-outline" style="padding: 0.75rem 1.5rem;">Cancel</button>
                         <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,93,170,0.3);">Submit Application</button>
                     </div>
                 </form>
@@ -134,6 +134,15 @@
         };
 
         document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('closeApplicationModalBtn').addEventListener('click', closeApplicationModal);
+            document.getElementById('cancelApplicationModalBtn').addEventListener('click', closeApplicationModal);
+            document.getElementById('applicationForm').addEventListener('submit', handleApplicationSubmit);
+            document.getElementById('applicationsList').addEventListener('click', function (e) {
+                const viewBtn = e.target.closest('[data-action="view-opportunity"]');
+                if (viewBtn) { viewOpportunity(viewBtn.dataset.oppId); return; }
+                const withdrawBtn = e.target.closest('[data-action="withdraw-application"]');
+                if (withdrawBtn) { withdrawApplication(withdrawBtn.dataset.appId, withdrawBtn); }
+            });
             setTimeout(() => {
                 Navigation.init('small_business');
                 loadApplications();
@@ -279,8 +288,8 @@
                         </div>
                     </div>
                     <div style="display:flex;gap:var(--space-sm);justify-content:flex-end;flex-wrap:wrap;">
-                        <button class="btn btn-small btn-outline" onclick="viewOpportunity('${app.opportunity_id}')">View Opportunity</button>
-                        ${isPending ? `<button class="btn btn-small btn-outline" style="color:var(--color-error);border-color:var(--color-error);" onclick="withdrawApplication('${app.id}', this)">Withdraw</button>` : ''}
+                        <button class="btn btn-small btn-outline" data-action="view-opportunity" data-opp-id="${app.opportunity_id}">View Opportunity</button>
+                        ${isPending ? `<button class="btn btn-small btn-outline" style="color:var(--color-error);border-color:var(--color-error);" data-action="withdraw-application" data-app-id="${app.id}">Withdraw</button>` : ''}
                     </div>
                 </div>`;
             }).join('');

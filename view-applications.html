@@ -115,7 +115,7 @@
                             style="width: 100%; height: 150px; margin-bottom: var(--space-md);"></textarea>
                     </div>
                     <div style="display: flex; gap: var(--space-md); justify-content: flex-end;">
-                        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-outline" id="cancelModalBtn">Cancel</button>
                         <button class="btn btn-primary" id="sendBtn">Send Message</button>
                     </div>
                 </div>
@@ -129,6 +129,7 @@
     <script src="js/components/navigation.js?v=1774549569000"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
             const params = new URLSearchParams(window.location.search);
             const opportunityId = params.get('id');
             const user = Auth.getUser();
@@ -181,11 +182,18 @@
                         </div>
                     </div>
                     <div class="small-business-actions">
-                        <button class="btn btn-outline btn-small" onclick="location.href='small-business-profile.html?id=${app.small_business_id}'">View Profile</button>
-                        <button class="btn btn-primary btn-small" onclick="openMessageModal('${app.small_business_id}', '${app.business_name || app.business_name}')">Message</button>
+                        <button class="btn btn-outline btn-small" data-action="view-profile" data-sb-id="${app.small_business_id}">View Profile</button>
+                        <button class="btn btn-primary btn-small" data-action="open-message" data-sb-id="${app.small_business_id}" data-biz-name="${(app.business_name || '').replace(/"/g, '&quot;')}">Message</button>
                     </div>
                 </div>
             `).join('');
+
+            listEl.addEventListener('click', function (e) {
+                const viewBtn = e.target.closest('[data-action="view-profile"]');
+                if (viewBtn) { location.href = 'small-business-profile.html?id=' + viewBtn.dataset.sbId; return; }
+                const msgBtn = e.target.closest('[data-action="open-message"]');
+                if (msgBtn) { openMessageModal(msgBtn.dataset.sbId, msgBtn.dataset.bizName); }
+            });
         }
 
         let currentRecipientId = null;
@@ -203,7 +211,7 @@
             document.getElementById('messageModal').style.display = 'none';
         }
 
-        document.getElementById('sendBtn').onclick = async () => {
+        document.getElementById('sendBtn').addEventListener('click', async () => {
             const sender = Auth.getUser();
             const subject = document.getElementById('msgSubject').value;
             const body = document.getElementById('msgBody').value;

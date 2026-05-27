@@ -215,7 +215,7 @@
                         <h3 class="card-title">🌐 Platform Overview</h3>
                         <div class="card-subtitle">Live counts from the database</div>
                     </div>
-                    <button class="btn btn-outline btn-small" onclick="loadAnalytics()">🔄 Refresh</button>
+                    <button class="btn btn-outline btn-small" id="btnRefreshAnalytics">🔄 Refresh</button>
                 </div>
                 <div class="metrics-grid" id="topMetrics">
                     <div class="loading-state">Loading…</div>
@@ -331,6 +331,7 @@
                 window.location.href = 'index.html';
                 return;
             }
+            document.getElementById('btnRefreshAnalytics').addEventListener('click', loadAnalytics);
             setTimeout(() => {
                 Navigation.init('admin');
                 loadAnalytics();

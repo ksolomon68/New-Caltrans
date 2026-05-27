@@ -98,8 +98,8 @@
                             <div class="rec-meta">ID: ${opp.id} &bull; Category: ${opp.category || 'Construction'} &bull; District: ${opp.district || '4'}</div>
                         </div>
                         <div class="rec-value" style="display: flex; gap: var(--space-sm); align-items: center;">
-                            <button class="btn btn-small btn-primary" onclick="window.location.href='opportunity-details.html?id=${opp.id}'">View Details</button>
-                            <button class="btn btn-small btn-outline" onclick="unsaveOpportunity('${opp.id}')" title="Remove from saved">
+                            <button class="btn btn-small btn-primary" data-action="view-details" data-opp-id="${opp.id}">View Details</button>
+                            <button class="btn btn-small btn-outline" data-action="unsave" data-opp-id="${opp.id}" title="Remove from saved">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="m18 6-12 12"/>
                                     <path d="m6 6 12 12"/>
@@ -111,6 +111,12 @@
             });
 
             listEl.innerHTML = html;
+            listEl.addEventListener('click', function (e) {
+                const viewBtn = e.target.closest('[data-action="view-details"]');
+                if (viewBtn) { window.location.href = 'opportunity-details.html?id=' + viewBtn.dataset.oppId; return; }
+                const unsaveBtn = e.target.closest('[data-action="unsave"]');
+                if (unsaveBtn) { unsaveOpportunity(unsaveBtn.dataset.oppId); }
+            });
         }
 
 

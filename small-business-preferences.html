@@ -162,7 +162,7 @@
                     </div>
 
                     <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl); justify-content: flex-end;">
-                        <button type="button" class="btn btn-outline" onclick="resetForm()">Reset</button>
+                        <button type="button" class="btn btn-outline" id="btnResetPrefs">Reset</button>
                         <button type="submit" class="btn btn-primary">Save Preferences</button>
                     </div>
                 </form>
@@ -182,6 +182,7 @@
                 Navigation.init('small_business');
                 loadPreferences();
             }, 50);
+            document.getElementById('btnResetPrefs').addEventListener('click', resetForm);
         });
 
         function loadPreferences() {
