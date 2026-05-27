@@ -84,10 +84,13 @@ const startServer = async () => {
             credentials: true
         }));
 
+        // Trust the first proxy hop (cPanel/LiteSpeed) so req.ip reflects the real client IP
+        app.set('trust proxy', 1);
+
         // Rate limiting on auth endpoints
         const authLimiter = rateLimit({
             windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 20,                   // 20 attempts per window
+            max: 50,                   // 50 attempts per window per real IP
             standardHeaders: true,
             legacyHeaders: false,
             message: { error: 'Too many requests, please try again later.' }
