@@ -35,7 +35,7 @@ const startServer = async () => {
                     fontSrc:        ["'self'", 'https://fonts.gstatic.com'],
                     imgSrc:         ["'self'", 'data:', 'blob:'],
                     connectSrc:     ["'self'", 'https://primereachgov.com'],
-                    frameSrc:       ["'self'", 'https://dot.ca.gov', 'https://www.youtube.com'],
+                    frameSrc:       ["'self'", 'https://dot.ca.gov', 'https://www.youtube.com', 'https://calendar.google.com'],
                     objectSrc:      ["'none'"],
                     baseUri:        ["'self'"],
                     formAction:     ["'self'"],
