@@ -47,8 +47,9 @@ const startServer = async () => {
                 includeSubDomains: true,
                 preload: true
             } : false,
+            crossOriginEmbedderPolicy: false, // allow cross-origin iframes (Google Calendar)
             referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-            permissionsPolicy: false       // let helmet default handle this
+            permissionsPolicy: false
         }));
 
         // Service Worker must be served with no-cache and correct scope header
