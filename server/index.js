@@ -30,6 +30,7 @@ const startServer = async () => {
                 directives: {
                     defaultSrc:     ["'self'"],
                     scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://primereachgov.com'],
+                    scriptSrcAttr:  ["'unsafe-inline'"],
                     styleSrc:       ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
                     fontSrc:        ["'self'", 'https://fonts.gstatic.com'],
                     imgSrc:         ["'self'", 'data:', 'blob:'],
