@@ -936,15 +936,13 @@ body {
     background-color: white;
 }
 
-/* We use a large height and negative margin to "window" only the calendar part */
+/* We embed Google Calendar directly — no offset needed */
 .iframe-cropper-container iframe {
     position: absolute;
-    top: -300px;
-    /* Hide Caltrans Header and Nav */
+    top: 0;
     left: 0;
     width: 100%;
-    height: 1500px;
-    /* Total height to ensure calendar is visible but footer is capped by container */
+    height: 700px;
     border: none;
 }
 
@@ -954,8 +952,7 @@ body {
     }
 
     .iframe-cropper-container iframe {
-        top: -350px;
-        /* Mobile header might be taller */
+        top: 0;
     }
 }
 
