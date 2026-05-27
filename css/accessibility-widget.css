@@ -331,12 +331,14 @@ html.aw-mask-on #a11y-mask { display: block; }
 
 /* ── Live region ─────────────────────────────────────────────── */
 #a11y-live {
-  position: absolute;
+  position: fixed;
+  top: 0; left: -1px;
   width: 1px; height: 1px;
   overflow: hidden;
   clip: rect(0,0,0,0);
   white-space: nowrap;
   border: 0;
+  pointer-events: none;
 }
 
 /* ================================================================
