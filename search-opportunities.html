@@ -595,9 +595,10 @@
 
                     const isSaved = window.savedOpportunityIds.has(id);
                     try {
+                        const _saveToken = localStorage.getItem('caltrans_token');
                         const res = await fetch(`${API_BASE}/opportunities/${isSaved ? 'unsave' : 'save'}`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 'Content-Type': 'application/json', ...(_saveToken ? { 'Authorization': `Bearer ${_saveToken}` } : {}) },
                             body: JSON.stringify({ smallBusinessId: user.id, opportunityId: id })
                         });
 
