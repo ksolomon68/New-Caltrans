@@ -394,9 +394,13 @@ function syncNavHeader() {
         li.innerHTML = `
             <div style="display: flex; gap: var(--space-sm); align-items: center;">
                 <a href="${dashboardUrl}" class="btn btn-primary btn-small">Dashboard</a>
-                <a href="#" onclick="if(typeof window.logout === 'function') { window.logout(); } else if(window.Auth && typeof window.Auth.logout === 'function') { window.Auth.logout(); } else { localStorage.removeItem('caltrans_user'); localStorage.removeItem('caltrans_token'); localStorage.removeItem('userId'); localStorage.removeItem('userType'); sessionStorage.clear(); window.location.href='login.html'; } return false;" class="btn btn-outline btn-small">Log Out</a>
+                <a href="#" class="btn btn-outline btn-small js-logout-btn">Log Out</a>
             </div>
         `;
+        li.querySelector('.js-logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.logout();
+        });
     }
 }
 
