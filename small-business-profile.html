@@ -370,7 +370,7 @@
                             <div id="primeContractorActions" class="contact-card-actions" style="display: none;">
                                 <button type="button" class="btn btn-primary" id="btnMessage">Send Message</button>
                                 <button type="button" class="btn btn-outline" id="btnEmail">Direct Email</button>
-                                <button type="button" class="btn btn-secondary" id="btnInviteSB" style="display: none;" onclick="showInviteModal()">Invite to Opportunity</button>
+                                <button type="button" class="btn btn-secondary" id="btnInviteSB" style="display: none;">Invite to Opportunity</button>
                             </div>
                         </section>
 
@@ -427,8 +427,7 @@
                                     <input type="file" id="csFileInput" accept=".pdf" style="display: none;">
                                     <div id="csEmptyState">
                                         <div style="font-size: 3rem; margin-bottom: var(--space-sm);">📄</div>
-                                        <button type="button" class="btn btn-outline"
-                                            onclick="document.getElementById('csFileInput').click()">Choose PDF
+                                        <button type="button" class="btn btn-outline js-cs-trigger-input">Choose PDF
                                             Document</button>
                                         <p style="margin-top: 1rem; font-size: 0.9rem;" class="text-muted">Maximum file
                                             size: 5MB</p>
@@ -438,8 +437,7 @@
                                         </p>
                                         <div
                                             style="display: flex; gap: var(--space-md); justify-content: center; margin-top: var(--space-md);">
-                                            <button type="button" class="btn btn-outline btn-small"
-                                                onclick="document.getElementById('csFileInput').click()">Change
+                                            <button type="button" class="btn btn-outline btn-small js-cs-trigger-input">Change
                                                 File</button>
                                             <button type="button" class="btn btn-success btn-small"
                                                 id="btnUploadCS">Upload Now</button>
@@ -452,12 +450,11 @@
                                         <div id="csUploadedFileName" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: var(--space-md);"></div>
                                         <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
                                             <button type="button" class="btn btn-outline btn-small"
-                                                onclick="window.viewCurrentCS()">View PDF</button>
-                                            <button type="button" class="btn btn-outline btn-small"
-                                                onclick="document.getElementById('csFileInput').click()">Replace PDF</button>
+                                                id="btnViewCS">View PDF</button>
+                                            <button type="button" class="btn btn-outline btn-small js-cs-trigger-input">Replace PDF</button>
                                             <button type="button" class="btn btn-outline btn-small"
                                                 style="color: var(--color-error); border-color: var(--color-error);"
-                                                onclick="window.removeCS()">Remove</button>
+                                                id="btnRemoveCS">Remove</button>
                                         </div>
                                     </div>
                                     <div id="uploadStatus" style="margin-top: 1rem; font-size: 0.85rem;"></div>
@@ -506,7 +503,7 @@
                 <div class="modal-content" style="background: var(--card-bg); width: 90%; max-width: 500px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl); overflow: hidden; position: relative;">
                     
                     <div style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); padding: var(--space-xl); color: white; position: relative;">
-                        <button type="button" onclick="ModalTrap.close('inviteModal')" aria-label="Close invite dialog" style="position: absolute; top: var(--space-md); right: var(--space-md); border: none; background: rgba(255,255,255,0.2); color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">&times;</button>
+                        <button type="button" id="btnCloseInviteModal" aria-label="Close invite dialog" style="position: absolute; top: var(--space-md); right: var(--space-md); border: none; background: rgba(255,255,255,0.2); color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">&times;</button>
                         <h3 id="inviteModalTitle" style="margin: 0; font-size: 1.5rem; font-weight: 700;">Invite to Apply</h3>
                         <p style="margin: var(--space-xs) 0 0 0; opacity: 0.9; font-size: 0.95rem;">Select one of your opportunities to invite this Small Business to apply.</p>
                     </div>
@@ -520,8 +517,8 @@
                         </div>
                         
                         <div style="display: flex; gap: var(--space-md); justify-content: flex-end; border-top: 1px solid var(--color-border-light); padding-top: var(--space-lg);">
-                            <button type="button" class="btn btn-outline" onclick="ModalTrap.close('inviteModal')" style="padding: 0.75rem 1.5rem;">Cancel</button>
-                            <button type="button" class="btn btn-primary" onclick="sendInviteToSB()" style="padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,93,170,0.3);">Send Invitation</button>
+                            <button type="button" class="btn btn-outline" id="btnCancelInvite" style="padding: 0.75rem 1.5rem;">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="btnSendInvite" style="padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,93,170,0.3);">Send Invitation</button>
                         </div>
                     </div>
                 </div>
@@ -729,6 +726,11 @@
                 document.getElementById('btnInviteSB').style.display = 'inline-flex';
                 window.targetSmallBusinessId = data.id; // Store for the modal to use
             }
+
+            document.getElementById('btnInviteSB').addEventListener('click', showInviteModal);
+            document.getElementById('btnCloseInviteModal').addEventListener('click', () => ModalTrap.close('inviteModal'));
+            document.getElementById('btnCancelInvite').addEventListener('click', () => ModalTrap.close('inviteModal'));
+            document.getElementById('btnSendInvite').addEventListener('click', sendInviteToSB);
         }
 
         async function showInviteModal() {
@@ -1091,7 +1093,7 @@
 
             // CS Upload Logic
             const csInput = document.getElementById('csFileInput');
-            csInput.onchange = (e) => {
+            csInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     if (file.size > 5 * 1024 * 1024) {
@@ -1103,9 +1105,15 @@
                     document.getElementById('csSelectedName').textContent = file.name;
                     document.getElementById('csSelectedState').style.display = 'block';
                 }
-            };
+            });
 
-            document.getElementById('btnUploadCS').onclick = handleCSUpload;
+            document.querySelectorAll('.js-cs-trigger-input').forEach(btn => {
+                btn.addEventListener('click', () => csInput.click());
+            });
+
+            document.getElementById('btnUploadCS').addEventListener('click', handleCSUpload);
+            document.getElementById('btnViewCS').addEventListener('click', () => window.viewCurrentCS());
+            document.getElementById('btnRemoveCS').addEventListener('click', () => window.removeCS());
         }
 
         async function handleCSUpload() {
