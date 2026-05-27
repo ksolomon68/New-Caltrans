@@ -1127,8 +1127,10 @@
             try {
                 // Try real upload first, but fall back to mock if it fails (for demo/dev without backend)
                 const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+                const csToken = localStorage.getItem('caltrans_token');
                 const response = await fetch(`${API_BASE}/upload-cs`, {
                     method: 'POST',
+                    headers: csToken ? { 'Authorization': `Bearer ${csToken}` } : {},
                     body: formData
                 });
 

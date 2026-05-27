@@ -14,9 +14,9 @@ const CapabilityUpload = {
                     Upload your Capability Statement (PDF, DOCX, MAX 10MB) to help agencies find you.
                 </p>
                 <input type="file" id="csFileInput" accept=".pdf,.doc,.docx" style="display: none;">
-                <button class="btn btn-outline" onclick="document.getElementById('csFileInput').click()">Choose File</button>
+                <button class="btn btn-outline js-cs-choose-btn">Choose File</button>
                 <div id="csFileInfo" style="margin-top: 1rem; font-size: 0.9rem; font-weight: 600;"></div>
-                <button id="csUploadBtn" class="btn btn-primary" style="margin-top: 1rem; display: none;" onclick="CapabilityUpload.handleUpload()">Upload Now</button>
+                <button id="csUploadBtn" class="btn btn-primary" style="margin-top: 1rem; display: none;">Upload Now</button>
                 <div id="csUploadProgress" style="margin-top: 1rem; display: none;">
                     <div style="width: 100%; bg: var(--color-gray-100); height: 8px; border-radius: 4px; overflow: hidden;">
                         <div id="csProgressBar" style="width: 0%; height: 100%; bg: var(--color-primary); transition: width 0.3s;"></div>
@@ -25,6 +25,14 @@ const CapabilityUpload = {
                 <div id="csUploadStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
             </div>
         `;
+
+        container.querySelector('.js-cs-choose-btn').addEventListener('click', () => {
+            document.getElementById('csFileInput').click();
+        });
+
+        document.getElementById('csUploadBtn').addEventListener('click', () => {
+            CapabilityUpload.handleUpload();
+        });
 
         document.getElementById('csFileInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -76,8 +84,11 @@ const CapabilityUpload = {
         formData.append('userId', user.id);
 
         try {
-            const response = await fetch('/api/upload-cs', {
+            const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL : '/api';
+            const token = localStorage.getItem('caltrans_token');
+            const response = await fetch(`${API_BASE}/upload-cs`, {
                 method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {},
                 body: formData
             });
 
