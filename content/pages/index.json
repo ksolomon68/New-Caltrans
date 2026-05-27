@@ -86,10 +86,10 @@
       "type": "iframe-embed",
       "fields": {
         "heading": "Upcoming Events",
-        "iframeSrc": "https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar",
+        "iframeSrc": "https://calendar.google.com/calendar/u/0/embed?wkst=1&bgcolor=%23ffffff&ctz=America/Los_Angeles&src=Y3RldmVudHNjYWxlbmRhckBnbWFpbC5jb20&color=%23795548&mode=AGENDA&pli=1",
         "iframeTitle": "Caltrans Events Calendar",
         "externalLinkText": "View Full Calendar",
-        "externalLinkHref": "https://dot.ca.gov/programs/civil-rights/caltrans-events-calendar"
+        "externalLinkHref": "https://calendar.google.com/calendar/u/0/embed?wkst=1&bgcolor=%23ffffff&ctz=America/Los_Angeles&src=Y3RldmVudHNjYWxlbmRhckBnbWFpbC5jb20&color=%23795548&mode=AGENDA&pli=1"
       }
     },
     {
