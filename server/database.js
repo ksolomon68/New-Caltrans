@@ -39,7 +39,9 @@ function createPool() {
     // Log pool-level connection errors and reset the pool so getDb() rebuilds it
     p.pool.on('error', (err) => {
         console.error('CaltransBizConnect DB: Pool connection error —', err.message, '— will reconnect on next request.');
-        pool = null; // force rebuild on next getDb() call
+        if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+            pool = null; // force rebuild on next getDb() call
+        }
     });
     console.log(`CaltransBizConnect DB: MySQL Pool Created → ${cfg.user}@${cfg.host}/${cfg.database}`);
     return p;
@@ -54,10 +56,49 @@ function getDb() {
             throw err;
         }
     }
-    return pool;
+    
+    // Return a wrapper that automatically retries once on connection loss
+    return {
+        async execute(sql, values) {
+            try {
+                return await pool.execute(sql, values);
+            } catch (err) {
+                if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+                    console.warn(`CaltransBizConnect DB: Connection lost during execute, retrying... (${err.message})`);
+                    pool = createPool();
+                    return await pool.execute(sql, values);
+                }
+                throw err;
+            }
+        },
+        async query(sql, values) {
+            try {
+                return await pool.query(sql, values);
+            } catch (err) {
+                if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+                    console.warn(`CaltransBizConnect DB: Connection lost during query, retrying... (${err.message})`);
+                    pool = createPool();
+                    return await pool.query(sql, values);
+                }
+                throw err;
+            }
+        },
+        async getConnection() {
+            try {
+                return await pool.getConnection();
+            } catch (err) {
+                if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+                    console.warn(`CaltransBizConnect DB: Connection lost during getConnection, retrying... (${err.message})`);
+                    pool = createPool();
+                    return await pool.getConnection();
+                }
+                throw err;
+            }
+        }
+    };
 }
 
-// Ping the pool every 5 minutes to prevent idle timeout disconnections
+// Ping the pool every 1 minute to prevent idle timeout disconnections (Hostinger drops them quickly)
 setInterval(async () => {
     try {
         await getDb().execute('SELECT 1');
@@ -65,7 +106,7 @@ setInterval(async () => {
         console.warn('CaltransBizConnect DB: Keep-alive ping failed — pool will reconnect:', e.message);
         pool = null;
     }
-}, 5 * 60 * 1000);
+}, 60 * 1000);
 
 
 async function initDatabase() {
