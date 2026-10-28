@@ -30,7 +30,7 @@ node server/index.js
 # Open the CMS admin panel
 http://localhost:3001/admin-cms.html
 
-# Sign in with an admin account (email must contain "admin" or be ks@evobrand.net)
+# Sign in with an admin account (credentials configured via CMS_ADMIN_PASSWORD or content/cms-auth.json)
 ```
 
 The server must be running for the CMS to function. Content JSON files are read and written directly by the Express server from the `content/` directory.
@@ -343,7 +343,7 @@ All endpoints are under `/api/cms`.
 | POST   | `/media`              | Admin | Upload image (`multipart/form-data`: `image` + `altText`) |
 | DELETE | `/media/:filename`    | Admin | Delete image and its sidecar meta file   |
 
-**Admin authentication:** Send the header `x-admin-email: your-admin@example.com` with all write requests.
+**Admin authentication:** Sign in to get a JWT, then send `Authorization: Bearer <token>` with all write requests. The server verifies the token (`requireAdmin` in `server/routes/cms.js`) and requires `type` to be `admin` or `caltrans_admin`.
 
 ---
 

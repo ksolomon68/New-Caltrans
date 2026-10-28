@@ -10,21 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Load districts and categories
         loadFormData();
 
-        // Form submission
-        // Note: The submit listener is now handled specific to the page (e.g., post-opportunity.html)
-        // to check for edit mode logic. We keep the validation call logic here for reference 
-        // but avoid attaching a duplicate listener if the page already defines one.
-        const pageSpecificSubmit = opportunityForm.getAttribute('data-handled-submit');
-        if (!pageSpecificSubmit) {
-            opportunityForm.addEventListener('submit', function (e) {
-                // If the page doesn't have custom logic, we default to standard submit
-                // But post-opportunity.html DOES have custom logic now, so this block might be redundant
-                // for that specific page. We'll leave it but rely on e.preventDefault() in the other script.
-                // Actually, to prevent double submission issues, let's just Log it.
-                // The other script handles the actual fetch.
-                // This listener primarily ensures validation runs if not called elsewhere.
-            });
-        }
+        // Form submission is wired per-page (e.g. post-opportunity.html), which
+        // handles create/edit-mode logic and calls validateOpportunityForm() itself.
 
         // Save draft button
         const saveDraftButton = document.getElementById('saveDraft');

@@ -33,12 +33,12 @@ CaltransBizConnect serves as the central hub for the Small Business Supportive S
 ```
 Antig2/
 ├── index.html                  # Home page with dual pathway hero
-├── for-small businesses.html            # Small Business landing page
-├── for-prime contractors.html           # Prime Contractor landing page
+├── for-small-businesses.html            # Small Business landing page
+├── for-prime-contractors.html           # Prime Contractor landing page
 ├── opportunities.html          # Opportunity listing with filters
 ├── login.html                  # Login page
 ├── dashboard-small-business.html       # Small Business dashboard
-├── dashboard-prime-contractor-contractor-contractor.html       # Prime Contractor dashboard
+├── dashboard-prime-contractor.html       # Prime Contractor dashboard
 ├── capability-statement.html   # Capability statement upload
 ├── post-opportunity.html       # Opportunity posting form
 ├── contact.html                # Contact page

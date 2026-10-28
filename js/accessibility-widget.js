@@ -33,7 +33,6 @@
 
   /* ── Feature definitions ─────────────────────────────────── */
   const FEATURES = [
-    { id: 'screenReader',   label: 'Screen Reader',   ico: 'headphones', cls: 'aw-sr'       },
     { id: 'highContrast',   label: 'Contrast +',      ico: 'contrast',   cls: 'aw-contrast'  },
     { id: 'darkMode',       label: 'Dark Mode',       ico: 'moon',       cls: 'aw-dark'      },
     { id: 'desaturate',     label: 'Desaturate',      ico: 'palette',    cls: 'aw-desat'     },
@@ -55,7 +54,7 @@
     },
     {
       id: 'visual', label: 'Visually\nImpaired', ico: 'eye',
-      set: { highContrast: true, textSize: 130, screenReader: true }
+      set: { highContrast: true, textSize: 130 }
     },
     {
       id: 'colorblind', label: 'Color\nBlind', ico: 'droplet',
@@ -71,7 +70,6 @@
   const DEFAULTS = {
     activeProfile: null,
     textSize: 100,
-    screenReader: false,
     highContrast: false,
     darkMode: false,
     desaturate: false,
